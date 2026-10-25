@@ -87,8 +87,8 @@ textarea{resize:none;overflow:hidden}
 .back{color:var(--gold2);font-size:14px;text-align:center;margin-top:14px}.back a{color:var(--gold2)}
 
 /* النافذة */
-.ov{position:fixed;inset:0;background:rgba(8,22,15,.72);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50;overflow:auto}
-.modal{background:var(--card);color:var(--tx);border-radius:34px;max-width:430px;width:100%;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.5);overflow:hidden;padding-bottom:26px}
+.ov{position:fixed;inset:0;background:rgba(8,22,15,.72);backdrop-filter:blur(6px);display:flex;align-items:flex-start;justify-content:center;padding:16px;z-index:50;overflow:auto}
+.modal{background:var(--card);color:var(--tx);border-radius:34px;max-width:430px;width:100%;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.5);overflow:hidden;padding-bottom:26px;margin:auto}
 .modal h2{font-size:26px;margin-top:20px}.modal .note{margin-top:2px}
 .pick{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 22px 0}
 .pick button{padding:20px 8px;border:2px solid var(--gold);border-radius:99px;background:var(--field);color:var(--tx);font:inherit;font-size:21px;font-weight:700;cursor:pointer;transition:.15s}
@@ -104,6 +104,10 @@ textarea{resize:none;overflow:hidden}
 .pick.one{grid-template-columns:1fr;gap:10px}.pick.one button{padding:14px 10px;font-size:18px}
 .lnk{background:none;border:0;color:var(--g2);text-decoration:underline;cursor:pointer;font:inherit;font-size:14px;margin-top:14px}
 .ptl{text-align:center;margin:12px 6px 18px}.ptl small{display:block;color:var(--gold2);font-size:14px;letter-spacing:.5px}.ptl h2{margin:0;font-size:32px;line-height:1.5;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.3)}.ptl h2::after{content:"";display:block;width:56px;height:3px;margin:8px auto 0;border-radius:3px;background:linear-gradient(90deg,transparent,var(--gold2),transparent)}
+.pf{padding:0 22px;text-align:start}.pf .seg{margin:4px 0}.pf .btn{margin-top:16px}
+.wk .it{padding:12px 0;border-bottom:1px solid var(--bd)}.wk .it:last-child{border-bottom:0}.wk .it.td{background:var(--goldb);border-radius:20px;padding:12px 16px;border:0;margin-bottom:6px}
+.tg{display:inline-block;background:var(--g);color:#fff;border-radius:99px;padding:0 14px;font-size:13px}.wd{font-size:13px;color:var(--gold)}
+.wk .pt{display:block;font-size:24px;line-height:1.5;color:var(--g2);margin-top:4px}.wk small{color:var(--mu);font-size:13px}
 .trow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd)}.trow:last-child{border-bottom:0}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:2px 0 16px}
 .stat{background:var(--card);color:var(--tx);border-radius:26px;padding:14px 6px;text-align:center;font-size:14px;box-shadow:var(--sh);border-bottom:4px solid var(--gold)}.stat b{display:block;font-size:30px;line-height:1.3;color:var(--g2)}
@@ -179,18 +183,79 @@ function streak() { const s = new Set(doneDays()); let d = riyadh(), n = 0; if (
 function confetti() { for (let i = 0; i < 26; i++) { const e = document.createElement('span'); e.className = 'conf'; e.textContent = ['✦','✧','❖','✦'][i % 4];
   e.style.left = Math.random() * 100 + 'vw'; e.style.animationDelay = Math.random() * .6 + 's'; e.style.color = i % 2 ? '#d6c18a' : '#f5eee6'; document.body.appendChild(e); setTimeout(() => e.remove(), 3200); } }
 
-const fieldHTML = ([k, l, t]) => `<div class="f"><label for="f_${k}${t === 'p' ? '_from' : ''}">${l}</label>` + (t === 'c'
-  ? `<div class="cnt" data-k="${k}"><button type="button" class="cb m" aria-label="إنقاص">−</button><input type="text" id="f_${k}" inputmode="numeric" autocomplete="off"><button type="button" class="cb p" aria-label="زيادة">+</button></div>`
+const cntHTML = (id, k) => `<div class="cnt"${k ? ` data-k="${k}"` : ''}><button type="button" class="cb m" aria-label="إنقاص">−</button><input type="text" id="${id}" inputmode="numeric" autocomplete="off"><button type="button" class="cb p" aria-label="زيادة">+</button></div>`;
+const fieldHTML = ([k, l, t]) => `<div class="f"><label for="f_${k}${t === 'p' ? '_from' : ''}">${l}</label>` + (t === 'c' ? cntHTML('f_' + k, k)
   : t === 'p' ? `<div class="rng"><div class="pg"><em>من صفحة</em><input type="text" id="f_${k}_from" inputmode="numeric" autocomplete="off"></div><div class="pg"><em>إلى صفحة</em><input type="text" id="f_${k}_to" inputmode="numeric" autocomplete="off"></div></div>`
   : `<input type="text" id="f_${k}" autocomplete="off">`) + '</div>';
+function bindCnt(box, init, onChange, max = 99999) {
+  const inp = box.querySelector('input');
+  const set = n => { n = Math.max(0, Math.min(max, n)); inp.value = n; onChange(n); };
+  inp.value = init; inp.oninput = () => set(cnum(inp.value));
+  box.querySelectorAll('.cb').forEach(b => { const d = b.classList.contains('p') ? 1 : -1; let t0, iv; const stop = () => { clearTimeout(t0); clearInterval(iv); };
+    b.addEventListener('pointerdown', e => { e.preventDefault(); set(cnum(inp.value) + d); t0 = setTimeout(() => { iv = setInterval(() => set(cnum(inp.value) + d), 90); }, 380); });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, stop));
+    b.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); set(cnum(inp.value) + d); } }); });
+  return set;
+}
+
+/* ---- بطاقة الطالب والعرض الأسبوعي (الأربعاء) ---- */
+const AR = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+const getPf = () => { try { const p = JSON.parse(ls('pf') || 'null'); return p && p.first && p.family && p.juz >= 1 && p.juz <= 30 && (p.order === 'first' || p.order === 'amma') ? p : null; } catch (e) { return null; } };
+const dow = d => new Date(d + 'T12:00:00Z').getUTCDay();
+const addDays = (d, n) => { const t = new Date(d + 'T12:00:00Z'); t.setUTCDate(t.getUTCDate() + n); return t.toISOString().slice(0, 10); };
+const nextWed = d => addDays(d, (3 - dow(d) + 7) % 7);
+const CYC = { start: /^\d{4}-\d\d-\d\d$/.test(ls('cyc')) ? ls('cyc') : '2026-10-28' };
+const sessionOf = (w, st = CYC.start) => (((Math.round((Date.parse(w + 'T12:00:00Z') - Date.parse(st + 'T12:00:00Z')) / 6048e5) % 4) + 4) % 4) + 1;
+const portion = (N, n) => { if (n > 4) return null; const base = Math.floor(N / 4), rem = N % 4, cnt = i => base + (i <= rem ? 1 : 0);
+  let start = 0; for (let i = 1; i < n; i++) start += cnt(i); return { from: start + 1, to: start + cnt(n), count: cnt(n) }; };
+const juzText = (pf, p) => { const x = pf.order === 'first' ? p.from : 31 - p.from, y = pf.order === 'first' ? p.to : 31 - p.to;
+  return p.count === 1 ? 'الجزء ' + AR(x) : 'من الجزء ' + AR(x) + ' إلى الجزء ' + AR(y); };
+function weeklyHTML(day) {
+  const pf = getPf(); if (!pf) return '';
+  const w1 = nextWed(day), items = day === w1 ? [['اليوم', w1], ['الأربعاء القادم', addDays(w1, 7)]] : [['الأربعاء القادم', w1]];
+  const row = ([lb, w]) => { const n = sessionOf(w), p = portion(pf.juz, n); let body;
+    if (!p.count) body = '<b class="pt">لا عرض مقرر</b><small>عدد أجزائك قليل، فلا جزء لك في هذه الجلسة.</small>';
+    else body = `<b class="pt">${juzText(pf, p)}</b><small>${AR(p.count)} ${p.count === 1 ? 'جزء' : p.count === 2 ? 'جزآن' : p.count <= 10 ? 'أجزاء' : 'جزءًا'} · الجلسة ${AR(n)} من ٤</small>`;
+    return `<div class="it${lb === 'اليوم' ? ' td' : ''}"><span class="tg">${lb}</span> <span class="wd">${dateLine(w)}</span>${body}</div>`; };
+  return `<div class="card wk"><h2 class="pill">العرض الأسبوعي</h2><p class="note" style="margin-top:0">محفوظك ${AR(pf.juz)} جزءًا تعرضه كاملًا كل ٤ أسابيع، على ٤ جلسات يوم الأربعاء.</p>${items.map(row).join('')}</div>`;
+}
+function profileModal(edit) {
+  document.querySelectorAll('.ov').forEach(o => o.remove());
+  const pf = getPf() || {}; let order = pf.order || '', juz = pf.juz || 0;
+  const o = document.createElement('div'); o.className = 'ov';
+  o.innerHTML = `<div class="modal" role="dialog" aria-modal="true">${banner('sm')}<h2 class="serif">بطاقتك</h2><p class="note">تُحفظ في متصفحك ولن نسألك عنها مرة أخرى.</p><div class="pf">
+    <label for="pf_first">الاسم</label><input type="text" id="pf_first" autocomplete="given-name">
+    <label for="pf_family">العائلة</label><input type="text" id="pf_family" autocomplete="family-name">
+    <label for="pf_juz">عدد الأجزاء المحفوظة</label>${cntHTML('pf_juz')}
+    <label>من أين بدأ حفظك؟</label><div class="seg" id="pf_ord"><button type="button" data-o="first">من الجزء الأول</button><button type="button" data-o="amma">من جزء عمّ</button></div>
+    <p class="note" id="pf_st" style="color:var(--bad)"></p><button class="btn" id="pf_save">حفظ</button>${edit ? '<div style="text-align:center"><button class="lnk" id="pf_x">إلغاء</button></div>' : ''}</div></div>`;
+  document.body.appendChild(o);
+  const q = s => o.querySelector(s);
+  q('#pf_first').value = pf.first || ''; q('#pf_family').value = pf.family || '';
+  bindCnt(q('.cnt'), juz, n => { juz = n; }, 30);
+  const paint = () => o.querySelectorAll('#pf_ord button').forEach(b => b.classList.toggle('on', b.dataset.o === order)); paint();
+  q('#pf_ord').onclick = e => { if (e.target.dataset.o) { order = e.target.dataset.o; paint(); } };
+  if (edit) q('#pf_x').onclick = () => o.remove();
+  q('#pf_save').onclick = () => {
+    const first = q('#pf_first').value.trim(), family = q('#pf_family').value.trim();
+    if (first.length < 2 || family.length < 2) return q('#pf_st').textContent = 'اكتب الاسم والعائلة.';
+    if (juz < 1) return q('#pf_st').textContent = 'حدّد عدد الأجزاء التي تحفظها.';
+    if (!order) return q('#pf_st').textContent = 'اختر من أين بدأ حفظك.';
+    ls('pf', JSON.stringify({ first, family, juz, order })); const full = first + ' ' + family; ls('nm', full);
+    try { const d = JSON.parse(ls('draft') || '{}'); if (d.day) { d.v = d.v || {}; d.v.name = full; ls('draft', JSON.stringify(d)); } } catch (e) {}
+    student();
+  };
+}
+
 function student() {
   document.title = 'تعاهد'; document.querySelectorAll('.ov').forEach(o => o.remove());
   const day = riyadh();
   let mq = ls('mq'), hq = ls('hq'), vals = { name: ls('nm') };
   if (!HQ.includes(hq)) hq = '';
-  const ready = !!(mq && hq);
+  const pf = getPf(), step = !mq ? 1 : !hq ? 2 : !pf ? 3 : 0, ready = step === 0;
   try { const d = JSON.parse(ls('draft') || '{}'); if (d.day === day) vals = { ...vals, ...d.v }; } catch (e) {}
-  app.innerHTML = hero('', ready ? `<button class="chip" id="chg">مقرأة ${esc(mq)} · ${esc(hq)} · تغيير</button>` : '') + hadithCard() + `
+  if (!(vals.name || '').trim() && pf) vals.name = pf.first + ' ' + pf.family;
+  app.innerHTML = hero('', ready ? `<span class="mb"><button class="chip" id="chg">مقرأة ${esc(mq)} · ${esc(hq)} · تغيير</button><button class="chip" id="pfb">بطاقتي</button></span>` : '') + hadithCard() + `
   <div class="card"><h2 class="pill">مهام اليوم: <span class="dd">${dateLine(day)}</span></h2><div class="prog"><span></span><span id="pc"></span></div><div class="bar"><i id="pb"></i></div>
   <div class="fgrid">${FIELDS.map(fieldHTML).join('')}</div>
   <button class="btn" id="go">إرسال</button><p class="note" id="st"></p></div>
@@ -202,25 +267,21 @@ function student() {
   ['rep', 'listening'].forEach(k => { vals[k] = String(cnum(vals[k])); });
   FIELDS.forEach(([k, , ty]) => {
     if (ty === 't') { const el = $('#f_' + k); el.value = vals[k] || ''; el.oninput = () => { vals[k] = el.value; save(); upd(); }; }
-    else if (ty === 'c') {
-      const box = $(`.cnt[data-k="${k}"]`), inp = box.querySelector('input');
-      const set = n => { n = Math.max(0, Math.min(99999, n)); vals[k] = String(n); inp.value = n; save(); upd(); };
-      inp.value = vals[k]; inp.oninput = () => set(cnum(inp.value));
-      box.querySelectorAll('.cb').forEach(b => { const d = b.classList.contains('p') ? 1 : -1; let t0, iv; const stop = () => { clearTimeout(t0); clearInterval(iv); };
-        b.addEventListener('pointerdown', e => { e.preventDefault(); set(cnum(inp.value) + d); t0 = setTimeout(() => { iv = setInterval(() => set(cnum(inp.value) + d), 90); }, 380); });
-        ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, stop));
-        b.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); set(cnum(inp.value) + d); } }); });
-    } else {
+    else if (ty === 'c') bindCnt($(`.cnt[data-k="${k}"]`), vals[k], n => { vals[k] = String(n); save(); upd(); });
+    else {
       const a = $('#f_' + k + '_from'), z = $('#f_' + k + '_to'); a.value = vals[k + '_f']; z.value = vals[k + '_t'];
       const sync = () => { a.value = vals[k + '_f'] = digits(a.value, 4); z.value = vals[k + '_t'] = digits(z.value, 4); vals[k] = pageStr(vals[k + '_f'], vals[k + '_t']); save(); upd(); };
       a.oninput = z.oninput = sync; vals[k] = pageStr(vals[k + '_f'], vals[k + '_t']);
     }
   });
-  upd(); reveal();
-  if (ready) $('#chg').onclick = () => { ls('mq', ''); ls('hq', ''); student(); };
+  upd();
+  if (ready && doneDays().includes(day)) $('#res').innerHTML = weeklyHTML(day);
+  reveal();
+  if (ready) { $('#chg').onclick = () => { ls('mq', ''); ls('hq', ''); student(); }; $('#pfb').onclick = () => profileModal(true); }
+  else if (step === 3) profileModal(false);
   else {
     const o = document.createElement('div'); o.className = 'ov';
-    o.innerHTML = `<div class="modal" role="dialog" aria-modal="true">${banner('sm')}` + (!mq
+    o.innerHTML = `<div class="modal" role="dialog" aria-modal="true">${banner('sm')}` + (step === 1
       ? `<h2 class="serif">مرحبًا بك في تعاهد</h2><p class="note">اختر مقرأتك للبدء، وستُحفظ على جهازك.</p>
          <div class="pick">${MQ.map(m => `<button data-m="${m}">${m}<small>مقرأة ${m}</small></button>`).join('')}</div>`
       : `<h2 class="serif">اختر حلقتك</h2><p class="note">مقرأة ${esc(mq)}</p>
@@ -246,7 +307,7 @@ function student() {
     let ds = doneDays().filter(d => d !== day); const full = done(vals); if (full) ds.push(day); ls('done', JSON.stringify(ds.slice(-400)));
     $('#res').innerHTML = full ? `<div class="card done-card"><div class="tick"><b>✓</b></div><h2 class="serif">بارك الله فيك، أتممتَ مهام اليوم</h2>
       <div class="streak"><div><b>${streak()}</b>أيام متتالية</div><div><b>${ds.length}</b>أيام الإتمام</div></div>
-      <p class="note">السلسلة محفوظة على جهازك. يمكنك تعديل إجاباتك وإعادة الإرسال اليوم.</p></div>`
+      <p class="note">السلسلة محفوظة على جهازك. يمكنك تعديل إجاباتك وإعادة الإرسال اليوم.</p></div>` + weeklyHTML(day)
       : `<div class="card done-card"><h2>تم الإرسال، ${FIELDS.length - filled(vals) === 1 ? 'وبقيت مهمة واحدة' : 'وبقيت ' + (FIELDS.length - filled(vals)) + ' مهام'}</h2><p class="note">أكمل الباقي ثم أعد الإرسال في اليوم نفسه.</p></div>`;
     reveal(); if (full) confetti(); $('#res').scrollIntoView({ behavior: 'smooth' });
   };
@@ -298,6 +359,10 @@ async function teacher() {
   <button class="btn" id="ex">تصدير</button></div>
   <div class="card" id="tc" hidden><h2 class="pill">رموز المعلمين</h2><p class="note" style="margin-top:0">لكل معلم رمز خاص يفتح له حلقته فقط. «إعادة تعيين» تنشئ رمزًا جديدًا وتوقف القديم.</p>
   ${HQ.map(h => `<div class="trow"><span>${h}</span><button class="btn sec sm" data-h="${h}">إعادة تعيين</button></div>`).join('')}</div>
+  <div class="card" id="cy" hidden><h2 class="pill">دورة العرض الأسبوعي</h2>
+  <p class="note" style="margin-top:0">يعرض كل طالب محفوظه كاملًا على ٤ أربعاوات متتالية، ثم تبدأ الدورة من جديد. اختر أربعاء بداية الدورة (الجلسة ١)، وسيتغير جدول كل الطلاب.</p>
+  <label for="cy_d">أربعاء البداية</label><input type="date" id="cy_d"><p class="note" id="cy_st" style="color:var(--bad)"></p>
+  <label>الأربعاوات القادمة</label><div id="cy_pv"></div><button class="btn" id="cy_save">حفظ</button></div>
   <div class="card"><button class="btn sec sm" id="sec">تغيير رمزي السري</button></div>`;
   const pickers = () => { $('#pk').innerHTML = S.mode === 'day' ? `<label>اليوم</label><input type="date" id="v1" value="${S.day}">`
     : S.mode === 'month' ? `<label>الشهر</label><input type="month" id="v1" value="${S.month}">`
@@ -324,6 +389,14 @@ async function teacher() {
     const c = genCode(), { error } = await sb.rpc('muqraa_admin_set_halaqa_secret', { p_secret: ls('tk'), p_halaqa: h, p_new: c });
     if (error) return alert('تعذّر إنشاء الرمز.');
     prompt('الرمز الجديد لمعلم ' + h + ' (انسخه وأرسله له):', c.slice(0, 4) + '-' + c.slice(4)); };
+  const cyPreview = () => { const st = $('#cy_d').value || CYC.start; let w = nextWed(riyadh()), h = '';
+    for (let i = 0; i < 5; i++) { h += `<div class="trow"><span class="wd">${dateLine(w)}</span><b>الجلسة ${AR(sessionOf(w, st))}</b></div>`; w = addDays(w, 7); } $('#cy_pv').innerHTML = h; };
+  $('#cy_d').onchange = () => { $('#cy_st').textContent = !$('#cy_d').value || dow($('#cy_d').value) === 3 ? '' : 'اختر يوم أربعاء.'; cyPreview(); };
+  $('#cy_save').onclick = async () => { const v = $('#cy_d').value; if (!v || dow(v) !== 3) return $('#cy_st').textContent = 'اختر يوم أربعاء.';
+    if (!confirm('سيتغير جدول العرض لكل الطلاب ابتداءً من هذا الأربعاء. متابعة؟')) return;
+    const { error } = await sb.rpc('muqraa_admin_set_cycle_start', { p_secret: ls('tk'), p_date: v }); if (error) return $('#cy_st').textContent = 'تعذّر الحفظ.';
+    CYC.start = v; ls('cyc', v); $('#cy_st').textContent = ''; cyPreview(); toast('تم حفظ أربعاء بداية الدورة'); };
+  window.__cyPreview = cyPreview;
   tabs(); pickers(); load(); reveal();
 }
 
@@ -337,7 +410,8 @@ async function load() {
   S.role = data.role; S.halaqa = data.halaqa || ''; S.rows = data.rows; S.known = data.known; msg.textContent = '';
   $('#pn1').textContent = isAdmin() ? 'تعاهد' : 'لوحة المعلم'; $('#pn').textContent = isAdmin() ? 'لوحة الإدارة' : S.halaqa;
   document.title = 'تعاهد · ' + (isAdmin() ? 'لوحة الإدارة' : S.halaqa);
-  $('#fhw').hidden = !isAdmin(); $('#tc').hidden = !isAdmin();
+  $('#fhw').hidden = !isAdmin(); $('#tc').hidden = !isAdmin(); $('#cy').hidden = !isAdmin();
+  if (isAdmin()) { $('#cy_d').value = CYC.start; window.__cyPreview(); }
   $('#xn').textContent = isAdmin() ? 'يشمل التصدير كل الحلقات والمقرأتين في الفترة المختارة.' : 'يشمل التصدير طلاب ' + S.halaqa + ' فقط.';
   draw();
 }
@@ -401,6 +475,7 @@ function doExport() {
   }
 }
 setInterval(() => { if (S.mode === 'day' && $('#tb') && ls('tk')) load(); }, 60000);
+sb.rpc('muqraa_cycle_start').then(({ data }) => { if (/^\d{4}-\d\d-\d\d$/.test(data || '') && data !== CYC.start) { CYC.start = data; ls('cyc', data); const r = $('#res .wk'); if (r) r.outerHTML = weeklyHTML(riyadh()); } }).catch(() => {});
 window.addEventListener('hashchange', route);
 route();
 </script>
