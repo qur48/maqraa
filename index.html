@@ -100,6 +100,11 @@ textarea{resize:none;overflow:hidden}
 .seg button{flex:1;min-width:76px;padding:9px 8px;border:1.5px solid var(--fieldbd);border-radius:99px;background:var(--field);color:var(--tx);font:inherit;cursor:pointer}
 .seg button.on{background:var(--g);color:#fff;border-color:var(--g);font-weight:700}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.pick.one{grid-template-columns:1fr;gap:10px}.pick.one button{padding:14px 10px;font-size:18px}
+.lnk{background:none;border:0;color:var(--g2);text-decoration:underline;cursor:pointer;font:inherit;font-size:14px;margin-top:14px}
+.ptl{text-align:center;margin:12px 6px 18px}.ptl small{display:block;color:var(--gold2);font-size:14px;letter-spacing:.5px}.ptl h2{margin:0;font-size:32px;line-height:1.5;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.3)}.ptl h2::after{content:"";display:block;width:56px;height:3px;margin:8px auto 0;border-radius:3px;background:linear-gradient(90deg,transparent,var(--gold2),transparent)}
+.trow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd)}.trow:last-child{border-bottom:0}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:2px 0 16px}
 .stat{background:var(--card);color:var(--tx);border-radius:26px;padding:14px 6px;text-align:center;font-size:14px;box-shadow:var(--sh);border-bottom:4px solid var(--gold)}.stat b{display:block;font-size:30px;line-height:1.3;color:var(--g2)}
 .wrap{overflow-x:auto;margin:6px -4px 0}
@@ -136,6 +141,7 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const app = document.getElementById('app'), $ = s => document.querySelector(s);
 const esc = t => String(t == null ? '' : t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const MQ = ['شعبة','حفص'];
+const HQ = ['حلقة حسان بن ثابت', 'حلقة ابن رجب', 'حلقة أبيّ بن مالك', 'حلقة عبدالرحمن بن النعمان'];
 const FIELDS = [['name','الاسم','t'],['num','رقم المحفوظ','t'],['rep','عدد التكرار','c'],['listening','السماع','c'],['reviewing','المراجعة','p'],['linking','الربط','p']];
 const riyadh = (ms = 0) => new Date(Date.now() + ms).toLocaleDateString('en-CA', {timeZone:'Asia/Riyadh'});
 const prevDay = d => { const t = new Date(d + 'T12:00:00Z'); t.setUTCDate(t.getUTCDate() - 1); return t.toISOString().slice(0, 10); };
@@ -158,7 +164,7 @@ const reveal = () => {
 };
 const toast = t => { const e = document.createElement('div'); e.className = 'toast'; e.textContent = t; document.body.appendChild(e); setTimeout(() => e.remove(), 2400); };
 const banner = (cls = '') => `<div class="banner ${cls}"><h1 class="logo-h"><span class="logo" role="img" aria-label="تعاهد"></span></h1></div>`;
-const hero = (sub, extra) => banner() + `<div class="meta"><span>${sub}</span>${extra || ''}</div>`;
+const hero = (sub, extra) => banner() + `<div class="meta"><span id="hsub">${sub}</span>${extra || ''}</div>`;
 const hadithCard = () => `<section class="hd serif" aria-label="حديث"><p class="lbl">قال ﷺ</p><div class="ln"></div>
   <p class="l1">«تَعاهَدوا هذا القُرآنَ،</p><p class="l2">فوالذي نَفسُ مُحَمَّدٍ بيَدِه لَهو أشَدُّ تَفَلُّتًا مِنَ الإبِلِ في عُقُلِها»</p></section>`;
 
@@ -178,10 +184,13 @@ const fieldHTML = ([k, l, t]) => `<div class="f"><label for="f_${k}${t === 'p' ?
   : t === 'p' ? `<div class="rng"><div class="pg"><em>من صفحة</em><input type="text" id="f_${k}_from" inputmode="numeric" autocomplete="off"></div><div class="pg"><em>إلى صفحة</em><input type="text" id="f_${k}_to" inputmode="numeric" autocomplete="off"></div></div>`
   : `<input type="text" id="f_${k}" autocomplete="off">`) + '</div>';
 function student() {
+  document.title = 'تعاهد'; document.querySelectorAll('.ov').forEach(o => o.remove());
   const day = riyadh();
-  let mq = ls('mq'), vals = { name: ls('nm') };
+  let mq = ls('mq'), hq = ls('hq'), vals = { name: ls('nm') };
+  if (!HQ.includes(hq)) hq = '';
+  const ready = !!(mq && hq);
   try { const d = JSON.parse(ls('draft') || '{}'); if (d.day === day) vals = { ...vals, ...d.v }; } catch (e) {}
-  app.innerHTML = hero('', mq ? `<button class="chip" id="chg">مقرأة ${esc(mq)} · تغيير</button>` : '') + hadithCard() + `
+  app.innerHTML = hero('', ready ? `<button class="chip" id="chg">مقرأة ${esc(mq)} · ${esc(hq)} · تغيير</button>` : '') + hadithCard() + `
   <div class="card"><h2 class="pill">مهام اليوم: <span class="dd">${dateLine(day)}</span></h2><div class="prog"><span></span><span id="pc"></span></div><div class="bar"><i id="pb"></i></div>
   <div class="fgrid">${FIELDS.map(fieldHTML).join('')}</div>
   <button class="btn" id="go">إرسال</button><p class="note" id="st"></p></div>
@@ -208,21 +217,28 @@ function student() {
     }
   });
   upd(); reveal();
-  if (mq) $('#chg').onclick = () => { ls('mq', ''); student(); };
-  else { const o = document.createElement('div'); o.className = 'ov'; o.innerHTML = `<div class="modal" role="dialog" aria-modal="true">${banner('sm')}
-    <h2 class="serif">مرحبًا بك في تعاهد</h2><p class="note">اختر مقرأتك للبدء، وستُحفظ على جهازك.</p>
-    <div class="pick"><button data-m="شعبة">شعبة<small>مقرأة شعبة</small></button><button data-m="حفص">حفص<small>مقرأة حفص</small></button></div></div>`;
-    o.onclick = e => { const m = e.target.closest('button'); if (m) { ls('mq', m.dataset.m); student(); } };
-    document.body.appendChild(o); }
-  document.querySelectorAll('.ov').forEach(o => { if (mq) o.remove(); });
+  if (ready) $('#chg').onclick = () => { ls('mq', ''); ls('hq', ''); student(); };
+  else {
+    const o = document.createElement('div'); o.className = 'ov';
+    o.innerHTML = `<div class="modal" role="dialog" aria-modal="true">${banner('sm')}` + (!mq
+      ? `<h2 class="serif">مرحبًا بك في تعاهد</h2><p class="note">اختر مقرأتك للبدء، وستُحفظ على جهازك.</p>
+         <div class="pick">${MQ.map(m => `<button data-m="${m}">${m}<small>مقرأة ${m}</small></button>`).join('')}</div>`
+      : `<h2 class="serif">اختر حلقتك</h2><p class="note">مقرأة ${esc(mq)}</p>
+         <div class="pick one">${HQ.map(h => `<button data-h="${esc(h)}">${esc(h)}</button>`).join('')}</div>
+         <button class="lnk" data-back="1">تغيير المقرأة</button>`) + '</div>';
+    o.onclick = e => { const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.m) ls('mq', b.dataset.m); else if (b.dataset.h) ls('hq', b.dataset.h); else if (b.dataset.back) { ls('mq', ''); ls('hq', ''); }
+      student(); };
+    document.body.appendChild(o);
+  }
   $('#go').onclick = async () => {
-    if (!mq) return;
+    if (!ready) return;
     if ((vals.name || '').trim().length < 2) return $('#st').textContent = 'اكتب اسمك أولًا.';
     for (const [k, l, ty] of FIELDS) if (ty === 'p') { const a = vals[k + '_f'], z = vals[k + '_t'];
       if (!a && z) return $('#st').textContent = 'اكتب صفحة البداية في ' + l + '.';
       if (a && z && +z < +a) return $('#st').textContent = 'صفحة النهاية أصغر من صفحة البداية في ' + l + '.'; }
     $('#go').disabled = true; $('#st').textContent = 'جارٍ الإرسال…';
-    const { error } = await sb.rpc('muqraa_submit_task', { p_muqraa: mq, p_name: vals.name, p_num: vals.num || '', p_rep: vals.rep || '',
+    const { error } = await sb.rpc('muqraa_submit_task', { p_muqraa: mq, p_halaqa: hq, p_name: vals.name, p_num: vals.num || '', p_rep: vals.rep || '',
       p_listening: vals.listening || '', p_reviewing: vals.reviewing || '', p_linking: vals.linking || '' });
     $('#go').disabled = false;
     if (error) return $('#st').textContent = 'تعذّر الإرسال، حاول مرة أخرى.';
@@ -236,45 +252,53 @@ function student() {
   };
 }
 
-/* ---------------- المعلم ---------------- */
+/* ---------------- الإدارة والمعلمون ---------------- */
 function login(msg) {
-  app.innerHTML = hero('دخول المعلم') + `<div class="card"><h2 class="pill">الرمز السري</h2><label for="tk">اكتب الرمز السري</label>
+  document.title = 'تعاهد';
+  app.innerHTML = hero('دخول الإدارة والمعلمين') + `<div class="card"><h2 class="pill">الرمز السري</h2><label for="tk">اكتب الرمز السري</label>
   <input type="password" id="tk" autocomplete="off"><button class="btn" id="in">دخول</button>
   <p class="note" id="st">${esc(msg || '')}</p></div><p class="back"><a href="#">العودة لنموذج الطالب</a></p>`;
   const go = () => { const v = $('#tk').value.trim(); if (v) { ls('tk', v); route(); } };
   $('#in').onclick = go; $('#tk').onkeydown = e => { if (e.key === 'Enter') go(); }; reveal();
 }
 
-const S = { mode:'day', day:riyadh(), month:riyadh().slice(0,7), year:riyadh().slice(0,4), from:riyadh(-6*864e5), to:riyadh(), mq:'الكل', q:'', fmt:'xlsx', scope:'done', rows:[], known:[] };
+const S = { role:'', halaqa:'', mode:'day', day:riyadh(), month:riyadh().slice(0,7), year:riyadh().slice(0,4), from:riyadh(-6*864e5), to:riyadh(), mq:'الكل', hq:'الكل', q:'', fmt:'xlsx', scope:'done', rows:[], known:[] };
+const isAdmin = () => S.role === 'admin';
 const range = () => { if (S.mode === 'day') return [S.day, S.day];
   if (S.mode === 'month') { const [y, m] = S.month.split('-').map(Number); return [S.month + '-01', S.month + '-' + String(new Date(Date.UTC(y, m, 0)).getUTCDate()).padStart(2, '0')]; }
   if (S.mode === 'year') return [S.year + '-01-01', S.year + '-12-31']; return [S.from, S.to]; };
 const label = () => S.mode === 'day' ? S.day : S.mode === 'month' ? S.month : S.mode === 'year' ? S.year : S.from + '_إلى_' + S.to;
 const cmpN = (a, b) => String(a.name).localeCompare(String(b.name), 'ar');
+const key3 = r => r.muqraa + '|' + (r.halaqa || '') + '|' + r.name;
+const genCode = () => { const A = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789', b = new Uint32Array(8); crypto.getRandomValues(b); return [...b].map(x => A[x % A.length]).join(''); };
 
 function summarize() {
-  const act = {}; S.rows.forEach(r => { (act[r.muqraa] = act[r.muqraa] || new Set()).add(r.day); });
-  const m = {}; S.rows.forEach(r => { const k = r.muqraa + '|' + r.name; const o = m[k] = m[k] || { muqraa:r.muqraa, name:r.name, sent:0, done:0, last:'' };
+  const act = {}; S.rows.forEach(r => { const g = r.muqraa + '|' + (r.halaqa || ''); (act[g] = act[g] || new Set()).add(r.day); });
+  const m = {}; S.rows.forEach(r => { const k = key3(r); const o = m[k] = m[k] || { muqraa:r.muqraa, halaqa:r.halaqa || '', name:r.name, sent:0, done:0, last:'' };
     o.sent++; if (done(r)) o.done++; if (r.day > o.last) o.last = r.day; });
-  return Object.values(m).map(o => ({ ...o, active:(act[o.muqraa] || new Set()).size, pct:Math.round(100 * o.done / Math.max(1, (act[o.muqraa] || new Set()).size)) }))
+  return Object.values(m).map(o => { const n = (act[o.muqraa + '|' + o.halaqa] || new Set()).size; return { ...o, active:n, pct:Math.round(100 * o.done / Math.max(1, n)) }; })
     .sort((a, b) => b.pct - a.pct || b.done - a.done || cmpN(a, b));
 }
 
 async function teacher() {
-  app.innerHTML = hero('لوحة المعلم', '<span class="mb"><button class="chip" id="rf">تحديث</button><button class="chip" id="out">خروج</button></span>') + `
+  app.innerHTML = hero('', '<span class="mb"><button class="chip" id="rf">تحديث</button><button class="chip" id="out">خروج</button></span>') + `
+  <div class="ptl"><small id="pn1"></small><h2 class="serif" id="pn"></h2></div>
   <div class="card"><h2 class="pill">الفترة</h2>
   <div class="seg" id="md">${[['day','يومي'],['month','شهري'],['year','سنوي'],['custom','مخصص']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
   <div id="pk"></div>
-  <div class="grid2"><div><label for="fm">المقرأة</label><select id="fm"><option>الكل</option>${MQ.map(m => `<option>${m}</option>`).join('')}</select></div>
+  <div class="grid3"><div><label for="fm">المقرأة</label><select id="fm"><option>الكل</option>${MQ.map(m => `<option>${m}</option>`).join('')}</select></div>
+  <div id="fhw" hidden><label for="fh">الحلقة</label><select id="fh"><option>الكل</option>${HQ.map(h => `<option>${h}</option>`).join('')}</select></div>
   <div><label for="fq">بحث بالاسم</label><input type="text" id="fq"></div></div><p class="note" id="msg"></p></div>
   <div class="stats" id="stats"></div>
   <div class="card"><div class="wrap"><table><thead id="th"></thead><tbody id="tb"></tbody></table></div></div>
   <div class="card" id="rem" hidden></div>
-  <div class="card"><h2 class="pill">تصدير</h2><p class="note" style="margin-top:0">يشمل التصدير المقرأتين في الفترة المختارة.</p>
+  <div class="card"><h2 class="pill">تصدير</h2><p class="note" id="xn" style="margin-top:0"></p>
   <label>الصيغة</label><div class="seg" id="xf">${[['xlsx','Excel'],['csv','CSV'],['json','JSON'],['print','طباعة / PDF']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
   <label>المحتوى</label><div class="seg" id="xs">${[['done','من أتمّ جميع المهام'],['all','جميع الإرسالات']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
   <button class="btn" id="ex">تصدير</button></div>
-  <div class="card"><button class="btn sec sm" id="sec">تغيير الرمز السري</button></div>`;
+  <div class="card" id="tc" hidden><h2 class="pill">رموز المعلمين</h2><p class="note" style="margin-top:0">لكل معلم رمز خاص يفتح له حلقته فقط. «إعادة تعيين» تنشئ رمزًا جديدًا وتوقف القديم.</p>
+  ${HQ.map(h => `<div class="trow"><span>${h}</span><button class="btn sec sm" data-h="${h}">إعادة تعيين</button></div>`).join('')}</div>
+  <div class="card"><button class="btn sec sm" id="sec">تغيير رمزي السري</button></div>`;
   const pickers = () => { $('#pk').innerHTML = S.mode === 'day' ? `<label>اليوم</label><input type="date" id="v1" value="${S.day}">`
     : S.mode === 'month' ? `<label>الشهر</label><input type="month" id="v1" value="${S.month}">`
     : S.mode === 'year' ? `<label>السنة</label><input type="number" id="v1" min="2020" max="2100" value="${S.year}">`
@@ -288,12 +312,18 @@ async function teacher() {
   $('#md').onclick = e => { if (e.target.dataset.k) { S.mode = e.target.dataset.k; tabs(); pickers(); load(); } };
   $('#xf').onclick = e => { if (e.target.dataset.k) { S.fmt = e.target.dataset.k; tabs(); } };
   $('#xs').onclick = e => { if (e.target.dataset.k) { S.scope = e.target.dataset.k; tabs(); } };
-  $('#fm').onchange = e => { S.mq = e.target.value; draw(); }; $('#fq').oninput = e => { S.q = e.target.value.trim(); draw(); };
+  $('#fm').onchange = e => { S.mq = e.target.value; draw(); }; $('#fh').onchange = e => { S.hq = e.target.value; draw(); };
+  $('#fq').oninput = e => { S.q = e.target.value.trim(); draw(); };
   $('#rf').onclick = load; $('#out').onclick = () => { ls('tk', ''); location.hash = ''; route(); };
   $('#ex').onclick = doExport;
   $('#sec').onclick = async () => { const n = prompt('اكتب الرمز السري الجديد (٨ أحرف أو أرقام على الأقل):'); if (!n) return;
     const { error } = await sb.rpc('muqraa_teacher_set_secret', { p_secret: ls('tk'), p_new: n });
-    if (error) return alert('تعذّر التغيير. تأكد أن الرمز ٨ أحرف أو أرقام على الأقل.'); ls('tk', n); toast('تم تغيير الرمز السري، احفظه جيدًا'); };
+    if (error) return alert(/taken/.test(error.message) ? 'هذا الرمز مستخدم، اختر رمزًا آخر.' : 'تعذّر التغيير. تأكد أن الرمز ٨ أحرف أو أرقام على الأقل.'); ls('tk', n); toast('تم تغيير الرمز السري، احفظه جيدًا'); };
+  $('#tc').onclick = async e => { const h = e.target.dataset.h; if (!h) return;
+    if (!confirm('سيتوقف الرمز الحالي لمعلم «' + h + '» ويُنشأ رمز جديد. متابعة؟')) return;
+    const c = genCode(), { error } = await sb.rpc('muqraa_admin_set_halaqa_secret', { p_secret: ls('tk'), p_halaqa: h, p_new: c });
+    if (error) return alert('تعذّر إنشاء الرمز.');
+    prompt('الرمز الجديد لمعلم ' + h + ' (انسخه وأرسله له):', c.slice(0, 4) + '-' + c.slice(4)); };
   tabs(); pickers(); load(); reveal();
 }
 
@@ -301,65 +331,72 @@ async function load() {
   const msg = $('#msg'); if (!msg) return; msg.textContent = 'جارٍ التحميل…';
   const [f, t] = range();
   if (!f || !t || t < f) return msg.textContent = 'تحقق من التواريخ.';
-  const { data, error } = await sb.rpc('muqraa_teacher_range', { p_secret: ls('tk'), p_from: f, p_to: t });
+  const { data, error } = await sb.rpc('muqraa_panel_range', { p_secret: ls('tk'), p_from: f, p_to: t });
   if (error) { if (/forbidden/.test(error.message)) { ls('tk', ''); return login('الرمز السري غير صحيح.'); }
     return msg.textContent = /bad range/.test(error.message) ? 'الفترة طويلة، الحد الأقصى ٤٠٠ يوم.' : 'تعذّر الاتصال، حاول مرة أخرى.'; }
-  S.rows = data.rows; S.known = data.known; msg.textContent = ''; draw();
+  S.role = data.role; S.halaqa = data.halaqa || ''; S.rows = data.rows; S.known = data.known; msg.textContent = '';
+  $('#pn1').textContent = isAdmin() ? 'تعاهد' : 'لوحة المعلم'; $('#pn').textContent = isAdmin() ? 'لوحة الإدارة' : S.halaqa;
+  document.title = 'تعاهد · ' + (isAdmin() ? 'لوحة الإدارة' : S.halaqa);
+  $('#fhw').hidden = !isAdmin(); $('#tc').hidden = !isAdmin();
+  $('#xn').textContent = isAdmin() ? 'يشمل التصدير كل الحلقات والمقرأتين في الفترة المختارة.' : 'يشمل التصدير طلاب ' + S.halaqa + ' فقط.';
+  draw();
 }
 
 function draw() {
   if (!$('#tb')) return;
-  const f = r => (S.mq === 'الكل' || r.muqraa === S.mq) && (!S.q || String(r.name).includes(S.q));
+  const A = isAdmin();
+  const f = r => (S.mq === 'الكل' || r.muqraa === S.mq) && (!A || S.hq === 'الكل' || r.halaqa === S.hq) && (!S.q || String(r.name).includes(S.q));
   if (S.mode === 'day') {
-    const sent = S.rows.filter(f).sort(cmpN), seen = new Set(S.rows.map(r => r.muqraa + '|' + r.name));
-    const miss = S.known.filter(k => !seen.has(k.muqraa + '|' + k.name) && f(k)).sort(cmpN), n = sent.filter(done).length;
+    const sent = S.rows.filter(f).sort(cmpN), seen = new Set(S.rows.map(key3));
+    const miss = S.known.filter(k => !seen.has(key3(k)) && f(k)).sort(cmpN), n = sent.filter(done).length;
     $('#stats').innerHTML = `<div class="stat"><b>${n}</b>أتمّوا</div><div class="stat"><b>${sent.length - n}</b>ناقصة</div><div class="stat"><b>${miss.length}</b>لم يرسلوا</div>`;
-    $('#th').innerHTML = '<tr><th>الاسم</th><th>المقرأة</th><th>المحفوظ</th><th>التكرار</th><th>السماع</th><th>المراجعة</th><th>الربط</th><th>الحالة</th><th></th></tr>';
-    $('#tb').innerHTML = sent.map(r => `<tr><td>${esc(r.name)}</td><td>${esc(r.muqraa)}</td><td class="w">${esc(r.num) || '—'}</td><td>${cnum(r.rep) || '—'}</td><td>${cnum(r.listening) || '—'}</td><td>${esc(r.reviewing) || '—'}</td><td>${esc(r.linking) || '—'}</td>
+    $('#th').innerHTML = `<tr><th>الاسم</th><th>المقرأة</th>${A ? '<th>الحلقة</th>' : ''}<th>المحفوظ</th><th>التكرار</th><th>السماع</th><th>المراجعة</th><th>الربط</th><th>الحالة</th><th></th></tr>`;
+    $('#tb').innerHTML = sent.map(r => `<tr><td>${esc(r.name)}</td><td>${esc(r.muqraa)}</td>${A ? `<td>${esc(r.halaqa) || '—'}</td>` : ''}<td class="w">${esc(r.num) || '—'}</td><td>${cnum(r.rep) || '—'}</td><td>${cnum(r.listening) || '—'}</td><td>${esc(r.reviewing) || '—'}</td><td>${esc(r.linking) || '—'}</td>
       <td>${done(r) ? '<span class="badge b-ok">مكتمل</span>' : `<span class="badge b-wn">${filled(r)}/${FIELDS.length}</span>`}</td><td><button class="x" data-id="${r.id}" title="حذف" aria-label="حذف">×</button></td></tr>`).join('')
-      + miss.map(r => `<tr><td>${esc(r.name)}</td><td>${esc(r.muqraa)}</td><td colspan="5">—</td><td><span class="badge b-mu">لم يرسل</span></td><td></td></tr>`).join('')
-      || '<tr><td colspan="9" class="note">لا توجد إرسالات في هذا اليوم.</td></tr>';
+      + miss.map(r => `<tr><td>${esc(r.name)}</td><td>${esc(r.muqraa)}</td>${A ? `<td>${esc(r.halaqa) || '—'}</td>` : ''}<td colspan="5">—</td><td><span class="badge b-mu">لم يرسل</span></td><td></td></tr>`).join('')
+      || `<tr><td colspan="${A ? 10 : 9}" class="note">لا توجد إرسالات في هذا اليوم.</td></tr>`;
     $('#tb').onclick = async e => { const id = e.target.dataset.id; if (id && confirm('حذف هذا السجل نهائيًا؟')) {
       const { error } = await sb.rpc('muqraa_teacher_delete', { p_secret: ls('tk'), p_id: +id }); if (error) alert('تعذّر الحذف.'); else load(); } };
-    const names = MQ.map(m => [m, miss.filter(k => k.muqraa === m)]).filter(x => x[1].length);
-    const txt = 'السلام عليكم ورحمة الله وبركاته\nتذكير من «تعاهد»: لم تصلنا مهام اليوم من:\n' + names.map(([m, l]) => `\nمقرأة ${m}:\n` + l.map(k => '- ' + k.name).join('\n')).join('\n') + '\n\nبارك الله فيكم، وتعاهدوا القرآن.';
+    const groups = {}; miss.forEach(k => { const h = k.halaqa || 'بدون حلقة'; (groups[h] = groups[h] || []).push(k); });
+    const txt = 'السلام عليكم ورحمة الله وبركاته\nتذكير من «تعاهد»: لم تصلنا مهام اليوم من:\n' + Object.entries(groups).map(([h, l]) => `\n${h}:\n` + l.map(k => '- ' + k.name + ' (' + k.muqraa + ')').join('\n')).join('\n') + '\n\nبارك الله فيكم، وتعاهدوا القرآن.';
     $('#rem').hidden = !miss.length;
     $('#rem').innerHTML = miss.length ? `<h2 class="pill">تذكير الطلاب</h2><p class="note" style="margin-top:0">من أرسل خلال آخر ٧ أيام ولم يرسل اليوم.</p>
       <div class="grid2"><button class="btn sm" id="cp">نسخ رسالة التذكير</button><a class="btn sm" id="wa" style="text-align:center;text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(txt)}">إرسال عبر واتساب</a></div>` : '';
     if (miss.length) $('#cp').onclick = async () => { try { await navigator.clipboard.writeText(txt); toast('تم نسخ الرسالة'); } catch (e) { prompt('انسخ الرسالة:', txt); } };
   } else {
-    const sm = summarize().filter(f), act = Math.max(0, ...Object.values(S.rows.reduce((a, r) => { (a[r.muqraa] = a[r.muqraa] || new Set()).add(r.day); return a; }, {})).map(s => s.size));
+    const sm = summarize().filter(f);
+    const act = Math.max(0, ...Object.values(S.rows.reduce((a, r) => { const g = r.muqraa + '|' + (r.halaqa || ''); (a[g] = a[g] || new Set()).add(r.day); return a; }, {})).map(s => s.size));
     const avg = sm.length ? Math.round(sm.reduce((s, o) => s + o.pct, 0) / sm.length) : 0;
     $('#stats').innerHTML = `<div class="stat"><b>${sm.length}</b>طالب</div><div class="stat"><b>${avg}%</b>متوسط الالتزام</div><div class="stat"><b>${act}</b>أيام الدراسة</div>`;
-    $('#th').innerHTML = '<tr><th></th><th>الاسم</th><th>المقرأة</th><th>أيام الإرسال</th><th>أيام الإتمام</th><th>نسبة الالتزام</th><th>آخر إرسال</th></tr>';
-    $('#tb').innerHTML = sm.map((o, i) => `<tr><td>${i < 3 && o.pct > 0 ? '<span class="rk">' + (i + 1) + '</span>' : ''}</td><td>${esc(o.name)}</td><td>${esc(o.muqraa)}</td><td>${o.sent}</td><td>${o.done}</td>
-      <td>${o.pct}%<span class="mini"><i style="width:${o.pct}%"></i></span></td><td>${o.last}</td></tr>`).join('') || '<tr><td colspan="7" class="note">لا توجد بيانات في هذه الفترة.</td></tr>';
+    $('#th').innerHTML = `<tr><th></th><th>الاسم</th><th>المقرأة</th>${A ? '<th>الحلقة</th>' : ''}<th>أيام الإرسال</th><th>أيام الإتمام</th><th>نسبة الالتزام</th><th>آخر إرسال</th></tr>`;
+    $('#tb').innerHTML = sm.map((o, i) => `<tr><td>${i < 3 && o.pct > 0 ? '<span class="rk">' + (i + 1) + '</span>' : ''}</td><td>${esc(o.name)}</td><td>${esc(o.muqraa)}</td>${A ? `<td>${esc(o.halaqa) || '—'}</td>` : ''}<td>${o.sent}</td><td>${o.done}</td>
+      <td>${o.pct}%<span class="mini"><i style="width:${o.pct}%"></i></span></td><td>${o.last}</td></tr>`).join('') || `<tr><td colspan="${A ? 8 : 7}" class="note">لا توجد بيانات في هذه الفترة.</td></tr>`;
     $('#tb').onclick = null; $('#rem').hidden = true; $('#rem').innerHTML = '';
   }
 }
 
 /* ---------------- التصدير ---------------- */
 const saveBlob = (blob, name) => { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); };
-const HEAD = ['التاريخ','اليوم','الاسم','رقم المحفوظ','عدد التكرار','السماع','المراجعة','الربط','الحالة'];
-const rowArr = r => [r.day, wd(r.day), r.name, r.num, cnum(r.rep), cnum(r.listening), r.reviewing, r.linking, done(r) ? 'مكتمل' : 'ناقص'];
+const HEAD = ['التاريخ','اليوم','الحلقة','الاسم','رقم المحفوظ','عدد التكرار','السماع','المراجعة','الربط','الحالة'];
+const rowArr = r => [r.day, wd(r.day), r.halaqa || '', r.name, r.num, cnum(r.rep), cnum(r.listening), r.reviewing, r.linking, done(r) ? 'مكتمل' : 'ناقص'];
 const pick = onlyDone => S.rows.filter(r => !onlyDone || done(r)).sort((a, b) => a.day.localeCompare(b.day) || cmpN(a, b));
 function doExport() {
-  const fmt = S.fmt, onlyDone = S.scope === 'done', lb = label(), name = 'تعاهد-' + lb;
+  const fmt = S.fmt, onlyDone = S.scope === 'done', lb = label(), name = 'تعاهد-' + (isAdmin() ? '' : S.halaqa.replace(/\s+/g, '_') + '-') + lb;
   const rows = pick(onlyDone), sm = summarize();
   if (fmt === 'xlsx') {
     const wb = XLSX.utils.book_new(), add = (title, aoa, cols) => { const ws = XLSX.utils.aoa_to_sheet(aoa); ws['!cols'] = cols.map(w => ({ wch:w })); XLSX.utils.book_append_sheet(wb, ws, title); };
-    MQ.forEach(m => add('مقرأة ' + m, [HEAD, ...rows.filter(r => r.muqraa === m).map(rowArr)], [12,10,24,28,14,28,28,28,10]));
-    if (S.mode !== 'day') add('ملخص', [['المقرأة','الاسم','أيام الإرسال','أيام الإتمام','أيام الدراسة','نسبة الالتزام %'], ...sm.map(o => [o.muqraa, o.name, o.sent, o.done, o.active, o.pct])], [12,24,14,14,14,16]);
+    MQ.forEach(m => add('مقرأة ' + m, [HEAD, ...rows.filter(r => r.muqraa === m).map(rowArr)], [12,10,22,24,28,14,12,18,18,10]));
+    if (S.mode !== 'day') add('ملخص', [['المقرأة','الحلقة','الاسم','أيام الإرسال','أيام الإتمام','أيام الدراسة','نسبة الالتزام %'], ...sm.map(o => [o.muqraa, o.halaqa, o.name, o.sent, o.done, o.active, o.pct])], [12,22,24,14,14,14,16]);
     wb.Workbook = { Views:[{ RTL:true }] }; XLSX.writeFile(wb, name + '.xlsx');
   } else if (fmt === 'csv') {
     const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
     saveBlob(new Blob(['\ufeff' + [['المقرأة', ...HEAD], ...rows.map(r => [r.muqraa, ...rowArr(r)])].map(a => a.map(q).join(',')).join('\r\n')], { type:'text/csv;charset=utf-8' }), name + '.csv');
   } else if (fmt === 'json') {
-    saveBlob(new Blob([JSON.stringify({ app:'تعاهد', period:lb, rows:rows.map(({ id, ...r }) => ({ ...r, rep:cnum(r.rep), listening:cnum(r.listening) })), summary:S.mode === 'day' ? undefined : sm }, null, 2)], { type:'application/json' }), name + '.json');
+    saveBlob(new Blob([JSON.stringify({ app:'تعاهد', period:lb, scope:isAdmin() ? 'الإدارة' : S.halaqa, rows:rows.map(({ id, ...r }) => ({ ...r, rep:cnum(r.rep), listening:cnum(r.listening) })), summary:S.mode === 'day' ? undefined : sm }, null, 2)], { type:'application/json' }), name + '.json');
   } else {
     const tbl = (h, b) => `<table><thead><tr>${h.map(x => `<th>${x}</th>`).join('')}</tr></thead><tbody>${b.map(r => `<tr>${r.map(x => `<td>${esc(x)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
-    $('#pr').innerHTML = `<h2>تعاهد — ${esc(lb.replace(/_/g, ' '))}</h2>` + (S.mode === 'day' ? MQ.map(m => `<h3>مقرأة ${m}</h3>` + tbl(HEAD, rows.filter(r => r.muqraa === m).map(rowArr))).join('')
-      : tbl(['المقرأة','الاسم','أيام الإرسال','أيام الإتمام','نسبة الالتزام %'], sm.map(o => [o.muqraa, o.name, o.sent, o.done, o.pct])));
+    $('#pr').innerHTML = `<h2>تعاهد — ${isAdmin() ? 'الإدارة' : esc(S.halaqa)} — ${esc(lb.replace(/_/g, ' '))}</h2>` + (S.mode === 'day' ? MQ.map(m => `<h3>مقرأة ${m}</h3>` + tbl(HEAD, rows.filter(r => r.muqraa === m).map(rowArr))).join('')
+      : tbl(['المقرأة','الحلقة','الاسم','أيام الإرسال','أيام الإتمام','نسبة الالتزام %'], sm.map(o => [o.muqraa, o.halaqa, o.name, o.sent, o.done, o.pct])));
     window.print();
   }
 }
