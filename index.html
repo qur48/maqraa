@@ -291,9 +291,9 @@ async function teacher() {
   $('#fm').onchange = e => { S.mq = e.target.value; draw(); }; $('#fq').oninput = e => { S.q = e.target.value.trim(); draw(); };
   $('#rf').onclick = load; $('#out').onclick = () => { ls('tk', ''); location.hash = ''; route(); };
   $('#ex').onclick = doExport;
-  $('#sec').onclick = async () => { const n = prompt('اكتب الرمز السري الجديد (١٢ حرفًا على الأقل):'); if (!n) return;
+  $('#sec').onclick = async () => { const n = prompt('اكتب الرمز السري الجديد (٨ أحرف أو أرقام على الأقل):'); if (!n) return;
     const { error } = await sb.rpc('muqraa_teacher_set_secret', { p_secret: ls('tk'), p_new: n });
-    if (error) return alert('تعذّر التغيير. تأكد أن الرمز ١٢ حرفًا على الأقل.'); ls('tk', n); toast('تم تغيير الرمز السري، احفظه جيدًا'); };
+    if (error) return alert('تعذّر التغيير. تأكد أن الرمز ٨ أحرف أو أرقام على الأقل.'); ls('tk', n); toast('تم تغيير الرمز السري، احفظه جيدًا'); };
   tabs(); pickers(); load(); reveal();
 }
 
