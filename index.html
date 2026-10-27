@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#1c3d2c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="تعاهد">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="color-scheme" content="light">
 <title>تعاهد</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231f412f'/%3E%3Crect x='16' y='16' width='32' height='32' fill='none' stroke='%23957f50' stroke-width='3'/%3E%3Crect x='16' y='16' width='32' height='32' fill='none' stroke='%23957f50' stroke-width='3' transform='rotate(45 32 32)'/%3E%3C/svg%3E">
@@ -182,6 +188,46 @@ body:has(.tabbar) .toast{bottom:96px}
 .trow.tr{align-items:flex-start}.acts{display:flex;gap:6px;flex-direction:column;flex:0 0 auto}
 .danger{color:var(--bad)!important;border-color:var(--bad)!important}
 @media print{body{background:#fff!important}body::before{display:none}main,.ov,.toast{display:none!important}#pr{display:block;color:#000;background:#fff;padding:12px}#pr table{min-width:0;font-size:12px}#pr th,#pr td{border:1px solid #999;color:#000;background:#fff}}
+/* مسيرتي */
+.modal.jr{max-width:620px}
+.jr-b{padding:0 18px;text-align:start}
+.jr-sec{margin:22px 0 0}
+.jr-sec>h3{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:17px;color:var(--g2)}
+.jr-sec>h3::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--gold);transform:rotate(45deg)}
+.jr-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.jr-grid.g3{grid-template-columns:repeat(3,1fr)}
+.jr-st{background:var(--goldb);border-radius:22px;padding:12px 8px;text-align:center;font-size:13.5px;line-height:1.5;color:var(--tx)}
+.jr-st b{display:block;font-size:28px;line-height:1.3;color:var(--g2)}
+.jr-st.bad{background:#f4ddd6}.jr-st.bad b{color:var(--bad)}
+.jr-st.wn{background:var(--wnb)}.jr-st.wn b{color:var(--wn)}
+.jr-st.ok{background:var(--okb)}
+.jr-tot{margin-top:10px;padding:12px 16px;border-radius:22px;background:var(--g);color:#fff;text-align:center;font-size:15px}
+.jr-tot b{color:var(--gold2);font-size:22px;margin-inline:6px}
+.jr-bar{height:12px;border-radius:99px;background:var(--bd);overflow:hidden;margin:6px 0 4px}
+.jr-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--g2),var(--gold));border-radius:99px}
+.jr-mon{margin:0 0 14px}
+.jr-mon .t{display:flex;justify-content:space-between;font-size:13.5px;color:var(--mu);margin-bottom:6px}
+.jr-cells{display:flex;flex-wrap:wrap;gap:4px}
+.jr-c{width:16px;height:16px;border-radius:5px;background:var(--bd)}
+.jr-c.ok{background:var(--g2)}.jr-c.part{background:var(--gold2)}.jr-c.miss{background:#d98c7c}.jr-c.pend{background:transparent;border:2px dashed var(--gold)}.jr-c.off{background:transparent;border:1.5px solid var(--bd)}
+.jr-leg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--mu);margin-top:6px}
+.jr-leg span{display:inline-flex;align-items:center;gap:5px}.jr-leg .jr-c{width:12px;height:12px;border-radius:4px}
+.jr-ch{display:flex;flex-wrap:wrap;gap:6px}
+.jr-ch span{padding:2px 12px;border-radius:99px;background:#f4ddd6;color:var(--bad);font-size:13px}
+.jr-ch span.part{background:var(--wnb);color:var(--wn)}
+.jr-w{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd);font-size:14.5px}
+.jr-w:last-child{border-bottom:0}
+.jr-tag{flex:none;padding:1px 14px;border-radius:99px;font-size:13px;background:var(--bd);color:var(--mu)}
+.jr-tag.done{background:var(--okb);color:var(--ok)}.jr-tag.missed{background:#f4ddd6;color:var(--bad)}.jr-tag.postponed{background:var(--wnb);color:var(--wn)}
+details.jr-d{border-bottom:1px solid var(--bd)}
+details.jr-d summary{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;cursor:pointer;font-size:14.5px;list-style:none}
+details.jr-d summary::-webkit-details-marker{display:none}
+details.jr-d dl{margin:0 0 10px;padding:10px 14px;border-radius:18px;background:var(--card2);display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:14px}
+details.jr-d dt{color:var(--mu)}details.jr-d dd{margin:0;font-weight:500}
+.jr-more{margin-top:10px}
+.pwa-tip{position:relative}
+.pwa-tip p{margin:0}
+.pwa-tip .x{position:absolute;top:10px;inset-inline-end:14px;background:none;border:0;font-size:22px;line-height:1;color:var(--mu);cursor:pointer;font-family:inherit}
 </style>
 </head>
 <body>
@@ -284,6 +330,89 @@ function weeklyHTML(day) {
   return `<div class="card wk"><h2 class="pill">العرض الأسبوعي</h2><p class="note" style="margin-top:0">محفوظك ${cntText(N)}، تعرضه كاملًا كل ٤ أسابيع على ٤ جلسات يوم الأربعاء.</p>${items.map(row).join('')}</div>`;
 }
 
+/* ---- مسيرتي: عرض تفصيلي لمشوار الطالب وحساب التفريطات ---- */
+/* التفريط = يوم (من تاريخ التسجيل حتى أمس) لم تكتمل فيه المهام الستّ، أو أربعاء فاته العرض (حالة «لم يعرض»). اليوم الجاري لا يُحسب حتى ينتهي. */
+const OFF_DOW = []; /* أيام أسبوع تُستثنى من الحساب (٥ = الجمعة)؛ فارغة = تُحسب كل الأيام */
+const pgCount = v => { const n = LAT(v).match(/\d+/g) || []; if (!n.length) return 0; const a = +n[0], b = +n[n.length - 1]; return n.length > 1 && b >= a ? b - a + 1 : 1; };
+const shortDate = (d, o) => { try { return new Date(d + 'T12:00:00').toLocaleDateString('ar-SA-u-ca-gregory', o || { weekday: 'short', day: 'numeric', month: 'long' }); } catch (e) { return d; } };
+function calcJourney(d, today) {
+  const subs = {}, pres = {};
+  (d.subs || []).forEach(s => { subs[s.day] = s; }); (d.pres || []).forEach(p => { pres[p.wed] = p.status; });
+  const created = /^\d{4}-\d\d-\d\d$/.test(d.created || '') ? d.created : today, days = [];
+  for (let x = created, i = 0; x <= today && i < 4000; x = addDays(x, 1), i++) {
+    const s = subs[x]; let st = s ? (s.ok ? 'ok' : 'part') : 'miss';
+    if (st !== 'ok' && x === today) st = 'pend'; else if (st === 'miss' && OFF_DOW.includes(dow(x))) st = 'off';
+    days.push({ day: x, st, s });
+  }
+  let cur = 0, best = 0;
+  days.forEach(o => { if (o.st === 'ok') { cur++; best = Math.max(best, cur); } else if (o.st === 'miss' || o.st === 'part') cur = 0; });
+  const cnt = k => days.filter(o => o.st === k).length, ok = cnt('ok'), part = cnt('part'), miss = cnt('miss'), due = ok + part + miss;
+  let w0 = nextWed(addDays(created, 1)); if (/^\d{4}-\d\d-\d\d$/.test(d.cycle_start || '') && d.cycle_start > w0) w0 = nextWed(d.cycle_start); /* لا تُحسب أربعاوات سبقت التسجيل أو بداية الدورة */
+  const weds = []; for (let w = w0, i = 0; w < today && i < 600; w = addDays(w, 7), i++) weds.push({ wed: w, st: pres[w] || 'none' });
+  const pc = k => weds.filter(w => w.st === k).length;
+  const sum = k => (d.subs || []).reduce((t, s) => t + cnum(s[k]), 0), pages = k => (d.subs || []).reduce((t, s) => t + pgCount(s[k]), 0);
+  return { created, days, ok, part, miss, due, pct: due ? Math.round(ok / due * 100) : 0, cur, best, weds,
+    pDone: pc('done'), pMissed: pc('missed'), pPost: pc('postponed'), pNone: pc('none'),
+    tafreet: part + miss + pc('missed'), submitted: (d.subs || []).length, rep: sum('rep'), listening: sum('listening'), rv: pages('reviewing'), lk: pages('linking') };
+}
+function journeyHTML(j) {
+  const st = (n, t, c) => `<div class="jr-st ${c || ''}"><b>${AR(n)}</b>${t}</div>`, PT = { done: 'عرض', missed: 'لم يعرض', postponed: 'تأجّل', none: 'لم يُسجَّل بعد' };
+  const months = []; j.days.forEach(o => { const k = o.day.slice(0, 7); let m = months[months.length - 1]; if (!m || m.k !== k) months.push(m = { k, list: [] }); m.list.push(o); });
+  const bad = j.days.filter(o => o.st === 'miss' || o.st === 'part').reverse(), subsDays = j.days.filter(o => o.s).reverse();
+  const row = o => { const s = o.s;
+    return `<details class="jr-d"><summary><span>${esc(shortDate(o.day))}</span><span class="jr-tag ${s.ok ? 'done' : 'postponed'}">${s.ok ? 'مكتمل' : 'ناقص'}</span></summary><dl>
+      <dt>رقم المحفوظ</dt><dd>${esc(s.num || '—')}</dd><dt>التكرار</dt><dd>${esc(s.rep || '—')}</dd><dt>السماع</dt><dd>${esc(s.listening || '—')}</dd>
+      <dt>المراجعة</dt><dd>${esc(s.reviewing || '—')}</dd><dt>الربط</dt><dd>${esc(s.linking || '—')}</dd></dl></details>`; };
+  return `<div class="jr-b">
+    <p class="note" style="text-align:center">منذ تسجيلك في ${esc(shortDate(j.created, { day: 'numeric', month: 'long', year: 'numeric' }))}</p>
+    <div class="jr-sec"><h3>التزامك بالمهام اليومية</h3>
+      <div class="jr-grid g3">${st(j.ok, 'يوم مكتمل', 'ok')}${st(j.cur, 'أيام متتالية الآن')}${st(j.best, 'أطول سلسلة')}</div>
+      <div class="jr-bar" role="img" aria-label="نسبة الالتزام ${j.pct}٪"><i style="width:${j.pct}%"></i></div>
+      <p class="note" style="margin:0">نسبة الإتمام ${AR(j.pct)}٪ من ${AR(j.due)} ${j.due === 1 ? 'يوم' : j.due === 2 ? 'يومين' : j.due <= 10 ? 'أيام' : 'يومًا'} مضت</p></div>
+    <div class="jr-sec"><h3>حساب التفريطات</h3>
+      <div class="jr-grid">${st(j.miss, 'يوم بلا إرسال', j.miss ? 'bad' : '')}${st(j.part, 'يوم ناقص المهام', j.part ? 'wn' : '')}${st(j.pMissed, 'أربعاء فاتك العرض فيه', j.pMissed ? 'bad' : '')}${st(j.pPost, 'عرض مؤجَّل', j.pPost ? 'wn' : '')}</div>
+      <div class="jr-tot">مجموع التفريطات<b>${AR(j.tafreet)}</b></div>
+      ${bad.length ? `<p class="note" style="margin:12px 0 6px">أيام التفريط${bad.length > 40 ? ' (آخر ٤٠ يومًا)' : ''}:</p><div class="jr-ch">${bad.slice(0, 40).map(o => `<span class="${o.st}">${esc(shortDate(o.day, { day: 'numeric', month: 'short' }))}</span>`).join('')}</div>` : '<p class="note" style="text-align:center">لا تفريط حتى الآن، بارك الله فيك.</p>'}</div>
+    <div class="jr-sec"><h3>حصيلتك</h3>
+      <div class="jr-grid g3">${st(j.submitted, 'يوم أرسلتَ فيه')}${st(j.rep, 'مجموع التكرار')}${st(j.listening, 'مجموع السماع')}</div>
+      <div class="jr-grid" style="margin-top:10px">${st(j.rv, 'صفحة مراجعة')}${st(j.lk, 'صفحة ربط')}</div></div>
+    <div class="jr-sec"><h3>عروض الأربعاء</h3>
+      ${j.weds.length ? [...j.weds].reverse().slice(0, 12).map(w => `<div class="jr-w"><span>${esc(shortDate(w.wed, { day: 'numeric', month: 'long', year: 'numeric' }))}</span><span class="jr-tag ${w.st}">${PT[w.st] || PT.none}</span></div>`).join('') : '<p class="note">لم يمضِ أربعاء منذ تسجيلك.</p>'}
+      ${j.weds.length ? `<p class="note">عرض ${AR(j.pDone)} · لم يعرض ${AR(j.pMissed)} · تأجّل ${AR(j.pPost)} · لم يُسجَّل ${AR(j.pNone)}</p>` : ''}</div>
+    <div class="jr-sec"><h3>خريطة الأيام</h3>
+      ${months.slice(-6).reverse().map(m => `<div class="jr-mon"><div class="t"><span>${esc(shortDate(m.k + '-01', { month: 'long', year: 'numeric' }))}</span><span>${AR(m.list.filter(o => o.st === 'ok').length)} مكتمل</span></div>
+        <div class="jr-cells">${m.list.map(o => `<i class="jr-c ${o.st}" title="${esc(shortDate(o.day))}"></i>`).join('')}</div></div>`).join('')}
+      <div class="jr-leg"><span><i class="jr-c ok"></i>مكتمل</span><span><i class="jr-c part"></i>ناقص</span><span><i class="jr-c miss"></i>بلا إرسال</span><span><i class="jr-c pend"></i>اليوم</span></div></div>
+    <div class="jr-sec"><h3>سجلك اليومي</h3>
+      ${subsDays.length ? subsDays.slice(0, 30).map(row).join('') + (subsDays.length > 30 ? `<details class="jr-more"><summary class="lnk" style="cursor:pointer">عرض الأقدم (${AR(subsDays.length - 30)})</summary>${subsDays.slice(30).map(row).join('')}</details>` : '') : '<p class="note">لا إرسالات بعد.</p>'}</div></div>`;
+}
+async function journey() {
+  const pf = getPf(); if (!pf) return;
+  const o = overlay('<h2 class="serif">مسيرتي</h2><p class="note" id="jr_s">جارٍ التحميل…</p><div id="jr_body"></div>', null, () => o.remove());
+  o.querySelector('.modal').classList.add('jr');
+  const { data, error } = await sb.rpc('muqraa_my_journey', { p_username: pf.username });
+  if (!o.isConnected) return;
+  if (error) return o.querySelector('#jr_s').textContent = /not found/.test(error.message) ? 'لم نجد حسابك، سجّل الدخول من جديد.' : 'تعذّر التحميل، حاول مرة أخرى.';
+  o.querySelector('#jr_s').remove(); o.querySelector('#jr_body').innerHTML = journeyHTML(calcJourney(data, riyadh()));
+}
+
+/* ---- إضافة التطبيق للشاشة الرئيسية ---- */
+let deferredInstall = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; const t = $('#pwa_tip'); if (t) pwaTip(); });
+const isStandalone = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+function pwaTip() {
+  const box = $('#pwa_tip'); if (!box || isStandalone() || ls('pwa_x')) return;
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent), android = /android/i.test(navigator.userAgent);
+  if (!ios && !android && !deferredInstall) return;
+  box.innerHTML = `<div class="card pwa-tip"><button class="x" aria-label="إخفاء" type="button">×</button><h2 class="pill">تعاهد على شاشتك</h2>` + (deferredInstall
+    ? '<p class="note" style="margin-top:0">ثبّت تعاهد ليفتح كالتطبيق من شاشة جوالك.</p><button class="btn sm" id="pwa_go" style="margin-top:12px">تثبيت</button>'
+    : ios ? '<p class="note" style="margin-top:0">لتفتحه كالتطبيق: من Safari اضغط زر المشاركة، ثم «إضافة إلى الشاشة الرئيسية».</p>'
+    : '<p class="note" style="margin-top:0">لتفتحه كالتطبيق: من قائمة المتصفح (⋮) اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».</p>') + '</div>';
+  box.querySelector('.x').onclick = () => { ls('pwa_x', '1'); box.innerHTML = ''; };
+  const g = box.querySelector('#pwa_go'); if (g) g.onclick = async () => { deferredInstall.prompt(); await deferredInstall.userChoice.catch(() => {}); deferredInstall = null; ls('pwa_x', '1'); box.innerHTML = ''; };
+}
+if ('serviceWorker' in navigator && location.protocol === 'https:') window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+
 /* ---- الحساب: اسم المستخدم والبطاقة ---- */
 const getPf = () => { try { const p = JSON.parse(ls('pf2') || 'null'); return p && p.username && Array.isArray(p.juz) && p.juz.length ? p : null; } catch (e) { return null; } };
 const setPf = p => { const { done_days, today, ...core } = p; ls('pf2', JSON.stringify(core));
@@ -369,11 +498,11 @@ function student() {
   try { const d = JSON.parse(ls('draft') || '{}'); if (d.day === day) draft = d.v; } catch (e) {}
   if (!draft) { try { const t = JSON.parse(ls('srv') || '{}'); if (t.day === day && t.v) draft = t.v; } catch (e) {} }
   const full = pf.first + ' ' + pf.family, vals = { ...(draft || {}), name: full };
-  app.innerHTML = hero(`${esc(full)} <small class="wd">مقرأة ${esc(pf.muqraa)} · ${esc(pf.halaqa)}</small>`, '<span class="mb"><button class="chip" id="pfb">بطاقتي</button><button class="chip" id="lgo">خروج</button></span>') + hadithCard() + `
+  app.innerHTML = hero(`${esc(full)} <small class="wd">مقرأة ${esc(pf.muqraa)} · ${esc(pf.halaqa)}</small>`, '<span class="mb"><button class="chip" id="jrb">مسيرتي</button><button class="chip" id="pfb">بطاقتي</button><button class="chip" id="lgo">خروج</button></span>') + hadithCard() + `
   <div class="card"><h2 class="pill">مهام اليوم: <span class="dd">${dateLine(day)}</span></h2><div class="prog"><span></span><span id="pc"></span></div><div class="bar"><i id="pb"></i></div>
   <div class="fgrid">${FIELDS.map(fieldHTML).join('')}</div>
   <button class="btn" id="go">إرسال</button><p class="note" id="st"></p></div>
-  <div id="res"></div><p class="vision">برنامج نوعي يُعنى برفع مستوى حفظ وإتقان طلاب الحلقات وتخريجهم حفاظًا متقنين.</p>`;
+  <div id="res"></div><div id="pwa_tip"></div><p class="vision">برنامج نوعي يُعنى برفع مستوى حفظ وإتقان طلاب الحلقات وتخريجهم حفاظًا متقنين.</p>`;
   const upd = () => { const n = filled(vals); $('#pc').textContent = n + ' من ' + FIELDS.length; $('#pb').style.width = (n / FIELDS.length * 100) + '%'; };
   app.querySelectorAll('.logo-h').forEach(secretTap);
   const save = () => ls('draft', JSON.stringify({ day, v: vals })), nums = x => LAT(x).match(/\d+/g) || [];
@@ -392,7 +521,7 @@ function student() {
   upd();
   if (doneDays().includes(day)) $('#res').innerHTML = weeklyHTML(day);
   reveal();
-  $('#pfb').onclick = () => profileForm(true);
+  $('#pfb').onclick = () => profileForm(true); $('#jrb').onclick = journey; pwaTip();
   $('#lgo').onclick = () => { if (!confirm('الخروج من هذا الجهاز؟ بياناتك محفوظة باسم المستخدم ويمكنك الدخول به من جديد.')) return; ['pf2', 'srv', 'draft', 'done'].forEach(k => ls(k, '')); student(); };
   $('#go').onclick = async () => {
     for (const [k, l, ty] of FIELDS) if (ty === 'p') { const a = vals[k + '_f'], z = vals[k + '_t'];
