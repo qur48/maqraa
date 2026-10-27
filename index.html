@@ -136,6 +136,16 @@ td.w{max-width:190px}
 .rk{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--gold);color:#fff;font-size:13px;font-weight:700}
 .x{background:none;border:0;cursor:pointer;color:var(--bad);font-size:22px;line-height:1}
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--g);color:#fff;border:1.5px solid var(--gold2);padding:9px 22px;border-radius:99px;z-index:70;font-size:15px;box-shadow:var(--sh)}
+/* شريط الأقسام السفلي (الإدارة والمعلمون) */
+.pane[hidden],#flt[hidden]{display:none}
+main:has(.tabbar){padding-bottom:112px}
+body:has(.tabbar) .toast{bottom:96px}
+.tabbar{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);width:min(560px,calc(100% - 20px));z-index:40;display:flex;gap:2px;padding:6px;background:rgba(20,48,34,.97);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1.5px solid rgba(214,193,138,.55);border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.tabbar button{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 2px 6px;border:0;border-radius:999px;background:transparent;color:var(--gold2);font:inherit;font-size:12px;line-height:1.3;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .2s,color .2s}
+.tabbar button[hidden]{display:none}
+.tabbar button svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tabbar button.on{background:var(--gold);color:#fff;font-weight:700}
+.tabbar button:not(.on):hover{background:rgba(255,255,255,.08)}
 #pr{display:none}
 .rv{opacity:0;transform:translateY(38px);transition:opacity .75s cubic-bezier(.2,.7,.2,1) var(--d,0ms),transform .75s cubic-bezier(.2,.7,.2,1) var(--d,0ms)}
 .rv.in{opacity:1;transform:none}
@@ -383,7 +393,7 @@ function login(msg) {
   $('#in').onclick = go; $('#tk').onkeydown = e => { if (e.key === 'Enter') go(); }; reveal();
 }
 
-const S = { role:'', halaqa:'', mode:'day', day:riyadh(), month:riyadh().slice(0,7), year:riyadh().slice(0,4), from:riyadh(-6*864e5), to:riyadh(), mq:'الكل', hq:'الكل', q:'', fmt:'xlsx', scope:'done', rows:[], known:[], wed:'', wdata:null };
+const S = { role:'', halaqa:'', mode:'day', day:riyadh(), month:riyadh().slice(0,7), year:riyadh().slice(0,4), from:riyadh(-6*864e5), to:riyadh(), mq:'الكل', hq:'الكل', q:'', fmt:'xlsx', scope:'done', rows:[], known:[], wed:'', wdata:null, tab:'home' };
 S.wed = nextWed(riyadh());
 const isAdmin = () => S.role === 'admin';
 const range = () => { if (S.mode === 'day') return [S.day, S.day];
@@ -405,29 +415,42 @@ function summarize() {
 async function teacher() {
   app.innerHTML = hero('', '<span class="mb"><button class="chip" id="rf">تحديث</button><button class="chip" id="out">خروج</button></span>') + `
   <div class="ptl"><small id="pn1"></small><h2 class="serif" id="pn"></h2></div>
+  <div class="card" id="flt"><h2 class="pill">التصفية</h2>
+  <div class="grid3"><div><label for="fm">المقرأة</label><select id="fm"><option>الكل</option>${MQ.map(m => `<option>${m}</option>`).join('')}</select></div>
+  <div id="fhw" hidden><label for="fh">الحلقة</label><select id="fh"><option>الكل</option>${HQ.map(h => `<option>${h}</option>`).join('')}</select></div>
+  <div><label for="fq">بحث بالاسم</label><input type="text" id="fq"></div></div></div>
+  <section class="pane" data-p="home">
   <div class="card"><h2 class="pill">الفترة</h2>
   <div class="seg" id="md">${[['day','يومي'],['month','شهري'],['year','سنوي'],['custom','مخصص']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
   <div id="pk"></div>
-  <div class="grid3"><div><label for="fm">المقرأة</label><select id="fm"><option>الكل</option>${MQ.map(m => `<option>${m}</option>`).join('')}</select></div>
-  <div id="fhw" hidden><label for="fh">الحلقة</label><select id="fh"><option>الكل</option>${HQ.map(h => `<option>${h}</option>`).join('')}</select></div>
-  <div><label for="fq">بحث بالاسم</label><input type="text" id="fq"></div></div><p class="note" id="msg"></p></div>
+  <p class="note" id="msg"></p></div>
   <div class="stats" id="stats"></div>
   <div class="card"><div class="wrap"><table><thead id="th"></thead><tbody id="tb"></tbody></table></div></div>
   <div class="card" id="rem" hidden></div>
+  </section>
+  <section class="pane" data-p="wed" hidden>
   <div class="card" id="wc" hidden><h2 class="pill">جدول عرض الأربعاء</h2><div id="wb"></div></div>
-  <div class="card" id="xcard" hidden><h2 class="pill">تصدير</h2><p class="note" id="xn" style="margin-top:0"></p>
-  <label>الصيغة</label><div class="seg" id="xf">${[['xlsx','Excel'],['csv','CSV'],['json','JSON'],['print','طباعة / PDF']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
-  <label>المحتوى</label><div class="seg" id="xs">${[['done','من أتمّ جميع المهام'],['all','جميع الإرسالات']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
-  <button class="btn" id="ex">تصدير</button></div>
-  <div class="card" id="sc" hidden><h2 class="pill">الطلاب المسجلون</h2><p class="note" style="margin-top:0">ابحث بالاسم أو اسم المستخدم. حذف الطالب يحذف حسابه وسجل عرضه نهائيًا، وتُحفظ إرساليّاته اليومية في سلة المحذوفات ٣٠ يومًا.</p>
-  <label for="sq">بحث</label><input type="text" id="sq" autocomplete="off"><div id="sl"></div></div>
-  <div class="card" id="tc" hidden><h2 class="pill">رموز المعلمين</h2><p class="note" style="margin-top:0">لكل معلم رمز خاص يفتح له حلقته فقط. «إعادة تعيين» تنشئ رمزًا جديدًا وتوقف القديم.</p>
-  ${HQ.map(h => `<div class="trow"><span>${h}</span><button class="btn sec sm" data-h="${h}">إعادة تعيين</button></div>`).join('')}</div>
   <div class="card" id="cy" hidden><h2 class="pill">دورة العرض الأسبوعي</h2>
   <p class="note" style="margin-top:0">يعرض كل طالب محفوظه كاملًا على ٤ أربعاوات متتالية، ثم تبدأ الدورة من جديد. اختر أربعاء بداية الدورة (الجلسة ١)، وسيتغير جدول كل الطلاب.</p>
   <label for="cy_d">أربعاء البداية</label><input type="date" id="cy_d"><p class="note" id="cy_st" style="color:var(--bad)"></p>
   <label>الأربعاوات القادمة</label><div id="cy_pv"></div><button class="btn" id="cy_save">حفظ</button></div>
-  <div class="card"><button class="btn sec sm" id="sec">تغيير رمزي السري</button></div>`;
+  </section>
+  <section class="pane" data-p="stu" hidden>
+  <div class="card" id="sc" hidden><h2 class="pill">الطلاب المسجلون</h2><p class="note" style="margin-top:0">ابحث بالاسم أو اسم المستخدم. حذف الطالب يحذف حسابه وسجل عرضه نهائيًا، وتُحفظ إرساليّاته اليومية في سلة المحذوفات ٣٠ يومًا.</p>
+  <label for="sq">بحث</label><input type="text" id="sq" autocomplete="off"><div id="sl"></div></div>
+  </section>
+  <section class="pane" data-p="exp" hidden>
+  <div class="card" id="xcard" hidden><h2 class="pill">تصدير</h2><p class="note" id="xn" style="margin-top:0"></p><button type="button" class="lnk" id="xp" style="margin:0 0 4px">تغيير الفترة</button>
+  <label>الصيغة</label><div class="seg" id="xf">${[['xlsx','Excel'],['csv','CSV'],['json','JSON'],['print','طباعة / PDF']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
+  <label>المحتوى</label><div class="seg" id="xs">${[['done','من أتمّ جميع المهام'],['all','جميع الإرسالات']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
+  <button class="btn" id="ex">تصدير</button></div>
+  </section>
+  <section class="pane" data-p="set" hidden>
+  <div class="card" id="tc" hidden><h2 class="pill">رموز المعلمين</h2><p class="note" style="margin-top:0">لكل معلم رمز خاص يفتح له حلقته فقط. «إعادة تعيين» تنشئ رمزًا جديدًا وتوقف القديم.</p>
+  ${HQ.map(h => `<div class="trow"><span>${h}</span><button class="btn sec sm" data-h="${h}">إعادة تعيين</button></div>`).join('')}</div>
+  <div class="card"><h2 class="pill">الرمز السري</h2><p class="note" style="margin-top:0">غيّر رمزك السري الخاص بحسابك هذا.</p><button class="btn sec sm" id="sec" style="margin-top:12px">تغيير رمزي السري</button></div>
+  </section>
+  <nav class="tabbar" id="nav" aria-label="أقسام اللوحة"><button type="button" data-t="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V11M12 20V4M19 20v-6"/></svg><span>المتابعة</span></button><button type="button" data-t="wed"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>الأربعاء</span></button><button type="button" data-t="stu" data-a="1" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17 14.2c2.6.2 4.5 2.1 4.5 5.3"/></svg><span>الطلاب</span></button><button type="button" data-t="exp" data-a="1" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></svg><span>التصدير</span></button><button type="button" data-t="set"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg><span>الإعدادات</span></button></nav>`;
   const pickers = () => { $('#pk').innerHTML = S.mode === 'day' ? `<label>اليوم</label><input type="date" id="v1" value="${S.day}">`
     : S.mode === 'month' ? `<label>الشهر</label><input type="month" id="v1" value="${S.month}">`
     : S.mode === 'year' ? `<label>السنة</label><input type="number" id="v1" min="2020" max="2100" value="${S.year}">`
@@ -444,7 +467,8 @@ async function teacher() {
   $('#fm').onchange = e => { S.mq = e.target.value; draw(); }; $('#fh').onchange = e => { S.hq = e.target.value; draw(); };
   $('#fq').oninput = e => { S.q = e.target.value.trim(); draw(); };
   $('#rf').onclick = () => { load(); loadWed(); if (isAdmin()) loadStu(); }; $('#wc').onclick = wedClick; $('#sl').onclick = stuClick; $('#sq').oninput = drawStu; $('#out').onclick = () => { ls('tk', ''); location.hash = ''; route(); };
-  $('#ex').onclick = doExport;
+  $('#ex').onclick = doExport; $('#xp').onclick = () => setTab('home');
+  $('#nav').onclick = e => { const b = e.target.closest('button'); if (b && b.dataset.t) setTab(b.dataset.t); };
   $('#sec').onclick = async () => { const n = prompt('اكتب الرمز السري الجديد (٨ أحرف أو أرقام على الأقل):'); if (!n) return;
     const { error } = await sb.rpc('muqraa_teacher_set_secret', { p_secret: ls('tk'), p_new: n });
     if (error) return alert(/taken/.test(error.message) ? 'هذا الرمز مستخدم، اختر رمزًا آخر.' : 'تعذّر التغيير. تأكد أن الرمز ٨ أحرف أو أرقام على الأقل.'); ls('tk', n); toast('تم تغيير الرمز السري، احفظه جيدًا'); };
@@ -464,6 +488,15 @@ async function teacher() {
   tabs(); pickers(); load(); reveal();
 }
 
+function setTab(t) {
+  if (!document.querySelector('.pane[data-p="' + t + '"]')) t = 'home';
+  S.tab = t;
+  document.querySelectorAll('.pane').forEach(p => p.hidden = p.dataset.p !== t);
+  document.querySelectorAll('#nav button').forEach(b => { const on = b.dataset.t === t; b.classList.toggle('on', on); if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+  const f = $('#flt'); if (f) f.hidden = !(t === 'home' || t === 'wed');
+  window.scrollTo(0, 0); reveal();
+}
+
 async function load() {
   const msg = $('#msg'); if (!msg) return; msg.textContent = 'جارٍ التحميل…';
   const [f, t] = range();
@@ -477,7 +510,10 @@ async function load() {
   if (!S._wl) { S._wl = 1; loadWed(); }
   $('#fhw').hidden = !isAdmin(); $('#tc').hidden = !isAdmin(); $('#sc').hidden = !isAdmin(); if (isAdmin() && !S._sl) { S._sl = 1; loadStu(); } $('#cy').hidden = !isAdmin(); $('#xcard').hidden = !isAdmin();
   if (isAdmin()) { $('#cy_d').value = CYC.start; window.__cyPreview(); }
-  $('#xn').textContent = 'يشمل التصدير كل الحلقات والمقرأتين في الفترة المختارة.';
+  document.querySelectorAll('#nav [data-a]').forEach(b => b.hidden = !isAdmin());
+  if (!isAdmin() && (S.tab === 'stu' || S.tab === 'exp')) S.tab = 'home';
+  setTab(S.tab);
+  $('#xn').textContent = 'يشمل التصدير كل الحلقات والمقرأتين في الفترة: ' + label().replace(/_/g, ' ') + '. تُحدَّد الفترة من قسم «المتابعة».';
   draw();
 }
 
