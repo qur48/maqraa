@@ -55,18 +55,19 @@ label{display:flex;align-items:center;gap:8px;font-weight:500;margin:14px 0 5px;
 input,select,textarea{display:block;width:100%;height:var(--fh);padding:11px 16px;border:1.5px solid var(--fieldbd);border-radius:18px;background:var(--field);box-shadow:inset 0 2px 5px rgba(110,85,35,.09);color:var(--tx);font:inherit;line-height:28px;transition:background .2s,border-color .2s,box-shadow .2s}
 input:focus,select:focus,textarea:focus{outline:none;background:var(--fieldf);border-color:var(--gold);box-shadow:inset 0 1px 2px rgba(110,85,35,.05),0 0 0 4px rgba(149,127,80,.22)}
 textarea{resize:none;overflow:hidden}
-.cnt{direction:ltr;display:flex;align-items:center;gap:8px;height:var(--fh);padding:0 6px;border:1.5px solid var(--fieldbd);border-radius:99px;background:var(--field);box-shadow:inset 0 2px 5px rgba(110,85,35,.09);transition:border-color .2s,box-shadow .2s,background .2s}
+.cnt{direction:ltr;display:flex;align-items:center;gap:8px;height:var(--fh);padding:0 5px;border:1.5px solid var(--fieldbd);border-radius:999px;background:var(--field);box-shadow:inset 0 2px 5px rgba(110,85,35,.09);transition:border-color .2s,box-shadow .2s,background .2s}
 .cnt:focus-within{background:var(--fieldf);border-color:var(--gold);box-shadow:inset 0 1px 2px rgba(110,85,35,.05),0 0 0 4px rgba(149,127,80,.22)}
-.cnt input{flex:1;min-width:0;height:100%;border:0;background:transparent;box-shadow:none;text-align:center;font-size:22px;font-weight:700;color:var(--g2);padding:0 4px;border-radius:0}
+.cnt input{-webkit-appearance:none;appearance:none;flex:1 1 0;min-width:0;width:auto;height:100%;margin:0;padding:0 4px;border:0;border-radius:0;background:transparent;box-shadow:none;text-align:center;font-size:22px;font-weight:700;color:var(--g2);-webkit-text-fill-color:var(--g2);opacity:1}
 .cnt input:focus{box-shadow:none;background:transparent}
-.cb{flex:none;width:42px;height:42px;border-radius:50%;border:0;font:inherit;font-size:26px;line-height:1;cursor:pointer;display:grid;place-items:center;user-select:none;-webkit-user-select:none;touch-action:manipulation;transition:transform .1s}
+.cb{-webkit-appearance:none;appearance:none;box-sizing:border-box;flex:0 0 44px;width:44px;min-width:44px;max-width:44px;height:44px;min-height:44px;max-height:44px;aspect-ratio:1/1;margin:0;padding:0;border:0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:inherit;font-size:26px;font-weight:700;line-height:1;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:transform .1s}
 .cb.m{background:transparent;color:var(--gold);border:2px solid var(--gold)}
 .cb.p{background:var(--g);color:#fff;box-shadow:inset 0 -3px 0 rgba(0,0,0,.2)}
-.cb:active{transform:scale(.9)}
+.cb:active{transform:scale(.92)}
 .rng{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .pg{position:relative}
 .pg em{position:absolute;inset-inline-start:16px;top:50%;transform:translateY(-50%);font-size:13px;font-style:normal;color:var(--mu);pointer-events:none}
 .pg input{padding-inline-start:72px;text-align:start;font-weight:700;color:var(--g2)}
+.pg.has em{display:none}.pg.has input{padding-inline-start:16px}
 .btn{display:block;width:100%;margin-top:18px;padding:13px;border:0;border-radius:99px;background:var(--g);color:#fff;font:inherit;font-weight:700;font-size:17px;cursor:pointer;box-shadow:inset 0 -4px 0 rgba(0,0,0,.2);transition:filter .15s}
 .btn:hover{filter:brightness(1.12)}
 .btn.sec{background:transparent;color:var(--tx);border:1.5px solid var(--gold);box-shadow:none;font-size:15px;font-weight:500}
@@ -108,6 +109,12 @@ textarea{resize:none;overflow:hidden}
 .wk .it{padding:12px 0;border-bottom:1px solid var(--bd)}.wk .it:last-child{border-bottom:0}.wk .it.td{background:var(--goldb);border-radius:20px;padding:12px 16px;border:0;margin-bottom:6px}
 .tg{display:inline-block;background:var(--g);color:#fff;border-radius:99px;padding:0 14px;font-size:13px}.wd{font-size:13px;color:var(--gold)}
 .wk .pt{display:block;font-size:24px;line-height:1.5;color:var(--g2);margin-top:4px}.wk small{color:var(--mu);font-size:13px}
+.jzg{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:6px 0}
+.jzg button{aspect-ratio:1/1;padding:0;border-radius:50%;border:1.5px solid var(--fieldbd);background:var(--field);color:var(--tx);font:inherit;font-weight:700;cursor:pointer;-webkit-appearance:none;appearance:none;-webkit-tap-highlight-color:transparent}
+.jzg button.on{background:var(--g);color:#fff;border-color:var(--g)}
+.seg.col{flex-direction:column}.seg.col button{flex:none;text-align:center}
+.un{direction:ltr;text-align:left}.ro{background:var(--card2);color:var(--mu);box-shadow:none}
+.sg{margin:6px 0 4px;padding-inline-start:22px}.sg li{margin:2px 0}
 .trow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd)}.trow:last-child{border-bottom:0}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:2px 0 16px}
 .stat{background:var(--card);color:var(--tx);border-radius:26px;padding:14px 6px;text-align:center;font-size:14px;box-shadow:var(--sh);border-bottom:4px solid var(--gold)}.stat b{display:block;font-size:30px;line-height:1.3;color:var(--g2)}
@@ -186,6 +193,7 @@ function confetti() { for (let i = 0; i < 26; i++) { const e = document.createEl
 const cntHTML = (id, k) => `<div class="cnt"${k ? ` data-k="${k}"` : ''}><button type="button" class="cb m" aria-label="إنقاص">−</button><input type="text" id="${id}" inputmode="numeric" autocomplete="off"><button type="button" class="cb p" aria-label="زيادة">+</button></div>`;
 const fieldHTML = ([k, l, t]) => `<div class="f"><label for="f_${k}${t === 'p' ? '_from' : ''}">${l}</label>` + (t === 'c' ? cntHTML('f_' + k, k)
   : t === 'p' ? `<div class="rng"><div class="pg"><em>من صفحة</em><input type="text" id="f_${k}_from" inputmode="numeric" autocomplete="off"></div><div class="pg"><em>إلى صفحة</em><input type="text" id="f_${k}_to" inputmode="numeric" autocomplete="off"></div></div>`
+  : k === 'name' ? '<input type="text" id="f_name" class="ro" readonly tabindex="-1">'
   : `<input type="text" id="f_${k}" autocomplete="off">`) + '</div>';
 function bindCnt(box, init, onChange, max = 99999) {
   const inp = box.querySelector('input');
@@ -197,120 +205,165 @@ function bindCnt(box, init, onChange, max = 99999) {
     b.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); set(cnum(inp.value) + d); } }); });
   return set;
 }
+const secretTap = el => { let taps = []; el.onclick = () => { const t = Date.now(); taps = taps.filter(x => t - x < 2500); taps.push(t); if (taps.length >= 5) { taps = []; location.hash = '#teacher'; } }; };
 
-/* ---- بطاقة الطالب والعرض الأسبوعي (الأربعاء) ---- */
+/* ---- العرض الأسبوعي (الأربعاء): دورة ثابتة كل ٤ أسابيع، والأجزاء من إدخال الطالب ---- */
 const AR = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
-const getPf = () => { try { const p = JSON.parse(ls('pf') || 'null'); return p && p.first && p.family && p.juz >= 1 && p.juz <= 30 && (p.order === 'first' || p.order === 'amma') ? p : null; } catch (e) { return null; } };
 const dow = d => new Date(d + 'T12:00:00Z').getUTCDay();
 const addDays = (d, n) => { const t = new Date(d + 'T12:00:00Z'); t.setUTCDate(t.getUTCDate() + n); return t.toISOString().slice(0, 10); };
 const nextWed = d => addDays(d, (3 - dow(d) + 7) % 7);
 const CYC = { start: /^\d{4}-\d\d-\d\d$/.test(ls('cyc')) ? ls('cyc') : '2026-10-28' };
 const sessionOf = (w, st = CYC.start) => (((Math.round((Date.parse(w + 'T12:00:00Z') - Date.parse(st + 'T12:00:00Z')) / 6048e5) % 4) + 4) % 4) + 1;
-const portion = (N, n) => { if (n > 4) return null; const base = Math.floor(N / 4), rem = N % 4, cnt = i => base + (i <= rem ? 1 : 0);
-  let start = 0; for (let i = 1; i < n; i++) start += cnt(i); return { from: start + 1, to: start + cnt(n), count: cnt(n) }; };
-const juzText = (pf, p) => { const x = pf.order === 'first' ? p.from : 31 - p.from, y = pf.order === 'first' ? p.to : 31 - p.to;
-  return p.count === 1 ? 'الجزء ' + AR(x) : 'من الجزء ' + AR(x) + ' إلى الجزء ' + AR(y); };
+const QN = ['الأول', 'الثاني', 'الثالث', 'الرابع'];
+/* كل جزء ٤ أرباع؛ المحفوظ كله ٤×ن ربعًا يُقسم على ٤ جلسات، فلكل جلسة ن ربعًا بالضبط (ن = عدد الأجزاء) */
+function juzPlan(juz, s) {
+  const j = [...juz].sort((a, b) => a - b), N = j.length, segs = [];
+  for (let q = (s - 1) * N; q < s * N; q++) { const ju = j[Math.floor(q / 4)], qi = (q % 4) + 1, last = segs[segs.length - 1];
+    if (last && last.juz === ju && last.b === qi - 1) last.b = qi; else segs.push({ juz: ju, a: qi, b: qi }); }
+  return segs;
+}
+const segText = g => { const n = AR(g.juz);
+  return g.a === 1 && g.b === 4 ? `الجزء ${n} كاملًا` : g.a === 1 && g.b === 2 ? `النصف الأول من الجزء ${n}` : g.a === 3 && g.b === 4 ? `النصف الثاني من الجزء ${n}`
+    : g.a === g.b ? `الربع ${QN[g.a - 1]} من الجزء ${n}` : g.a === 1 && g.b === 3 ? `ثلاثة أرباع الجزء ${n} الأولى` : g.a === 2 && g.b === 4 ? `ثلاثة أرباع الجزء ${n} الأخيرة`
+    : `الربعان الثاني والثالث من الجزء ${n}`; };
+const cntText = N => N === 1 ? 'جزء واحد' : N === 2 ? 'جزآن' : N <= 10 ? AR(N) + ' أجزاء' : AR(N) + ' جزءًا';
+const amountText = N => { const w = Math.floor(N / 4), r = N % 4, rt = r === 1 ? 'ربع' : r === 2 ? 'نصف' : 'ثلاثة أرباع',
+    wt = w === 1 ? 'جزء' : w === 2 ? 'جزآن' : w <= 10 ? AR(w) + ' أجزاء' : AR(w) + ' جزءًا';
+  return !w ? (r === 3 ? 'ثلاثة أرباع الجزء' : rt + ' جزء') : r ? wt + ' و' + rt : wt; };
 function weeklyHTML(day) {
   const pf = getPf(); if (!pf) return '';
-  const w1 = nextWed(day), items = day === w1 ? [['اليوم', w1], ['الأربعاء القادم', addDays(w1, 7)]] : [['الأربعاء القادم', w1]];
-  const row = ([lb, w]) => { const n = sessionOf(w), p = portion(pf.juz, n); let body;
-    if (!p.count) body = '<b class="pt">لا عرض مقرر</b><small>عدد أجزائك قليل، فلا جزء لك في هذه الجلسة.</small>';
-    else body = `<b class="pt">${juzText(pf, p)}</b><small>${AR(p.count)} ${p.count === 1 ? 'جزء' : p.count === 2 ? 'جزآن' : p.count <= 10 ? 'أجزاء' : 'جزءًا'} · الجلسة ${AR(n)} من ٤</small>`;
-    return `<div class="it${lb === 'اليوم' ? ' td' : ''}"><span class="tg">${lb}</span> <span class="wd">${dateLine(w)}</span>${body}</div>`; };
-  return `<div class="card wk"><h2 class="pill">العرض الأسبوعي</h2><p class="note" style="margin-top:0">محفوظك ${AR(pf.juz)} جزءًا تعرضه كاملًا كل ٤ أسابيع، على ٤ جلسات يوم الأربعاء.</p>${items.map(row).join('')}</div>`;
+  const w1 = nextWed(day), items = day === w1 ? [['اليوم', w1], ['الأربعاء القادم', addDays(w1, 7)]] : [['الأربعاء القادم', w1]], N = pf.juz.length;
+  const row = ([lb, w]) => { const s = sessionOf(w);
+    return `<div class="it${lb === 'اليوم' ? ' td' : ''}"><span class="tg">${lb}</span> <span class="wd">${dateLine(w)}</span><b class="pt">${amountText(N)}</b>
+      <ul class="sg">${juzPlan(pf.juz, s).map(g => `<li>${segText(g)}</li>`).join('')}</ul><small>الجلسة ${AR(s)} من ٤</small></div>`; };
+  return `<div class="card wk"><h2 class="pill">العرض الأسبوعي</h2><p class="note" style="margin-top:0">محفوظك ${cntText(N)}، تعرضه كاملًا كل ٤ أسابيع على ٤ جلسات يوم الأربعاء.</p>${items.map(row).join('')}</div>`;
 }
-function profileModal(edit) {
+
+/* ---- الحساب: اسم المستخدم والبطاقة ---- */
+const getPf = () => { try { const p = JSON.parse(ls('pf2') || 'null'); return p && p.username && Array.isArray(p.juz) && p.juz.length ? p : null; } catch (e) { return null; } };
+const setPf = p => { const { done_days, today, ...core } = p; ls('pf2', JSON.stringify(core));
+  if (Array.isArray(done_days)) ls('done', JSON.stringify([...new Set([...doneDays(), ...done_days])].sort().slice(-400)));
+  if (today) ls('srv', JSON.stringify({ day: riyadh(), v: today })); return core; };
+function overlay(html, onclick) {
   document.querySelectorAll('.ov').forEach(o => o.remove());
-  const pf = getPf() || {}; let order = pf.order || '', juz = pf.juz || 0;
-  const o = document.createElement('div'); o.className = 'ov';
-  o.innerHTML = `<div class="modal" role="dialog" aria-modal="true">${banner('sm')}<h2 class="serif">بطاقتك</h2><p class="note">تُحفظ في متصفحك ولن نسألك عنها مرة أخرى.</p><div class="pf">
+  const o = document.createElement('div'); o.className = 'ov'; o.innerHTML = `<div class="modal" role="dialog" aria-modal="true">${banner('sm')}${html}</div>`;
+  if (onclick) o.onclick = onclick; document.body.appendChild(o); o.querySelectorAll('.logo-h').forEach(secretTap); return o;
+}
+function welcome(view) {
+  if (view === 'register') return profileForm(false);
+  if (view === 'login') {
+    const o = overlay(`<h2 class="serif">دخول</h2><p class="note">اكتب اسم المستخدم الذي أنشأته.</p><div class="pf"><label for="un_in">اسم المستخدم</label>
+      <input type="text" id="un_in" class="un" autocomplete="username" autocapitalize="none" spellcheck="false"><p class="note" id="un_st" style="color:var(--bad)"></p>
+      <button class="btn" id="un_go">دخول</button><div style="text-align:center"><button class="lnk" data-v="start">رجوع</button></div></div>`, e => { const b = e.target.closest('[data-v]'); if (b) welcome(b.dataset.v); });
+    const st = o.querySelector('#un_st'), go = async () => { const u = o.querySelector('#un_in').value.trim().toLowerCase();
+      if (!/^[a-z0-9_]{4,20}$/.test(u)) return st.textContent = 'اسم المستخدم من ٤ إلى ٢٠ حرفًا إنجليزيًا أو أرقامًا أو _';
+      o.querySelector('#un_go').disabled = true; st.textContent = 'جارٍ التحقق…';
+      const { data, error } = await sb.rpc('muqraa_login', { p_username: u }); o.querySelector('#un_go').disabled = false;
+      if (error) return st.textContent = /not found/.test(error.message) ? 'لا يوجد اسم مستخدم بهذا الاسم.' : 'تعذّر الاتصال، حاول مرة أخرى.';
+      setPf(data); student(); };
+    o.querySelector('#un_go').onclick = go; o.querySelector('#un_in').onkeydown = e => { if (e.key === 'Enter') go(); }; return;
+  }
+  overlay(`<h2 class="serif">مرحبًا بك في تعاهد</h2><p class="note">ادخل باسم المستخدم لتفتح صفحتك من أي جهاز.</p>
+    <div class="pick one"><button data-v="login">عندي اسم مستخدم</button><button data-v="register">أنا جديد، إنشاء بطاقتي</button></div>`, e => { const b = e.target.closest('[data-v]'); if (b) welcome(b.dataset.v); });
+}
+function profileForm(edit) {
+  const pf = edit ? getPf() : null; let mq = pf ? pf.muqraa : '', hq = pf ? pf.halaqa : ''; const sel = new Set(pf ? pf.juz : []);
+  const o = overlay(`<h2 class="serif">${edit ? 'بطاقتي' : 'إنشاء بطاقتك'}</h2><p class="note">${edit ? 'عدّل بياناتك ثم احفظ.' : 'تُحفظ بياناتك باسم المستخدم، فتدخل بها من أي جهاز.'}</p><div class="pf">
+    <label for="pf_un">اسم المستخدم</label><input type="text" id="pf_un" class="un${edit ? ' ro' : ''}"${edit ? ' readonly tabindex="-1"' : ' autocomplete="username" autocapitalize="none" spellcheck="false"'}>
+    ${edit ? '' : '<p class="note" style="margin-top:4px">٤ إلى ٢٠ حرفًا إنجليزيًا أو أرقامًا أو _ ، احفظه جيدًا فهو مفتاح دخولك.</p>'}
     <label for="pf_first">الاسم</label><input type="text" id="pf_first" autocomplete="given-name">
     <label for="pf_family">العائلة</label><input type="text" id="pf_family" autocomplete="family-name">
-    <label for="pf_juz">عدد الأجزاء المحفوظة</label>${cntHTML('pf_juz')}
-    <label>من أين بدأ حفظك؟</label><div class="seg" id="pf_ord"><button type="button" data-o="first">من الجزء الأول</button><button type="button" data-o="amma">من جزء عمّ</button></div>
-    <p class="note" id="pf_st" style="color:var(--bad)"></p><button class="btn" id="pf_save">حفظ</button>${edit ? '<div style="text-align:center"><button class="lnk" id="pf_x">إلغاء</button></div>' : ''}</div></div>`;
-  document.body.appendChild(o);
-  const q = s => o.querySelector(s);
-  q('#pf_first').value = pf.first || ''; q('#pf_family').value = pf.family || '';
-  bindCnt(q('.cnt'), juz, n => { juz = n; }, 30);
-  const paint = () => o.querySelectorAll('#pf_ord button').forEach(b => b.classList.toggle('on', b.dataset.o === order)); paint();
-  q('#pf_ord').onclick = e => { if (e.target.dataset.o) { order = e.target.dataset.o; paint(); } };
-  if (edit) q('#pf_x').onclick = () => o.remove();
-  q('#pf_save').onclick = () => {
-    const first = q('#pf_first').value.trim(), family = q('#pf_family').value.trim();
-    if (first.length < 2 || family.length < 2) return q('#pf_st').textContent = 'اكتب الاسم والعائلة.';
-    if (juz < 1) return q('#pf_st').textContent = 'حدّد عدد الأجزاء التي تحفظها.';
-    if (!order) return q('#pf_st').textContent = 'اختر من أين بدأ حفظك.';
-    ls('pf', JSON.stringify({ first, family, juz, order })); const full = first + ' ' + family; ls('nm', full);
-    try { const d = JSON.parse(ls('draft') || '{}'); if (d.day) { d.v = d.v || {}; d.v.name = full; ls('draft', JSON.stringify(d)); } } catch (e) {}
-    student();
+    <label>المقرأة</label><div class="seg" id="pf_mq">${MQ.map(m => `<button type="button" data-m="${m}">${m}</button>`).join('')}</div>
+    <label>الحلقة</label><div class="seg col" id="pf_hq">${HQ.map(h => `<button type="button" data-h="${esc(h)}">${esc(h)}</button>`).join('')}</div>
+    <label>الأجزاء التي تحفظها <span class="wd" id="jz_n"></span></label><div class="jzg" id="pf_jz">${Array.from({ length: 30 }, (_, i) => `<button type="button" data-j="${i + 1}">${AR(i + 1)}</button>`).join('')}</div>
+    <div style="text-align:end"><button class="lnk" id="jz_clr" type="button">مسح الكل</button></div>
+    <p class="note" id="pf_st" style="color:var(--bad)"></p><button class="btn" id="pf_save">حفظ</button>
+    <div style="text-align:center"><button class="lnk" id="pf_x" type="button">${edit ? 'إلغاء' : 'رجوع'}</button></div></div>`);
+  const q = x => o.querySelector(x);
+  q('#pf_un').value = pf ? pf.username : ''; q('#pf_first').value = pf ? pf.first : ''; q('#pf_family').value = pf ? pf.family : '';
+  const paint = () => { q('#pf_mq').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.m === mq));
+    q('#pf_hq').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.h === hq));
+    q('#pf_jz').querySelectorAll('button').forEach(b => b.classList.toggle('on', sel.has(+b.dataset.j)));
+    q('#jz_n').textContent = sel.size ? '(' + cntText(sel.size) + ')' : ''; }; paint();
+  q('#pf_mq').onclick = e => { if (e.target.dataset.m) { mq = e.target.dataset.m; paint(); } };
+  q('#pf_hq').onclick = e => { if (e.target.dataset.h) { hq = e.target.dataset.h; paint(); } };
+  q('#pf_jz').onclick = e => { const j = +e.target.dataset.j; if (j) { sel.has(j) ? sel.delete(j) : sel.add(j); paint(); } };
+  q('#jz_clr').onclick = () => { sel.clear(); paint(); };
+  q('#pf_x').onclick = () => edit ? o.remove() : welcome('start');
+  q('#pf_save').onclick = async () => {
+    const st = q('#pf_st'), un = edit ? pf.username : q('#pf_un').value.trim().toLowerCase(), first = q('#pf_first').value.trim(), family = q('#pf_family').value.trim();
+    if (!edit && !/^[a-z0-9_]{4,20}$/.test(un)) return st.textContent = 'اسم المستخدم من ٤ إلى ٢٠ حرفًا إنجليزيًا أو أرقامًا أو _';
+    if (first.length < 2 || family.length < 2) return st.textContent = 'اكتب الاسم والعائلة.';
+    if (!mq) return st.textContent = 'اختر مقرأتك.';
+    if (!hq) return st.textContent = 'اختر حلقتك.';
+    if (!sel.size) return st.textContent = 'اختر الأجزاء التي تحفظها.';
+    q('#pf_save').disabled = true; st.textContent = 'جارٍ الحفظ…';
+    const { data, error } = await sb.rpc(edit ? 'muqraa_update_profile' : 'muqraa_register', { p_username: un, p_first: first, p_family: family, p_muqraa: mq, p_halaqa: hq, p_juz: [...sel].sort((a, b) => a - b) });
+    q('#pf_save').disabled = false;
+    if (error) return st.textContent = /taken/.test(error.message) ? 'اسم المستخدم مستخدم، اختر اسمًا آخر.' : /invalid/.test(error.message) ? 'تحقق من البيانات المدخلة.' : 'تعذّر الحفظ، حاول مرة أخرى.';
+    setPf(data); student();
   };
+}
+async function syncProfile() {
+  const pf = getPf(); if (!pf) return;
+  const { data, error } = await sb.rpc('muqraa_login', { p_username: pf.username });
+  if (error) { if (/not found/.test(error.message)) { ls('pf2', ''); student(); } return; }
+  const before = JSON.stringify(pf), prevSrv = ls('srv'), core = setPf(data);
+  let draftToday = false; try { draftToday = JSON.parse(ls('draft') || '{}').day === riyadh(); } catch (e) {}
+  if (JSON.stringify(core) !== before || (ls('srv') !== prevSrv && !draftToday)) student();
 }
 
 function student() {
   document.title = 'تعاهد'; document.querySelectorAll('.ov').forEach(o => o.remove());
-  const day = riyadh();
-  let mq = ls('mq'), hq = ls('hq'), vals = { name: ls('nm') };
-  if (!HQ.includes(hq)) hq = '';
-  const pf = getPf(), step = !mq ? 1 : !hq ? 2 : !pf ? 3 : 0, ready = step === 0;
-  try { const d = JSON.parse(ls('draft') || '{}'); if (d.day === day) vals = { ...vals, ...d.v }; } catch (e) {}
-  if (!(vals.name || '').trim() && pf) vals.name = pf.first + ' ' + pf.family;
-  app.innerHTML = hero('', ready ? `<span class="mb"><button class="chip" id="chg">مقرأة ${esc(mq)} · ${esc(hq)} · تغيير</button><button class="chip" id="pfb">بطاقتي</button></span>` : '') + hadithCard() + `
+  const day = riyadh(), pf = getPf();
+  if (!pf) { app.innerHTML = hero('', '') + hadithCard() + '<p class="vision">برنامج نوعي يُعنى برفع مستوى حفظ وإتقان طلاب الحلقات وتخريجهم حفاظًا متقنين.</p>'; app.querySelectorAll('.logo-h').forEach(secretTap); welcome('start'); return; }
+  let draft = null;
+  try { const d = JSON.parse(ls('draft') || '{}'); if (d.day === day) draft = d.v; } catch (e) {}
+  if (!draft) { try { const t = JSON.parse(ls('srv') || '{}'); if (t.day === day && t.v) draft = t.v; } catch (e) {} }
+  const full = pf.first + ' ' + pf.family, vals = { ...(draft || {}), name: full };
+  app.innerHTML = hero(`${esc(full)} <small class="wd">مقرأة ${esc(pf.muqraa)} · ${esc(pf.halaqa)}</small>`, '<span class="mb"><button class="chip" id="pfb">بطاقتي</button><button class="chip" id="lgo">خروج</button></span>') + hadithCard() + `
   <div class="card"><h2 class="pill">مهام اليوم: <span class="dd">${dateLine(day)}</span></h2><div class="prog"><span></span><span id="pc"></span></div><div class="bar"><i id="pb"></i></div>
   <div class="fgrid">${FIELDS.map(fieldHTML).join('')}</div>
   <button class="btn" id="go">إرسال</button><p class="note" id="st"></p></div>
   <div id="res"></div><p class="vision">برنامج نوعي يُعنى برفع مستوى حفظ وإتقان طلاب الحلقات وتخريجهم حفاظًا متقنين.</p>`;
   const upd = () => { const n = filled(vals); $('#pc').textContent = n + ' من ' + FIELDS.length; $('#pb').style.width = (n / FIELDS.length * 100) + '%'; };
-  let taps = []; $('.logo-h').onclick = () => { const t = Date.now(); taps = taps.filter(x => t - x < 2500); taps.push(t); if (taps.length >= 5) { taps = []; location.hash = '#teacher'; } };
+  app.querySelectorAll('.logo-h').forEach(secretTap);
   const save = () => ls('draft', JSON.stringify({ day, v: vals })), nums = x => LAT(x).match(/\d+/g) || [];
   ['reviewing', 'linking'].forEach(k => { if (vals[k + '_f'] === undefined) { const n = nums(vals[k]); vals[k + '_f'] = n[0] || ''; vals[k + '_t'] = n.length > 1 ? n[n.length - 1] : ''; } });
   ['rep', 'listening'].forEach(k => { vals[k] = String(cnum(vals[k])); });
   FIELDS.forEach(([k, , ty]) => {
-    if (ty === 't') { const el = $('#f_' + k); el.value = vals[k] || ''; el.oninput = () => { vals[k] = el.value; save(); upd(); }; }
+    if (ty === 't') { const el = $('#f_' + k); el.value = vals[k] || ''; if (k !== 'name') el.oninput = () => { vals[k] = el.value; save(); upd(); }; }
     else if (ty === 'c') bindCnt($(`.cnt[data-k="${k}"]`), vals[k], n => { vals[k] = String(n); save(); upd(); });
     else {
       const a = $('#f_' + k + '_from'), z = $('#f_' + k + '_to'); a.value = vals[k + '_f']; z.value = vals[k + '_t'];
-      const sync = () => { a.value = vals[k + '_f'] = digits(a.value, 4); z.value = vals[k + '_t'] = digits(z.value, 4); vals[k] = pageStr(vals[k + '_f'], vals[k + '_t']); save(); upd(); };
-      a.oninput = z.oninput = sync; vals[k] = pageStr(vals[k + '_f'], vals[k + '_t']);
+      const mark = () => { [a, z].forEach(i => i.parentNode.classList.toggle('has', !!i.value)); };
+      const sync = () => { a.value = vals[k + '_f'] = digits(a.value, 4); z.value = vals[k + '_t'] = digits(z.value, 4); vals[k] = pageStr(vals[k + '_f'], vals[k + '_t']); mark(); save(); upd(); };
+      a.oninput = z.oninput = sync; vals[k] = pageStr(vals[k + '_f'], vals[k + '_t']); mark();
     }
   });
   upd();
-  if (ready && doneDays().includes(day)) $('#res').innerHTML = weeklyHTML(day);
+  if (doneDays().includes(day)) $('#res').innerHTML = weeklyHTML(day);
   reveal();
-  if (ready) { $('#chg').onclick = () => { ls('mq', ''); ls('hq', ''); student(); }; $('#pfb').onclick = () => profileModal(true); }
-  else if (step === 3) profileModal(false);
-  else {
-    const o = document.createElement('div'); o.className = 'ov';
-    o.innerHTML = `<div class="modal" role="dialog" aria-modal="true">${banner('sm')}` + (step === 1
-      ? `<h2 class="serif">مرحبًا بك في تعاهد</h2><p class="note">اختر مقرأتك للبدء، وستُحفظ على جهازك.</p>
-         <div class="pick">${MQ.map(m => `<button data-m="${m}">${m}<small>مقرأة ${m}</small></button>`).join('')}</div>`
-      : `<h2 class="serif">اختر حلقتك</h2><p class="note">مقرأة ${esc(mq)}</p>
-         <div class="pick one">${HQ.map(h => `<button data-h="${esc(h)}">${esc(h)}</button>`).join('')}</div>
-         <button class="lnk" data-back="1">تغيير المقرأة</button>`) + '</div>';
-    o.onclick = e => { const b = e.target.closest('button'); if (!b) return;
-      if (b.dataset.m) ls('mq', b.dataset.m); else if (b.dataset.h) ls('hq', b.dataset.h); else if (b.dataset.back) { ls('mq', ''); ls('hq', ''); }
-      student(); };
-    document.body.appendChild(o);
-  }
+  $('#pfb').onclick = () => profileForm(true);
+  $('#lgo').onclick = () => { if (!confirm('الخروج من هذا الجهاز؟ بياناتك محفوظة باسم المستخدم ويمكنك الدخول به من جديد.')) return; ['pf2', 'srv', 'draft', 'done'].forEach(k => ls(k, '')); student(); };
   $('#go').onclick = async () => {
-    if (!ready) return;
-    if ((vals.name || '').trim().length < 2) return $('#st').textContent = 'اكتب اسمك أولًا.';
     for (const [k, l, ty] of FIELDS) if (ty === 'p') { const a = vals[k + '_f'], z = vals[k + '_t'];
       if (!a && z) return $('#st').textContent = 'اكتب صفحة البداية في ' + l + '.';
       if (a && z && +z < +a) return $('#st').textContent = 'صفحة النهاية أصغر من صفحة البداية في ' + l + '.'; }
     $('#go').disabled = true; $('#st').textContent = 'جارٍ الإرسال…';
-    const { error } = await sb.rpc('muqraa_submit_task', { p_muqraa: mq, p_halaqa: hq, p_name: vals.name, p_num: vals.num || '', p_rep: vals.rep || '',
+    const { error } = await sb.rpc('muqraa_submit_task', { p_username: pf.username, p_num: vals.num || '', p_rep: vals.rep || '',
       p_listening: vals.listening || '', p_reviewing: vals.reviewing || '', p_linking: vals.linking || '' });
     $('#go').disabled = false;
-    if (error) return $('#st').textContent = 'تعذّر الإرسال، حاول مرة أخرى.';
-    ls('nm', vals.name.trim()); $('#st').textContent = '';
-    let ds = doneDays().filter(d => d !== day); const full = done(vals); if (full) ds.push(day); ls('done', JSON.stringify(ds.slice(-400)));
-    $('#res').innerHTML = full ? `<div class="card done-card"><div class="tick"><b>✓</b></div><h2 class="serif">بارك الله فيك، أتممتَ مهام اليوم</h2>
+    if (error) { if (/not found/.test(error.message)) { ls('pf2', ''); return student(); } return $('#st').textContent = 'تعذّر الإرسال، حاول مرة أخرى.'; }
+    $('#st').textContent = '';
+    let ds = doneDays().filter(d => d !== day); const ok = done(vals); if (ok) ds.push(day); ls('done', JSON.stringify(ds.slice(-400)));
+    $('#res').innerHTML = ok ? `<div class="card done-card"><div class="tick"><b>✓</b></div><h2 class="serif">بارك الله فيك، أتممتَ مهام اليوم</h2>
       <div class="streak"><div><b>${streak()}</b>أيام متتالية</div><div><b>${ds.length}</b>أيام الإتمام</div></div>
-      <p class="note">السلسلة محفوظة على جهازك. يمكنك تعديل إجاباتك وإعادة الإرسال اليوم.</p></div>` + weeklyHTML(day)
+      <p class="note">يمكنك تعديل إجاباتك وإعادة الإرسال اليوم.</p></div>` + weeklyHTML(day)
       : `<div class="card done-card"><h2>تم الإرسال، ${FIELDS.length - filled(vals) === 1 ? 'وبقيت مهمة واحدة' : 'وبقيت ' + (FIELDS.length - filled(vals)) + ' مهام'}</h2><p class="note">أكمل الباقي ثم أعد الإرسال في اليوم نفسه.</p></div>`;
-    reveal(); if (full) confetti(); $('#res').scrollIntoView({ behavior: 'smooth' });
+    reveal(); if (ok) confetti(); $('#res').scrollIntoView({ behavior: 'smooth' });
   };
+  syncProfile();
 }
 
 /* ---------------- الإدارة والمعلمون ---------------- */
@@ -353,7 +406,7 @@ async function teacher() {
   <div class="stats" id="stats"></div>
   <div class="card"><div class="wrap"><table><thead id="th"></thead><tbody id="tb"></tbody></table></div></div>
   <div class="card" id="rem" hidden></div>
-  <div class="card"><h2 class="pill">تصدير</h2><p class="note" id="xn" style="margin-top:0"></p>
+  <div class="card" id="xcard" hidden><h2 class="pill">تصدير</h2><p class="note" id="xn" style="margin-top:0"></p>
   <label>الصيغة</label><div class="seg" id="xf">${[['xlsx','Excel'],['csv','CSV'],['json','JSON'],['print','طباعة / PDF']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
   <label>المحتوى</label><div class="seg" id="xs">${[['done','من أتمّ جميع المهام'],['all','جميع الإرسالات']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
   <button class="btn" id="ex">تصدير</button></div>
@@ -410,9 +463,9 @@ async function load() {
   S.role = data.role; S.halaqa = data.halaqa || ''; S.rows = data.rows; S.known = data.known; msg.textContent = '';
   $('#pn1').textContent = isAdmin() ? 'تعاهد' : 'لوحة المعلم'; $('#pn').textContent = isAdmin() ? 'لوحة الإدارة' : S.halaqa;
   document.title = 'تعاهد · ' + (isAdmin() ? 'لوحة الإدارة' : S.halaqa);
-  $('#fhw').hidden = !isAdmin(); $('#tc').hidden = !isAdmin(); $('#cy').hidden = !isAdmin();
+  $('#fhw').hidden = !isAdmin(); $('#tc').hidden = !isAdmin(); $('#cy').hidden = !isAdmin(); $('#xcard').hidden = !isAdmin();
   if (isAdmin()) { $('#cy_d').value = CYC.start; window.__cyPreview(); }
-  $('#xn').textContent = isAdmin() ? 'يشمل التصدير كل الحلقات والمقرأتين في الفترة المختارة.' : 'يشمل التصدير طلاب ' + S.halaqa + ' فقط.';
+  $('#xn').textContent = 'يشمل التصدير كل الحلقات والمقرأتين في الفترة المختارة.';
   draw();
 }
 
@@ -424,12 +477,12 @@ function draw() {
     const sent = S.rows.filter(f).sort(cmpN), seen = new Set(S.rows.map(key3));
     const miss = S.known.filter(k => !seen.has(key3(k)) && f(k)).sort(cmpN), n = sent.filter(done).length;
     $('#stats').innerHTML = `<div class="stat"><b>${n}</b>أتمّوا</div><div class="stat"><b>${sent.length - n}</b>ناقصة</div><div class="stat"><b>${miss.length}</b>لم يرسلوا</div>`;
-    $('#th').innerHTML = `<tr><th>الاسم</th><th>المقرأة</th>${A ? '<th>الحلقة</th>' : ''}<th>المحفوظ</th><th>التكرار</th><th>السماع</th><th>المراجعة</th><th>الربط</th><th>الحالة</th><th></th></tr>`;
+    $('#th').innerHTML = `<tr><th>الاسم</th><th>المقرأة</th>${A ? '<th>الحلقة</th>' : ''}<th>المحفوظ</th><th>التكرار</th><th>السماع</th><th>المراجعة</th><th>الربط</th><th>الحالة</th>${A ? '<th></th>' : ''}</tr>`;
     $('#tb').innerHTML = sent.map(r => `<tr><td>${esc(r.name)}</td><td>${esc(r.muqraa)}</td>${A ? `<td>${esc(r.halaqa) || '—'}</td>` : ''}<td class="w">${esc(r.num) || '—'}</td><td>${cnum(r.rep) || '—'}</td><td>${cnum(r.listening) || '—'}</td><td>${esc(r.reviewing) || '—'}</td><td>${esc(r.linking) || '—'}</td>
-      <td>${done(r) ? '<span class="badge b-ok">مكتمل</span>' : `<span class="badge b-wn">${filled(r)}/${FIELDS.length}</span>`}</td><td><button class="x" data-id="${r.id}" title="حذف" aria-label="حذف">×</button></td></tr>`).join('')
-      + miss.map(r => `<tr><td>${esc(r.name)}</td><td>${esc(r.muqraa)}</td>${A ? `<td>${esc(r.halaqa) || '—'}</td>` : ''}<td colspan="5">—</td><td><span class="badge b-mu">لم يرسل</span></td><td></td></tr>`).join('')
-      || `<tr><td colspan="${A ? 10 : 9}" class="note">لا توجد إرسالات في هذا اليوم.</td></tr>`;
-    $('#tb').onclick = async e => { const id = e.target.dataset.id; if (id && confirm('حذف هذا السجل نهائيًا؟')) {
+      <td>${done(r) ? '<span class="badge b-ok">مكتمل</span>' : `<span class="badge b-wn">${filled(r)}/${FIELDS.length}</span>`}</td>${A ? `<td><button class="x" data-id="${r.id}" title="حذف" aria-label="حذف">×</button></td>` : ''}</tr>`).join('')
+      + miss.map(r => `<tr><td>${esc(r.name)}</td><td>${esc(r.muqraa)}</td>${A ? `<td>${esc(r.halaqa) || '—'}</td>` : ''}<td colspan="5">—</td><td><span class="badge b-mu">لم يرسل</span></td>${A ? '<td></td>' : ''}</tr>`).join('')
+      || `<tr><td colspan="${A ? 10 : 8}" class="note">لا توجد إرسالات في هذا اليوم.</td></tr>`;
+    $('#tb').onclick = !A ? null : async e => { const id = e.target.dataset.id; if (id && confirm('حذف هذا السجل نهائيًا؟')) {
       const { error } = await sb.rpc('muqraa_teacher_delete', { p_secret: ls('tk'), p_id: +id }); if (error) alert('تعذّر الحذف.'); else load(); } };
     const groups = {}; miss.forEach(k => { const h = k.halaqa || 'بدون حلقة'; (groups[h] = groups[h] || []).push(k); });
     const txt = 'السلام عليكم ورحمة الله وبركاته\nتذكير من «تعاهد»: لم تصلنا مهام اليوم من:\n' + Object.entries(groups).map(([h, l]) => `\n${h}:\n` + l.map(k => '- ' + k.name + ' (' + k.muqraa + ')').join('\n')).join('\n') + '\n\nبارك الله فيكم، وتعاهدوا القرآن.';
