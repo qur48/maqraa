@@ -154,6 +154,33 @@ body:has(.tabbar) .toast{bottom:96px}
 @media (prefers-reduced-motion:reduce){.conf{display:none}.bar i{transition:none}}
 @media (min-width:720px){.fgrid{grid-template-columns:repeat(6,1fr)}}
 @media (max-width:480px){h2.pill{max-width:calc(100% - 16px);border-radius:24px;line-height:1.55;padding-top:7px;padding-bottom:7px}.banner,.banner.sm{height:120px}.logo{height:88px}.logo-h{left:22px}.hd .l1{font-size:28px}.hd .l2{font-size:20px}.stat b{font-size:26px}}
+
+/* سهم الرجوع ورابط الإدارة في نافذة الطالب */
+.modal{position:relative}
+.bk{position:absolute;top:14px;right:14px;z-index:2;width:42px;height:42px;display:grid;place-items:center;padding:0;border-radius:50%;border:1.5px solid rgba(247,240,225,.7);background:rgba(28,61,44,.55);color:#f7f0e1;cursor:pointer;-webkit-appearance:none;appearance:none;-webkit-tap-highlight-color:transparent}
+.bk svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.bk:hover{background:rgba(28,61,44,.85)}
+.adm{display:inline-block;margin:20px 0 0;color:var(--gold);font-size:12.5px;text-decoration:underline;text-underline-offset:3px}
+/* جدول عرض الأربعاء: الأوجه والحلقات */
+.fsum{margin:12px 0 4px;padding:14px 16px;border-radius:24px;background:var(--g);color:#fff;text-align:center}
+.fsum span{display:block;font-size:14px;color:var(--gold2)}
+.fsum b{display:inline-block;font-size:44px;line-height:1.25;color:#fff}
+.fsum small{font-size:15px;color:var(--gold2);margin-inline-start:6px}
+.fsum p{margin:4px 0 0;font-size:12.5px;line-height:1.6;color:rgba(245,238,230,.82)}
+.hqs{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:12px 0 4px}
+.hqs button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 2px 7px;border:1.5px solid var(--fieldbd);border-radius:22px;background:var(--field);color:var(--tx);font:inherit;cursor:pointer;min-width:0;-webkit-tap-highlight-color:transparent}
+.hqs i{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--goldb);color:var(--gold)}
+.hqs svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.hqs span{font-size:11.5px;line-height:1.35;font-weight:700;text-align:center}
+.hqs em{font-style:normal;font-size:11px;color:var(--mu)}
+.hqs button.on{background:var(--g);color:#fff;border-color:var(--g)}.hqs button.on i{background:var(--gold);color:#fff}.hqs button.on em{color:var(--gold2)}
+.fsel{margin:8px 0 2px;padding:10px 14px;border-radius:20px;background:var(--goldb);color:var(--g2);text-align:center;font-size:14.5px}.fsel b{font-size:19px}
+.gh{display:flex;justify-content:space-between;align-items:center;margin:14px 0 2px;padding:6px 14px;border-radius:99px;background:var(--card2);color:var(--g2);font-weight:700;font-size:14.5px}.gh small{color:var(--gold);font-weight:400}
+.sr.dn{background:var(--okb);border-radius:20px;padding:12px 14px;margin:6px 0;border-bottom:0}
+.amr{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}.fc{background:var(--goldb);color:var(--gold);border-radius:99px;padding:0 10px;font-size:12.5px}
+.okl{margin:0 0 6px;color:var(--ok);font-size:13.5px;font-weight:700}
+.trow.tr{align-items:flex-start}.acts{display:flex;gap:6px;flex-direction:column;flex:0 0 auto}
+.danger{color:var(--bad)!important;border-color:var(--bad)!important}
 @media print{body{background:#fff!important}body::before{display:none}main,.ov,.toast{display:none!important}#pr{display:block;color:#000;background:#fff;padding:12px}#pr table{min-width:0;font-size:12px}#pr th,#pr td{border:1px solid #999;color:#000;background:#fff}}
 </style>
 </head>
@@ -197,6 +224,7 @@ const hadithCard = () => `<section class="hd serif" aria-label="حديث"><p cla
   <p class="l1">«تَعاهَدوا هذا القُرآنَ،</p><p class="l2">فوالذي نَفسُ مُحَمَّدٍ بيَدِه لَهو أشَدُّ تَفَلُّتًا مِنَ الإبِلِ في عُقُلِها»</p></section>`;
 
 function route() {
+  document.querySelectorAll('.ov').forEach(o => o.remove());
   if (location.hash === '#teacher') return ls('tk') ? teacher() : login();
   student();
 }
@@ -261,17 +289,19 @@ const getPf = () => { try { const p = JSON.parse(ls('pf2') || 'null'); return p 
 const setPf = p => { const { done_days, today, ...core } = p; ls('pf2', JSON.stringify(core));
   if (Array.isArray(done_days)) ls('done', JSON.stringify([...new Set([...doneDays(), ...done_days])].sort().slice(-400)));
   if (today) ls('srv', JSON.stringify({ day: riyadh(), v: today })); return core; };
-function overlay(html, onclick) {
+const BK = '<button type="button" class="bk" aria-label="رجوع"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>';
+function overlay(html, onclick, back) {
   document.querySelectorAll('.ov').forEach(o => o.remove());
-  const o = document.createElement('div'); o.className = 'ov'; o.innerHTML = `<div class="modal" role="dialog" aria-modal="true">${banner('sm')}${html}</div>`;
+  const o = document.createElement('div'); o.className = 'ov'; o.innerHTML = `<div class="modal" role="dialog" aria-modal="true">${banner('sm')}${back ? BK : ''}${html}</div>`;
+  if (back) o.querySelector('.bk').onclick = back;
   if (onclick) o.onclick = onclick; document.body.appendChild(o); o.querySelectorAll('.logo-h').forEach(secretTap); return o;
 }
 function welcome(view) {
   if (view === 'register') return profileForm(false);
   if (view === 'login') {
-    const o = overlay(`<h2 class="serif">دخول</h2><p class="note">اكتب اسم المستخدم الذي أنشأته.</p><div class="pf"><label for="un_in">اسم المستخدم</label>
+    const o = overlay(`<h2 class="serif">تسجيل دخول</h2><p class="note">اكتب اسم المستخدم الذي أنشأته.</p><div class="pf"><label for="un_in">اسم المستخدم</label>
       <input type="text" id="un_in" class="un" autocomplete="username" autocapitalize="none" spellcheck="false"><p class="note" id="un_st" style="color:var(--bad)"></p>
-      <button class="btn" id="un_go">دخول</button><div style="text-align:center"><button class="lnk" data-v="start">رجوع</button></div></div>`, e => { const b = e.target.closest('[data-v]'); if (b) welcome(b.dataset.v); });
+      <button class="btn" id="un_go">دخول</button></div>`, null, () => welcome('start'));
     const st = o.querySelector('#un_st'), go = async () => { const u = o.querySelector('#un_in').value.trim().toLowerCase();
       if (!/^[a-z0-9_]{4,20}$/.test(u)) return st.textContent = 'اسم المستخدم من ٤ إلى ٢٠ حرفًا إنجليزيًا أو أرقامًا أو _';
       o.querySelector('#un_go').disabled = true; st.textContent = 'جارٍ التحقق…';
@@ -281,11 +311,11 @@ function welcome(view) {
     o.querySelector('#un_go').onclick = go; o.querySelector('#un_in').onkeydown = e => { if (e.key === 'Enter') go(); }; return;
   }
   overlay(`<h2 class="serif">مرحبًا بك في تعاهد</h2><p class="note">ادخل باسم المستخدم لتفتح صفحتك من أي جهاز.</p>
-    <div class="pick one"><button data-v="login">عندي اسم مستخدم</button><button data-v="register">أنا جديد، إنشاء بطاقتي</button></div>`, e => { const b = e.target.closest('[data-v]'); if (b) welcome(b.dataset.v); });
+    <div class="pick one"><button data-v="login">تسجيل دخول</button><button data-v="register">تسجيل جديد</button></div><a class="adm" href="#teacher">دخول الإدارة والمعلمين</a>`, e => { const b = e.target.closest('[data-v]'); if (b) welcome(b.dataset.v); });
 }
-function profileForm(edit) {
-  const pf = edit ? getPf() : null; let mq = pf ? pf.muqraa : '', hq = pf ? pf.halaqa : ''; const sel = new Set(pf ? pf.juz : []);
-  const o = overlay(`<h2 class="serif">${edit ? 'بطاقتي' : 'إنشاء بطاقتك'}</h2><p class="note">${edit ? 'عدّل بياناتك ثم احفظ.' : 'تُحفظ بياناتك باسم المستخدم، فتدخل بها من أي جهاز.'}</p><div class="pf">
+function profileForm(edit, admin) {
+  const pf = edit && !admin ? getPf() : null; edit = edit && !admin; let mq = pf ? pf.muqraa : '', hq = pf ? pf.halaqa : ''; const sel = new Set(pf ? pf.juz : []);
+  const o = overlay(`<h2 class="serif">${admin ? 'إضافة طالب' : edit ? 'بطاقتي' : 'إنشاء بطاقتك'}</h2><p class="note">${admin ? 'أنشئ حساب الطالب، ثم أعطه اسم المستخدم ليدخل به.' : edit ? 'عدّل بياناتك ثم احفظ.' : 'تُحفظ بياناتك باسم المستخدم، فتدخل بها من أي جهاز.'}</p><div class="pf">
     <label for="pf_un">اسم المستخدم</label><input type="text" id="pf_un" class="un${edit ? ' ro' : ''}"${edit ? ' readonly tabindex="-1"' : ' autocomplete="username" autocapitalize="none" spellcheck="false"'}>
     ${edit ? '' : '<p class="note" style="margin-top:4px">٤ إلى ٢٠ حرفًا إنجليزيًا أو أرقامًا أو _ ، احفظه جيدًا فهو مفتاح دخولك.</p>'}
     <label for="pf_first">الاسم</label><input type="text" id="pf_first" autocomplete="given-name">
@@ -294,8 +324,7 @@ function profileForm(edit) {
     <label>الحلقة</label><div class="seg col" id="pf_hq">${HQ.map(h => `<button type="button" data-h="${esc(h)}">${esc(h)}</button>`).join('')}</div>
     <label>الأجزاء التي تحفظها <span class="wd" id="jz_n"></span></label><div class="jzg" id="pf_jz">${Array.from({ length: 30 }, (_, i) => `<button type="button" data-j="${i + 1}">${AR(i + 1)}</button>`).join('')}</div>
     <div style="text-align:end"><button class="lnk" id="jz_clr" type="button">مسح الكل</button></div>
-    <p class="note" id="pf_st" style="color:var(--bad)"></p><button class="btn" id="pf_save">حفظ</button>
-    <div style="text-align:center"><button class="lnk" id="pf_x" type="button">${edit ? 'إلغاء' : 'رجوع'}</button></div></div>`);
+    <p class="note" id="pf_st" style="color:var(--bad)"></p><button class="btn" id="pf_save">${admin ? 'إضافة الطالب' : 'حفظ'}</button></div>`, null, () => (edit || admin) ? o.remove() : welcome('start'));
   const q = x => o.querySelector(x);
   q('#pf_un').value = pf ? pf.username : ''; q('#pf_first').value = pf ? pf.first : ''; q('#pf_family').value = pf ? pf.family : '';
   const paint = () => { q('#pf_mq').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.m === mq));
@@ -306,7 +335,6 @@ function profileForm(edit) {
   q('#pf_hq').onclick = e => { if (e.target.dataset.h) { hq = e.target.dataset.h; paint(); } };
   q('#pf_jz').onclick = e => { const j = +e.target.dataset.j; if (j) { sel.has(j) ? sel.delete(j) : sel.add(j); paint(); } };
   q('#jz_clr').onclick = () => { sel.clear(); paint(); };
-  q('#pf_x').onclick = () => edit ? o.remove() : welcome('start');
   q('#pf_save').onclick = async () => {
     const st = q('#pf_st'), un = edit ? pf.username : q('#pf_un').value.trim().toLowerCase(), first = q('#pf_first').value.trim(), family = q('#pf_family').value.trim();
     if (!edit && !/^[a-z0-9_]{4,20}$/.test(un)) return st.textContent = 'اسم المستخدم من ٤ إلى ٢٠ حرفًا إنجليزيًا أو أرقامًا أو _';
@@ -315,9 +343,12 @@ function profileForm(edit) {
     if (!hq) return st.textContent = 'اختر حلقتك.';
     if (!sel.size) return st.textContent = 'اختر الأجزاء التي تحفظها.';
     q('#pf_save').disabled = true; st.textContent = 'جارٍ الحفظ…';
-    const { data, error } = await sb.rpc(edit ? 'muqraa_update_profile' : 'muqraa_register', { p_username: un, p_first: first, p_family: family, p_muqraa: mq, p_halaqa: hq, p_juz: [...sel].sort((a, b) => a - b) });
+    const args = { p_username: un, p_first: first, p_family: family, p_muqraa: mq, p_halaqa: hq, p_juz: [...sel].sort((a, b) => a - b) };
+    if (admin) args.p_secret = ls('tk');
+    const { data, error } = await sb.rpc(admin ? 'muqraa_admin_add_student' : edit ? 'muqraa_update_profile' : 'muqraa_register', args);
     q('#pf_save').disabled = false;
-    if (error) return st.textContent = /taken/.test(error.message) ? 'اسم المستخدم مستخدم، اختر اسمًا آخر.' : /invalid/.test(error.message) ? 'تحقق من البيانات المدخلة.' : 'تعذّر الحفظ، حاول مرة أخرى.';
+    if (error) return st.textContent = /taken/.test(error.message) ? 'اسم المستخدم مستخدم، اختر اسمًا آخر.' : /invalid/.test(error.message) ? 'تحقق من البيانات المدخلة.' : /forbidden/.test(error.message) ? 'انتهت صلاحية الدخول، سجّل دخول الإدارة من جديد.' : 'تعذّر الحفظ، حاول مرة أخرى.';
+    if (admin) { o.remove(); toast('تمت إضافة الطالب'); loadStu(); loadWed(); return; }
     setPf(data); student();
   };
 }
@@ -393,7 +424,7 @@ function login(msg) {
   $('#in').onclick = go; $('#tk').onkeydown = e => { if (e.key === 'Enter') go(); }; reveal();
 }
 
-const S = { role:'', halaqa:'', mode:'day', day:riyadh(), month:riyadh().slice(0,7), year:riyadh().slice(0,4), from:riyadh(-6*864e5), to:riyadh(), mq:'الكل', hq:'الكل', q:'', fmt:'xlsx', scope:'done', rows:[], known:[], wed:'', wdata:null, tab:'home' };
+const S = { role:'', halaqa:'', mode:'day', day:riyadh(), month:riyadh().slice(0,7), year:riyadh().slice(0,4), from:riyadh(-6*864e5), to:riyadh(), mq:'الكل', hq:'الكل', q:'', fmt:'xlsx', scope:'done', rows:[], known:[], wed:'', wdata:null, tab:'home', what:'tasks', trash:null };
 S.wed = nextWed(riyadh());
 const isAdmin = () => S.role === 'admin';
 const range = () => { if (S.mode === 'day') return [S.day, S.day];
@@ -406,8 +437,8 @@ const genCode = () => { const A = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789', b = new Uin
 
 function summarize() {
   const act = {}; S.rows.forEach(r => { const g = r.muqraa + '|' + (r.halaqa || ''); (act[g] = act[g] || new Set()).add(r.day); });
-  const m = {}; S.rows.forEach(r => { const k = key3(r); const o = m[k] = m[k] || { muqraa:r.muqraa, halaqa:r.halaqa || '', name:r.name, sent:0, done:0, last:'' };
-    o.sent++; if (done(r)) o.done++; if (r.day > o.last) o.last = r.day; });
+  const m = {}; S.rows.forEach(r => { const k = key3(r); const o = m[k] = m[k] || { muqraa:r.muqraa, halaqa:r.halaqa || '', name:r.name, sent:0, done:0, last:'', ids:[] };
+    o.ids.push(r.id); o.sent++; if (done(r)) o.done++; if (r.day > o.last) o.last = r.day; });
   return Object.values(m).map(o => { const n = (act[o.muqraa + '|' + o.halaqa] || new Set()).size; return { ...o, active:n, pct:Math.round(100 * o.done / Math.max(1, n)) }; })
     .sort((a, b) => b.pct - a.pct || b.done - a.done || cmpN(a, b));
 }
@@ -425,7 +456,8 @@ async function teacher() {
   <div id="pk"></div>
   <p class="note" id="msg"></p></div>
   <div class="stats" id="stats"></div>
-  <div class="card"><div class="wrap"><table><thead id="th"></thead><tbody id="tb"></tbody></table></div></div>
+  <div class="card"><div class="wrap"><table><thead id="th"></thead><tbody id="tb"></tbody></table></div>
+  <div id="bk2" hidden style="text-align:center;margin-top:12px"><button type="button" class="btn sec sm danger" id="delall"></button></div></div>
   <div class="card" id="rem" hidden></div>
   </section>
   <section class="pane" data-p="wed" hidden>
@@ -436,13 +468,18 @@ async function teacher() {
   <label>الأربعاوات القادمة</label><div id="cy_pv"></div><button class="btn" id="cy_save">حفظ</button></div>
   </section>
   <section class="pane" data-p="stu" hidden>
-  <div class="card" id="sc" hidden><h2 class="pill">الطلاب المسجلون</h2><p class="note" style="margin-top:0">ابحث بالاسم أو اسم المستخدم. حذف الطالب يحذف حسابه وسجل عرضه نهائيًا، وتُحفظ إرساليّاته اليومية في سلة المحذوفات ٣٠ يومًا.</p>
+  <div class="card" id="sc" hidden><h2 class="pill">الطلاب المسجلون</h2><p class="note" style="margin-top:0">ابحث بالاسم أو اسم المستخدم. حذف الطالب ينقل حسابه وإرسالاته وسجل عرضه إلى «السلة» ٣٠ يومًا، ويمكن استعادته منها.</p>
+  <button class="btn" id="sadd" type="button" style="margin:0 0 4px">+ إضافة طالب باسم مستخدم</button>
   <label for="sq">بحث</label><input type="text" id="sq" autocomplete="off"><div id="sl"></div></div>
+  </section>
+  <section class="pane" data-p="trs" hidden>
+  <div class="card" id="trc" hidden><h2 class="pill">سلة المحذوفات</h2><p class="note" style="margin-top:0">كل ما يُحذف يُحفظ هنا ٣٠ يومًا، فيمكنك استعادته إن حُذف بالخطأ، أو حذفه نهائيًا.</p><div id="tl"></div></div>
   </section>
   <section class="pane" data-p="exp" hidden>
   <div class="card" id="xcard" hidden><h2 class="pill">تصدير</h2><p class="note" id="xn" style="margin-top:0"></p><button type="button" class="lnk" id="xp" style="margin:0 0 4px">تغيير الفترة</button>
+  <label>ما الذي يُصدَّر؟</label><div class="seg" id="xw">${[['tasks','المهام'],['pres','العرض الأسبوعي'],['both','الاثنان']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
   <label>الصيغة</label><div class="seg" id="xf">${[['xlsx','Excel'],['csv','CSV'],['json','JSON'],['print','طباعة / PDF']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
-  <label>المحتوى</label><div class="seg" id="xs">${[['done','من أتمّ جميع المهام'],['all','جميع الإرسالات']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
+  <label>المحتوى</label><div class="seg" id="xs">${[['done',''],['all','']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
   <button class="btn" id="ex">تصدير</button></div>
   </section>
   <section class="pane" data-p="set" hidden>
@@ -450,7 +487,7 @@ async function teacher() {
   ${HQ.map(h => `<div class="trow"><span>${h}</span><button class="btn sec sm" data-h="${h}">إعادة تعيين</button></div>`).join('')}</div>
   <div class="card"><h2 class="pill">الرمز السري</h2><p class="note" style="margin-top:0">غيّر رمزك السري الخاص بحسابك هذا.</p><button class="btn sec sm" id="sec" style="margin-top:12px">تغيير رمزي السري</button></div>
   </section>
-  <nav class="tabbar" id="nav" aria-label="أقسام اللوحة"><button type="button" data-t="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V11M12 20V4M19 20v-6"/></svg><span>المتابعة</span></button><button type="button" data-t="wed"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>الأربعاء</span></button><button type="button" data-t="stu" data-a="1" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17 14.2c2.6.2 4.5 2.1 4.5 5.3"/></svg><span>الطلاب</span></button><button type="button" data-t="exp" data-a="1" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></svg><span>التصدير</span></button><button type="button" data-t="set"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg><span>الإعدادات</span></button></nav>`;
+  <nav class="tabbar" id="nav" aria-label="أقسام اللوحة"><button type="button" data-t="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V11M12 20V4M19 20v-6"/></svg><span>المتابعة</span></button><button type="button" data-t="wed"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>الأربعاء</span></button><button type="button" data-t="stu" data-a="1" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17 14.2c2.6.2 4.5 2.1 4.5 5.3"/></svg><span>الطلاب</span></button><button type="button" data-t="exp" data-a="1" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></svg><span>التصدير</span></button><button type="button" data-t="trs" data-a="1" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg><span>السلة</span></button><button type="button" data-t="set"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg><span>الإعدادات</span></button></nav>`;
   const pickers = () => { $('#pk').innerHTML = S.mode === 'day' ? `<label>اليوم</label><input type="date" id="v1" value="${S.day}">`
     : S.mode === 'month' ? `<label>الشهر</label><input type="month" id="v1" value="${S.month}">`
     : S.mode === 'year' ? `<label>السنة</label><input type="number" id="v1" min="2020" max="2100" value="${S.year}">`
@@ -460,13 +497,19 @@ async function teacher() {
     $('#v1').onchange = ch; if ($('#v2')) $('#v2').onchange = ch; };
   const tabs = () => { document.querySelectorAll('#md button').forEach(b => b.classList.toggle('on', b.dataset.k === S.mode));
     document.querySelectorAll('#xf button').forEach(b => b.classList.toggle('on', b.dataset.k === S.fmt));
-    document.querySelectorAll('#xs button').forEach(b => b.classList.toggle('on', b.dataset.k === S.scope)); };
+    document.querySelectorAll('#xs button').forEach(b => b.classList.toggle('on', b.dataset.k === S.scope));
+    document.querySelectorAll('#xw button').forEach(b => b.classList.toggle('on', b.dataset.k === S.what));
+    const L = { tasks: ['من أتمّ جميع المهام', 'جميع الإرسالات'], pres: ['من عرض فقط', 'جميع الطلاب'], both: ['من أتمّ / من عرض فقط', 'الجميع'] }[S.what];
+    document.querySelectorAll('#xs button').forEach(b => { b.textContent = L[b.dataset.k === 'done' ? 0 : 1]; });
+    const xl = document.querySelector('#xs').previousElementSibling; if (xl) xl.textContent = S.what === 'pres' ? 'المحتوى (حالة العرض)' : 'المحتوى'; };
   $('#md').onclick = e => { if (e.target.dataset.k) { S.mode = e.target.dataset.k; tabs(); pickers(); load(); } };
   $('#xf').onclick = e => { if (e.target.dataset.k) { S.fmt = e.target.dataset.k; tabs(); } };
   $('#xs').onclick = e => { if (e.target.dataset.k) { S.scope = e.target.dataset.k; tabs(); } };
+  $('#xw').onclick = e => { if (e.target.dataset.k) { S.what = e.target.dataset.k; tabs(); } };
+  $('#sadd').onclick = () => profileForm(false, true); $('#tl').onclick = trashClick;
   $('#fm').onchange = e => { S.mq = e.target.value; draw(); }; $('#fh').onchange = e => { S.hq = e.target.value; draw(); };
   $('#fq').oninput = e => { S.q = e.target.value.trim(); draw(); };
-  $('#rf').onclick = () => { load(); loadWed(); if (isAdmin()) loadStu(); }; $('#wc').onclick = wedClick; $('#sl').onclick = stuClick; $('#sq').oninput = drawStu; $('#out').onclick = () => { ls('tk', ''); location.hash = ''; route(); };
+  $('#rf').onclick = () => { load(); loadWed(); if (isAdmin()) { loadStu(); loadTrash(); } }; $('#wc').onclick = wedClick; $('#sl').onclick = stuClick; $('#sq').oninput = drawStu; $('#out').onclick = () => { ls('tk', ''); location.hash = ''; route(); };
   $('#ex').onclick = doExport; $('#xp').onclick = () => setTab('home');
   $('#nav').onclick = e => { const b = e.target.closest('button'); if (b && b.dataset.t) setTab(b.dataset.t); };
   $('#sec').onclick = async () => { const n = prompt('اكتب الرمز السري الجديد (٨ أحرف أو أرقام على الأقل):'); if (!n) return;
@@ -494,6 +537,8 @@ function setTab(t) {
   document.querySelectorAll('.pane').forEach(p => p.hidden = p.dataset.p !== t);
   document.querySelectorAll('#nav button').forEach(b => { const on = b.dataset.t === t; b.classList.toggle('on', on); if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   const f = $('#flt'); if (f) f.hidden = !(t === 'home' || t === 'wed');
+  const fw = $('#fhw'); if (fw) fw.hidden = !(isAdmin() && t === 'home');
+  if (t === 'trs' && isAdmin()) loadTrash();
   window.scrollTo(0, 0); reveal();
 }
 
@@ -508,12 +553,12 @@ async function load() {
   $('#pn1').textContent = isAdmin() ? 'تعاهد' : 'لوحة المعلم'; $('#pn').textContent = isAdmin() ? 'لوحة الإدارة' : S.halaqa;
   document.title = 'تعاهد · ' + (isAdmin() ? 'لوحة الإدارة' : S.halaqa);
   if (!S._wl) { S._wl = 1; loadWed(); }
-  $('#fhw').hidden = !isAdmin(); $('#tc').hidden = !isAdmin(); $('#sc').hidden = !isAdmin(); if (isAdmin() && !S._sl) { S._sl = 1; loadStu(); } $('#cy').hidden = !isAdmin(); $('#xcard').hidden = !isAdmin();
+  $('#tc').hidden = !isAdmin(); $('#sc').hidden = !isAdmin(); $('#trc').hidden = !isAdmin(); if (isAdmin() && !S._sl) { S._sl = 1; loadStu(); loadTrash(); } $('#cy').hidden = !isAdmin(); $('#xcard').hidden = !isAdmin();
   if (isAdmin()) { $('#cy_d').value = CYC.start; window.__cyPreview(); }
   document.querySelectorAll('#nav [data-a]').forEach(b => b.hidden = !isAdmin());
-  if (!isAdmin() && (S.tab === 'stu' || S.tab === 'exp')) S.tab = 'home';
+  if (!isAdmin() && (S.tab === 'stu' || S.tab === 'exp' || S.tab === 'trs')) S.tab = 'home';
   setTab(S.tab);
-  $('#xn').textContent = 'يشمل التصدير كل الحلقات والمقرأتين في الفترة: ' + label().replace(/_/g, ' ') + '. تُحدَّد الفترة من قسم «المتابعة».';
+  $('#xn').textContent = 'يشمل التصدير كل الحلقات والمقرأتين في الفترة: ' + label().replace(/_/g, ' ') + '. تُحدَّد الفترة من قسم «المتابعة». المهام تُصدَّر من الإرسالات اليومية، والعرض من جدول الأربعاوات الواقعة في الفترة.';
   draw();
 }
 
@@ -531,8 +576,7 @@ function draw() {
       <td>${done(r) ? '<span class="badge b-ok">مكتمل</span>' : `<span class="badge b-wn">${filled(r)}/${FIELDS.length}</span>`}</td>${A ? `<td><button class="x" data-id="${r.id}" title="حذف" aria-label="حذف">×</button></td>` : ''}</tr>`).join('')
       + miss.map(r => `<tr><td>${esc(r.name)}</td><td>${esc(r.muqraa)}</td>${A ? `<td>${esc(r.halaqa) || '—'}</td>` : ''}<td colspan="5">—</td><td><span class="badge b-mu">لم يرسل</span></td>${A ? '<td></td>' : ''}</tr>`).join('')
       || `<tr><td colspan="${A ? 10 : 8}" class="note">لا توجد إرسالات في هذا اليوم.</td></tr>`;
-    $('#tb').onclick = !A ? null : async e => { const id = e.target.dataset.id; if (id && confirm('حذف هذا السجل نهائيًا؟')) {
-      const { error } = await sb.rpc('muqraa_teacher_delete', { p_secret: ls('tk'), p_id: +id }); if (error) alert('تعذّر الحذف.'); else load(); } };
+    $('#tb').onclick = !A ? null : e => { const id = e.target.dataset.id; if (id) delIds([+id], 'سيُنقل هذا السجل إلى «السلة» ويمكن استعادته خلال ٣٠ يومًا. متابعة؟'); };
     const groups = {}; miss.forEach(k => { const h = k.halaqa || 'بدون حلقة'; (groups[h] = groups[h] || []).push(k); });
     const txt = 'السلام عليكم ورحمة الله وبركاته\nتذكير من «تعاهد»: لم تصلنا مهام اليوم من:\n' + Object.entries(groups).map(([h, l]) => `\n${h}:\n` + l.map(k => '- ' + k.name + ' (' + k.muqraa + ')').join('\n')).join('\n') + '\n\nبارك الله فيكم، وتعاهدوا القرآن.';
     $('#rem').hidden = !miss.length;
@@ -544,11 +588,49 @@ function draw() {
     const act = Math.max(0, ...Object.values(S.rows.reduce((a, r) => { const g = r.muqraa + '|' + (r.halaqa || ''); (a[g] = a[g] || new Set()).add(r.day); return a; }, {})).map(s => s.size));
     const avg = sm.length ? Math.round(sm.reduce((s, o) => s + o.pct, 0) / sm.length) : 0;
     $('#stats').innerHTML = `<div class="stat"><b>${sm.length}</b>طالب</div><div class="stat"><b>${avg}%</b>متوسط الالتزام</div><div class="stat"><b>${act}</b>أيام الدراسة</div>`;
-    $('#th').innerHTML = `<tr><th></th><th>الاسم</th><th>المقرأة</th>${A ? '<th>الحلقة</th>' : ''}<th>أيام الإرسال</th><th>أيام الإتمام</th><th>نسبة الالتزام</th><th>آخر إرسال</th></tr>`;
+    $('#th').innerHTML = `<tr><th></th><th>الاسم</th><th>المقرأة</th>${A ? '<th>الحلقة</th>' : ''}<th>أيام الإرسال</th><th>أيام الإتمام</th><th>نسبة الالتزام</th><th>آخر إرسال</th>${A ? '<th></th>' : ''}</tr>`;
     $('#tb').innerHTML = sm.map((o, i) => `<tr><td>${i < 3 && o.pct > 0 ? '<span class="rk">' + (i + 1) + '</span>' : ''}</td><td>${esc(o.name)}</td><td>${esc(o.muqraa)}</td>${A ? `<td>${esc(o.halaqa) || '—'}</td>` : ''}<td>${o.sent}</td><td>${o.done}</td>
-      <td>${o.pct}%<span class="mini"><i style="width:${o.pct}%"></i></span></td><td>${o.last}</td></tr>`).join('') || `<tr><td colspan="${A ? 8 : 7}" class="note">لا توجد بيانات في هذه الفترة.</td></tr>`;
-    $('#tb').onclick = null; $('#rem').hidden = true; $('#rem').innerHTML = '';
+      <td>${o.pct}%<span class="mini"><i style="width:${o.pct}%"></i></span></td><td>${o.last}</td>${A ? `<td><button class="x" data-i="${i}" title="حذف إرساليات هذا الطالب في الفترة" aria-label="حذف">×</button></td>` : ''}</tr>`).join('') || `<tr><td colspan="${A ? 9 : 7}" class="note">لا توجد بيانات في هذه الفترة.</td></tr>`;
+    $('#tb').onclick = !A ? null : e => { const o = sm[+e.target.dataset.i]; if (e.target.dataset.i !== undefined && o) delIds(o.ids, 'سيُنقل ' + AR(o.ids.length) + ' إرسال للطالب «' + o.name + '» في هذه الفترة إلى «السلة» ويمكن استعادتها. متابعة؟'); }; $('#rem').hidden = true; $('#rem').innerHTML = '';
   }
+  const ids = A ? S.rows.filter(f).map(r => r.id) : [], bd = $('#bk2');
+  if (bd) { bd.hidden = !ids.length; if (ids.length) { $('#delall').textContent = 'حذف كل الإرسالات المعروضة (' + AR(ids.length) + ')';
+    $('#delall').onclick = () => delIds(ids, 'سيُنقل ' + AR(ids.length) + ' إرسال إلى «السلة» ويمكن استعادتها خلال ٣٠ يومًا. متابعة؟'); } }
+}
+
+/* ---------------- الحذف والسلة (الإدارة فقط) ---------------- */
+async function delIds(ids, msg) {
+  if (!ids.length || !confirm(msg)) return;
+  const { error } = await sb.rpc('muqraa_admin_delete_ids', { p_secret: ls('tk'), p_ids: ids });
+  if (error) return alert('تعذّر الحذف.');
+  toast('نُقل إلى «السلة» ويمكن استعادته منها'); load(); loadTrash();
+}
+const KIND = { submission: 'إرسال يومي', student: 'حساب طالب', presentation: 'حالة عرض' }, PSTAT = { done: 'عرض', missed: 'لم يعرض', postponed: 'تأجل' };
+async function loadTrash() {
+  const { data, error } = await sb.rpc('muqraa_admin_trash', { p_secret: ls('tk') }); if (!$('#tl')) return;
+  if (error) { if (!S.trash) $('#tl').innerHTML = '<p class="note">تعذّر تحميل السلة، اضغط «تحديث».</p>'; return; }
+  S.trash = data; drawTrash();
+}
+function drawTrash() {
+  const l = $('#tl'); if (!l || !S.trash) return; const a = S.trash;
+  const dt = v => new Date(v).toLocaleDateString('ar-SA-u-ca-gregory', { day: 'numeric', month: 'long' });
+  const info = x => x.kind === 'student' ? `${esc(x.username)} · مقرأة ${esc(x.muqraa)} · ${esc(x.halaqa)}`
+    : x.kind === 'presentation' ? `أربعاء ${esc(x.day)} · ${PSTAT[x.status] || ''} · ${esc(x.halaqa)}` : `${esc(x.day)} · مقرأة ${esc(x.muqraa)} · ${esc(x.halaqa) || '—'}`;
+  l.innerHTML = a.length ? `<div class="trow"><span class="note" style="margin:0">${AR(a.length)} عنصر في السلة</span><button type="button" class="btn sec sm danger" data-e="1">تفريغ السلة</button></div>`
+    + a.map(x => `<div class="trow tr"><span><b>${esc(x.name) || '—'}</b> <span class="badge b-mu">${KIND[x.kind] || ''}</span><br><span class="wd">${info(x)}</span><br><span class="wd" style="color:var(--mu)">حُذف ${dt(x.deleted_at)}</span></span>
+      <span class="acts"><button type="button" class="btn sm" data-r="${x.id}">استعادة</button><button type="button" class="btn sec sm danger" data-d="${x.id}">حذف نهائي</button></span></div>`).join('')
+    : '<p class="note" style="text-align:center">السلة فارغة.</p>';
+}
+async function trashClick(e) {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.r) { b.disabled = true;
+    const { error } = await sb.rpc('muqraa_admin_restore_row', { p_secret: ls('tk'), p_trash_id: +b.dataset.r });
+    if (error) { b.disabled = false; return alert(/exists/.test(error.message) ? 'هذا السجل موجود بالفعل، لا حاجة لاستعادته.' : /student missing/.test(error.message) ? 'استعد حساب الطالب أولًا ثم أعد المحاولة.' : 'تعذّرت الاستعادة.'); }
+    toast('تمت الاستعادة'); loadTrash(); load(); loadWed(); loadStu(); return; }
+  if (b.dataset.d || b.dataset.e) { const all = !!b.dataset.e;
+    if (!confirm(all ? 'سيُحذف كل ما في السلة نهائيًا ولا يمكن التراجع. متابعة؟' : 'سيُحذف هذا العنصر نهائيًا ولا يمكن التراجع. متابعة؟')) return;
+    const { error } = await sb.rpc('muqraa_admin_trash_purge', { p_secret: ls('tk'), p_trash_id: all ? null : +b.dataset.d });
+    if (error) return alert('تعذّر الحذف.'); toast('تم الحذف نهائيًا'); loadTrash(); }
 }
 
 /* ---------------- جدول عرض الأربعاء (للإدارة والمعلمين) ---------------- */
@@ -571,21 +653,51 @@ async function loadWed() {
   S.wdata = data; if (/^\d{4}-\d\d-\d\d$/.test(data.cycle_start || '')) { CYC.start = data.cycle_start; ls('cyc', data.cycle_start); }
   drawWed();
 }
+/* الأوجه: الجزء ٢٠ وجهًا، فالربع ٥ أوجه؛ تُحتسب لمن حُدِّد له «عرض» فقط، وتشمل ما تأجل وعُرض معه */
+const FP = 5, facesOf = q => q * FP;
+const HSHORT = { 'حلقة حسان بن ثابت': 'حسان', 'حلقة ابن رجب': 'ابن رجب', 'حلقة أبيّ بن مالك': 'أبيّ', 'حلقة عبدالرحمن بن النعمان': 'عبدالرحمن' };
+const hShort = h => HSHORT[h] || String(h).replace(/^حلقة\s+/, '');
+const IC_BOOK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6c-2-1.5-5-2-8-1.6v13c3-.4 6 .1 8 1.6 2-1.5 5-2 8-1.6v-13C17 4 14 4.5 12 6zM12 6v13"/></svg>';
+const IC_ALL = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l9-4 9 4-9 4-9-4zM3 12l9 4 9-4M3 16l9 4 9-4"/></svg>';
 function drawWed() {
   const d = S.wdata, wb = $('#wb'); if (!d || !wb) return; $('#wc').hidden = false;
-  const A = d.role === 'admin', W = S.wed, cyc = d.cycle_start, s = sessionOf(W, cyc), shown = (d.students || []).length;
+  const A = d.role === 'admin', W = S.wed, cyc = d.cycle_start, s = sessionOf(W, cyc), all = d.students || [], today = riyadh(), nw = nextWed(today);
+  if (!A) S.hq = 'الكل';
   const f = r => (S.mq === 'الكل' || r.muqraa === S.mq) && (!A || S.hq === 'الكل' || r.halaqa === S.hq) && (!S.q || String(r.name).includes(S.q));
-  const stat = sid => (d.pres.find(p => p.sid === sid && p.wed === W) || {}).status || '', sts = d.students.filter(f);
-  const c = k => sts.filter(x => stat(x.sid) === k).length, none = sts.filter(x => !stat(x.sid)).length;
-  const rows = sts.map(x => { const pl = wedPlan(x, W, d.pres, cyc), tot = pl.reduce((a, p) => a + p.n, 0), cur = stat(x.sid);
-    return `<div class="sr"><div class="nm"><b>${esc(x.name)}</b><span class="wd">${esc(x.muqraa)}${A ? ' · ' + esc(x.halaqa) : ''}</span></div><span class="am">${amountText(tot)}</span>
+  const stat = sid => (d.pres.find(p => p.sid === sid && p.wed === W) || {}).status || '';
+  const plan = {}; all.forEach(x => { plan[x.sid] = wedPlan(x, W, d.pres, cyc); });
+  const qs = x => plan[x.sid].reduce((a, p) => a + p.n, 0), fcs = x => stat(x.sid) === 'done' ? facesOf(qs(x)) : 0;
+  const total = all.reduce((a, x) => a + fcs(x), 0), byH = {};
+  all.forEach(x => { const o = byH[x.halaqa] = byH[x.halaqa] || { n: 0, done: 0, faces: 0 }; o.n++; if (stat(x.sid) === 'done') o.done++; o.faces += fcs(x); });
+  const sts = all.filter(f).sort(cmpN), c = k => sts.filter(x => stat(x.sid) === k).length, none = sts.filter(x => !stat(x.sid)).length;
+  const row = x => { const pl = plan[x.sid], tot = qs(x), cur = stat(x.sid);
+    return `<div class="sr${cur === 'done' ? ' dn' : ''}"><div class="nm"><b>${esc(x.name)}</b><span class="wd">مقرأة ${esc(x.muqraa)}</span></div>
+      <div class="amr"><span class="am">${amountText(tot)}</span><span class="fc">${AR(facesOf(tot))} وجهًا</span></div>
       <ul>${pl.map(p => p.segs.map(g => `<li${p.carried ? ' class="cr"' : ''}>${segText(g)}${p.carried ? ' (مؤجَّل من أربعاء ' + shDate(p.wed) + ')' : ''}</li>`).join('')).join('')}</ul>
-      <div class="seg sx">${[['done', 'عرض'], ['missed', 'لم يعرض'], ['postponed', 'تأجل']].map(([k, t]) => `<button type="button" data-sid="${x.sid}" data-s="${k}"${cur === k ? ' class="on"' : ''}>${t}</button>`).join('')}</div></div>`; }).join('');
+      ${cur === 'done' ? `<p class="okl">✓ حُسب لـ«عرض»: ${AR(facesOf(tot))} وجهًا</p>` : ''}
+      <div class="seg sx">${[['done', 'عرض'], ['missed', 'لم يعرض'], ['postponed', 'تأجل']].map(([k, t]) => `<button type="button" data-sid="${x.sid}" data-s="${k}"${cur === k ? ' class="on"' : ''}>${t}</button>`).join('')}</div></div>`; };
+  let list;
+  if (A && S.hq === 'الكل') list = HQ.map(h => { const g = sts.filter(x => x.halaqa === h); return g.length ? `<div class="gh"><span>${esc(h)}</span><small>${AR(g.length)} طالب · ${AR(byH[h].faces)} وجهًا</small></div>` + g.map(row).join('') : ''; }).join('')
+    + sts.filter(x => !HQ.includes(x.halaqa)).map(row).join('');
+  else list = sts.map(row).join('');
+  const hqBar = !A ? '' : `<div class="hqs" role="group" aria-label="الحلقات"><button type="button" data-hq="الكل"${S.hq === 'الكل' ? ' class="on"' : ''}><i>${IC_ALL}</i><span>الكل</span><em>${AR(all.length)} طالب</em></button>`
+    + HQ.map(h => { const o = byH[h] || { n: 0, faces: 0 }; return `<button type="button" data-hq="${esc(h)}" title="${esc(h)}"${S.hq === h ? ' class="on"' : ''}><i>${IC_BOOK}</i><span>${esc(hShort(h))}</span><em>${AR(o.faces)} وجه</em></button>`; }).join('') + '</div>';
+  const sel = A && S.hq !== 'الكل' ? (() => { const o = byH[S.hq] || { n: 0, done: 0, faces: 0 }; return `<div class="fsel"><b>${esc(S.hq)}</b><br>أوجه هذه الحلقة: <b>${AR(o.faces)}</b> وجهًا · عرض ${AR(o.done)} من ${AR(o.n)} طالب</div>`; })() : '';
   wb.innerHTML = `<div class="wnav"><button type="button" class="btn sec sm" data-w="-7">السابق</button><b>الجلسة ${AR(s)} من ٤</b><button type="button" class="btn sec sm" data-w="7">التالي</button></div>
     <p class="note" style="text-align:center">${dateLine(W)}</p>
+    ${W !== nw ? `<div style="text-align:center"><button type="button" class="btn sm" data-w="0" style="margin:0 auto 6px">العودة إلى ${today === nw ? 'أربعاء اليوم' : 'الأربعاء القادم'} (${shDate(nw)})</button></div>` : ''}
+    <div class="fsum"><span>${A ? 'أوجه العرض — جميع الحلقات' : 'أوجه العرض — حلقتك'}</span><b>${AR(total)}</b><small>وجهًا</small>
+    <p>تُحسب تلقائيًا عند الضغط على «عرض» أمام الطالب: كل ربع = ${AR(FP)} أوجه (الجزء ${AR(FP * 4)} وجهًا)، ويدخل فيها ما تأجل وعُرض مع هذا الأربعاء. هذا مجموع كل الطلاب في هذا الأربعاء، سواء اخترتَ حلقة أم لا.</p></div>
+    ${hqBar}${sel}
     <div class="stats s4"><div class="stat"><b>${c('done')}</b>عرضوا</div><div class="stat"><b>${c('missed')}</b>لم يعرضوا</div><div class="stat"><b>${c('postponed')}</b>تأجلوا</div><div class="stat"><b>${none}</b>لم يُسجَّل</div></div>
-    ${rows || `<p class="note">${shown ? 'لا يوجد طلاب مطابقون للتصفية.' : 'لا يوجد طلاب مسجلون بعد.'}</p>`}
-    <div style="text-align:center"><button type="button" class="lnk" data-w="0">العودة للأربعاء القادم</button></div>`;
+    ${list || `<p class="note">${all.length ? 'لا يوجد طلاب مطابقون للتصفية.' : 'لا يوجد طلاب مسجلون بعد.'}</p>`}
+    ${A && d.pres.some(p => p.wed === W) ? `<div style="text-align:center"><button type="button" class="lnk danger" data-clr="1">مسح حالات هذا الأربعاء${S.hq !== 'الكل' ? ' لهذه الحلقة' : ' لكل الحلقات'}</button></div>` : ''}`;
+}
+async function clearWed() {
+  const h = S.hq !== 'الكل' ? S.hq : null;
+  if (!confirm('ستُنقل حالات العرض لهذا الأربعاء' + (h ? ' في «' + h + '»' : ' في كل الحلقات') + ' إلى «السلة» ويمكن استعادتها. متابعة؟')) return;
+  const { error } = await sb.rpc('muqraa_admin_clear_wed', { p_secret: ls('tk'), p_wed: S.wed, p_halaqa: h });
+  if (error) return alert('تعذّر المسح.'); toast('نُقلت الحالات إلى «السلة»'); loadWed(); loadTrash();
 }
 async function setPres(sid, st) {
   const d = S.wdata, W = S.wed, cur = (d.pres.find(p => p.sid === sid && p.wed === W) || {}).status || '', nx = cur === st ? '' : st;
@@ -597,6 +709,8 @@ async function setPres(sid, st) {
 function wedClick(e) {
   const b = e.target.closest('button'); if (!b) return;
   if (b.dataset.w !== undefined) { S.wed = b.dataset.w === '0' ? nextWed(riyadh()) : addDays(S.wed, +b.dataset.w); return loadWed(); }
+  if (b.dataset.hq !== undefined) { S.hq = b.dataset.hq; const fh = $('#fh'); if (fh) fh.value = S.hq; return draw(); }
+  if (b.dataset.clr) return clearWed();
   if (b.dataset.s && b.dataset.sid) setPres(+b.dataset.sid, b.dataset.s);
 }
 
@@ -615,11 +729,11 @@ function drawStu() {
 }
 async function stuClick(e) {
   const u = e.target.dataset.u, x = u && (S.stu || []).find(s => s.username === u); if (!x) return;
-  if (!confirm('سيُحذف حساب «' + x.name + '» (' + u + ') نهائيًا مع سجل عرضه، وتُنقل إرسالاته اليومية إلى سلة المحذوفات ٣٠ يومًا. لا يمكن استعادة الحساب نفسه. متابعة؟')) return;
+  if (!confirm('سيُنقل حساب «' + x.name + '» (' + u + ') مع إرسالاته وسجل عرضه إلى «السلة» ٣٠ يومًا، ويمكن استعادته منها. متابعة؟')) return;
   e.target.disabled = true;
   const { error } = await sb.rpc('muqraa_admin_delete_student', { p_secret: ls('tk'), p_username: u });
   if (error) { e.target.disabled = false; return alert('تعذّر الحذف.'); }
-  S.stu = S.stu.filter(s => s.username !== u); drawStu(); toast('تم حذف الطالب'); load(); loadWed();
+  S.stu = S.stu.filter(s => s.username !== u); drawStu(); toast('نُقل الطالب إلى «السلة»'); load(); loadWed(); loadTrash();
 }
 
 /* ---------------- التصدير ---------------- */
@@ -627,24 +741,55 @@ const saveBlob = (blob, name) => { const a = document.createElement('a'); a.href
 const HEAD = ['التاريخ','اليوم','الحلقة','الاسم','رقم المحفوظ','عدد التكرار','السماع','المراجعة','الربط','الحالة'];
 const rowArr = r => [r.day, wd(r.day), r.halaqa || '', r.name, r.num, cnum(r.rep), cnum(r.listening), r.reviewing, r.linking, done(r) ? 'مكتمل' : 'ناقص'];
 const pick = onlyDone => S.rows.filter(r => !onlyDone || done(r)).sort((a, b) => a.day.localeCompare(b.day) || cmpN(a, b));
-function doExport() {
-  const fmt = S.fmt, onlyDone = S.scope === 'done', lb = label(), name = 'تعاهد-' + (isAdmin() ? '' : S.halaqa.replace(/\s+/g, '_') + '-') + lb;
-  const rows = pick(onlyDone), sm = summarize();
+const PHEAD = ['الأربعاء','الجلسة','المقرأة','الحلقة','الاسم','المقرر','الأرباع','الأوجه','الحالة','الأوجه المحسوبة'];
+const PST = { done: 'عرض', missed: 'لم يعرض', postponed: 'تأجل', '': 'لم يُسجَّل' };
+const wedsIn = (a, b) => { const o = []; for (let w = nextWed(a); w <= b && o.length < 60; w = addDays(w, 7)) o.push(w); return o; };
+/* صفوف العرض: لكل طالب في كل أربعاء ضمن الفترة، مع الأوجه (تُحسب فقط لمن عرض) */
+function presRows(d, onlyDone, from, to) {
+  const out = [], st = d.students.slice().sort((a, b) => (HQ.indexOf(a.halaqa) - HQ.indexOf(b.halaqa)) || cmpN(a, b));
+  wedsIn(from, to).forEach(W => st.forEach(x => { const c = (d.pres.find(p => p.sid === x.sid && p.wed === W) || {}).status || '';
+    if (onlyDone && c !== 'done') return;
+    const pl = wedPlan(x, W, d.pres, d.cycle_start), q = pl.reduce((a, p) => a + p.n, 0);
+    out.push([W, sessionOf(W, d.cycle_start), x.muqraa, x.halaqa, x.name, pl.map(p => p.segs.map(segText).join('، ') + (p.carried ? ' (مؤجَّل من ' + shDate(p.wed) + ')' : '')).join(' + '), q, facesOf(q), PST[c], c === 'done' ? facesOf(q) : 0]); }));
+  return out;
+}
+/* ملخص الأوجه: لكل أربعاء ولكل حلقة، ثم المجموع لجميع الحلقات */
+function presSum(pr) {
+  const weds = [...new Set(pr.map(r => r[0]))], tot = HQ.map(() => 0), body = weds.map(W => { const v = HQ.map((h, i) => pr.filter(r => r[0] === W && r[3] === h).reduce((a, r) => a + r[9], 0)); v.forEach((n, i) => { tot[i] += n; }); return [W, ...v, v.reduce((a, b) => a + b, 0)]; });
+  return [['الأربعاء', ...HQ, 'جميع الحلقات'], ...body, ['المجموع', ...tot, tot.reduce((a, b) => a + b, 0)]];
+}
+async function doExport() {
+  const fmt = S.fmt, what = S.what, onlyDone = S.scope === 'done', lb = label(), wantT = what !== 'pres', wantP = what !== 'tasks';
+  const name = 'تعاهد-' + (what === 'pres' ? 'العرض-' : '') + lb;
+  let pr = [];
+  if (wantP) { const [f, t] = range(), btn = $('#ex'); btn.disabled = true;
+    const { data, error } = await sb.rpc('muqraa_panel_pres_range', { p_secret: ls('tk'), p_from: f, p_to: t }); btn.disabled = false;
+    if (error) return alert(/forbidden/.test(error.message) ? 'الرمز السري غير صحيح.' : /bad range/.test(error.message) ? 'الفترة طويلة، الحد الأقصى ٤٠٠ يوم.' : 'تعذّر تحميل بيانات العرض.');
+    pr = presRows(data, onlyDone, f, t);
+    if (!wedsIn(f, t).length) { if (!wantT) return toast('لا يوجد يوم أربعاء ضمن الفترة المختارة'); toast('لا يوجد أربعاء في الفترة، سيُصدَّر قسم المهام فقط'); } }
+  const rows = wantT ? pick(onlyDone) : [], sm = wantT ? summarize() : [];
   if (fmt === 'xlsx') {
     const wb = XLSX.utils.book_new(), add = (title, aoa, cols) => { const ws = XLSX.utils.aoa_to_sheet(aoa); ws['!cols'] = cols.map(w => ({ wch:w })); XLSX.utils.book_append_sheet(wb, ws, title); };
-    MQ.forEach(m => add('مقرأة ' + m, [HEAD, ...rows.filter(r => r.muqraa === m).map(rowArr)], [12,10,22,24,28,14,12,18,18,10]));
-    if (S.mode !== 'day') add('ملخص', [['المقرأة','الحلقة','الاسم','أيام الإرسال','أيام الإتمام','أيام الدراسة','نسبة الالتزام %'], ...sm.map(o => [o.muqraa, o.halaqa, o.name, o.sent, o.done, o.active, o.pct])], [12,22,24,14,14,14,16]);
+    if (wantT) { MQ.forEach(m => add('مقرأة ' + m, [HEAD, ...rows.filter(r => r.muqraa === m).map(rowArr)], [12,10,22,24,28,14,12,18,18,10]));
+      if (S.mode !== 'day') add('ملخص', [['المقرأة','الحلقة','الاسم','أيام الإرسال','أيام الإتمام','أيام الدراسة','نسبة الالتزام %'], ...sm.map(o => [o.muqraa, o.halaqa, o.name, o.sent, o.done, o.active, o.pct])], [12,22,24,14,14,14,16]); }
+    if (wantP) { add('العرض الأسبوعي', [PHEAD, ...pr], [12,8,10,22,24,52,9,9,12,14]); add('أوجه العرض', presSum(pr), [14, 20, 20, 20, 22, 14]); }
     wb.Workbook = { Views:[{ RTL:true }] }; XLSX.writeFile(wb, name + '.xlsx');
   } else if (fmt === 'csv') {
-    const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
-    saveBlob(new Blob(['\ufeff' + [['المقرأة', ...HEAD], ...rows.map(r => [r.muqraa, ...rowArr(r)])].map(a => a.map(q).join(',')).join('\r\n')], { type:'text/csv;charset=utf-8' }), name + '.csv');
+    const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"', csv = (h, b) => new Blob(['﻿' + [h, ...b].map(a => a.map(q).join(',')).join('\r\n')], { type:'text/csv;charset=utf-8' });
+    if (wantT) saveBlob(csv(['المقرأة', ...HEAD], rows.map(r => [r.muqraa, ...rowArr(r)])), (wantP ? name + '-المهام' : name) + '.csv');
+    if (wantP) setTimeout(() => saveBlob(csv(PHEAD, pr), (wantT ? name + '-العرض' : name) + '.csv'), wantT ? 400 : 0);
   } else if (fmt === 'json') {
-    saveBlob(new Blob([JSON.stringify({ app:'تعاهد', period:lb, scope:isAdmin() ? 'الإدارة' : S.halaqa, rows:rows.map(({ id, ...r }) => ({ ...r, rep:cnum(r.rep), listening:cnum(r.listening) })), summary:S.mode === 'day' ? undefined : sm }, null, 2)], { type:'application/json' }), name + '.json');
+    const o = { app:'تعاهد', period:lb, scope:'الإدارة' };
+    if (wantT) o.tasks = { rows:rows.map(({ id, ...r }) => ({ ...r, rep:cnum(r.rep), listening:cnum(r.listening) })), summary:S.mode === 'day' ? undefined : sm.map(({ ids, ...r }) => r) };
+    if (wantP) o.presentation = { rows:pr.map(r => Object.fromEntries(PHEAD.map((h, i) => [h, r[i]]))), faces_summary:presSum(pr) };
+    saveBlob(new Blob([JSON.stringify(o, null, 2)], { type:'application/json' }), name + '.json');
   } else {
-    const tbl = (h, b) => `<table><thead><tr>${h.map(x => `<th>${x}</th>`).join('')}</tr></thead><tbody>${b.map(r => `<tr>${r.map(x => `<td>${esc(x)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
-    $('#pr').innerHTML = `<h2>تعاهد — ${isAdmin() ? 'الإدارة' : esc(S.halaqa)} — ${esc(lb.replace(/_/g, ' '))}</h2>` + (S.mode === 'day' ? MQ.map(m => `<h3>مقرأة ${m}</h3>` + tbl(HEAD, rows.filter(r => r.muqraa === m).map(rowArr))).join('')
-      : tbl(['المقرأة','الحلقة','الاسم','أيام الإرسال','أيام الإتمام','نسبة الالتزام %'], sm.map(o => [o.muqraa, o.halaqa, o.name, o.sent, o.done, o.pct])));
-    window.print();
+    const tbl = (h, b) => `<table><thead><tr>${h.map(x => `<th>${esc(x)}</th>`).join('')}</tr></thead><tbody>${b.map(r => `<tr>${r.map(x => `<td>${esc(x)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+    let html = `<h2>تعاهد — الإدارة — ${esc(lb.replace(/_/g, ' '))}</h2>`;
+    if (wantT) html += S.mode === 'day' ? MQ.map(m => `<h3>مقرأة ${m}</h3>` + tbl(HEAD, rows.filter(r => r.muqraa === m).map(rowArr))).join('')
+      : tbl(['المقرأة','الحلقة','الاسم','أيام الإرسال','أيام الإتمام','نسبة الالتزام %'], sm.map(o => [o.muqraa, o.halaqa, o.name, o.sent, o.done, o.pct]));
+    if (wantP) html += '<h3>العرض الأسبوعي</h3>' + tbl(PHEAD, pr) + '<h3>أوجه العرض</h3>' + tbl(...[presSum(pr)].map(a => [a[0], a.slice(1)]).flat());
+    $('#pr').innerHTML = html; window.print();
   }
 }
 setInterval(() => { if (S.mode === 'day' && $('#tb') && ls('tk')) load(); }, 60000);
