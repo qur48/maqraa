@@ -419,6 +419,8 @@ async function teacher() {
   <label>الصيغة</label><div class="seg" id="xf">${[['xlsx','Excel'],['csv','CSV'],['json','JSON'],['print','طباعة / PDF']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
   <label>المحتوى</label><div class="seg" id="xs">${[['done','من أتمّ جميع المهام'],['all','جميع الإرسالات']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
   <button class="btn" id="ex">تصدير</button></div>
+  <div class="card" id="sc" hidden><h2 class="pill">الطلاب المسجلون</h2><p class="note" style="margin-top:0">ابحث بالاسم أو اسم المستخدم. حذف الطالب يحذف حسابه وسجل عرضه نهائيًا، وتُحفظ إرساليّاته اليومية في سلة المحذوفات ٣٠ يومًا.</p>
+  <label for="sq">بحث</label><input type="text" id="sq" autocomplete="off"><div id="sl"></div></div>
   <div class="card" id="tc" hidden><h2 class="pill">رموز المعلمين</h2><p class="note" style="margin-top:0">لكل معلم رمز خاص يفتح له حلقته فقط. «إعادة تعيين» تنشئ رمزًا جديدًا وتوقف القديم.</p>
   ${HQ.map(h => `<div class="trow"><span>${h}</span><button class="btn sec sm" data-h="${h}">إعادة تعيين</button></div>`).join('')}</div>
   <div class="card" id="cy" hidden><h2 class="pill">دورة العرض الأسبوعي</h2>
@@ -441,7 +443,7 @@ async function teacher() {
   $('#xs').onclick = e => { if (e.target.dataset.k) { S.scope = e.target.dataset.k; tabs(); } };
   $('#fm').onchange = e => { S.mq = e.target.value; draw(); }; $('#fh').onchange = e => { S.hq = e.target.value; draw(); };
   $('#fq').oninput = e => { S.q = e.target.value.trim(); draw(); };
-  $('#rf').onclick = () => { load(); loadWed(); }; $('#wc').onclick = wedClick; $('#out').onclick = () => { ls('tk', ''); location.hash = ''; route(); };
+  $('#rf').onclick = () => { load(); loadWed(); if (isAdmin()) loadStu(); }; $('#wc').onclick = wedClick; $('#sl').onclick = stuClick; $('#sq').oninput = drawStu; $('#out').onclick = () => { ls('tk', ''); location.hash = ''; route(); };
   $('#ex').onclick = doExport;
   $('#sec').onclick = async () => { const n = prompt('اكتب الرمز السري الجديد (٨ أحرف أو أرقام على الأقل):'); if (!n) return;
     const { error } = await sb.rpc('muqraa_teacher_set_secret', { p_secret: ls('tk'), p_new: n });
@@ -473,7 +475,7 @@ async function load() {
   $('#pn1').textContent = isAdmin() ? 'تعاهد' : 'لوحة المعلم'; $('#pn').textContent = isAdmin() ? 'لوحة الإدارة' : S.halaqa;
   document.title = 'تعاهد · ' + (isAdmin() ? 'لوحة الإدارة' : S.halaqa);
   if (!S._wl) { S._wl = 1; loadWed(); }
-  $('#fhw').hidden = !isAdmin(); $('#tc').hidden = !isAdmin(); $('#cy').hidden = !isAdmin(); $('#xcard').hidden = !isAdmin();
+  $('#fhw').hidden = !isAdmin(); $('#tc').hidden = !isAdmin(); $('#sc').hidden = !isAdmin(); if (isAdmin() && !S._sl) { S._sl = 1; loadStu(); } $('#cy').hidden = !isAdmin(); $('#xcard').hidden = !isAdmin();
   if (isAdmin()) { $('#cy_d').value = CYC.start; window.__cyPreview(); }
   $('#xn').textContent = 'يشمل التصدير كل الحلقات والمقرأتين في الفترة المختارة.';
   draw();
@@ -560,6 +562,28 @@ function wedClick(e) {
   const b = e.target.closest('button'); if (!b) return;
   if (b.dataset.w !== undefined) { S.wed = b.dataset.w === '0' ? nextWed(riyadh()) : addDays(S.wed, +b.dataset.w); return loadWed(); }
   if (b.dataset.s && b.dataset.sid) setPres(+b.dataset.sid, b.dataset.s);
+}
+
+/* ---------------- الطلاب المسجلون وحذفهم (الإدارة فقط) ---------------- */
+async function loadStu() {
+  const { data, error } = await sb.rpc('muqraa_admin_students', { p_secret: ls('tk') }); if (!$('#sl')) return;
+  if (error) { if (!S.stu) $('#sl').innerHTML = '<p class="note">تعذّر تحميل القائمة، اضغط «تحديث».</p>'; return; }
+  S.stu = data; drawStu();
+}
+function drawStu() {
+  const l = $('#sl'); if (!l || !S.stu) return; const q = LAT($('#sq').value.trim().toLowerCase());
+  const a = S.stu.filter(x => !q || String(x.name).toLowerCase().includes(q) || x.username.includes(q));
+  l.innerHTML = `<p class="note">${AR(a.length)} من ${AR(S.stu.length)} طالب</p>` + a.slice(0, 80).map(x => `<div class="trow"><span><b>${esc(x.name)}</b> <small class="wd un">${esc(x.username)}</small><br><span class="wd">مقرأة ${esc(x.muqraa)} · ${esc(x.halaqa)}</span></span>
+    <button type="button" class="btn sec sm" style="color:var(--bad);border-color:var(--bad)" data-u="${esc(x.username)}">حذف</button></div>`).join('')
+    + (a.length > 80 ? '<p class="note">يظهر أول ٨٠ نتيجة، ضيّق البحث.</p>' : '');
+}
+async function stuClick(e) {
+  const u = e.target.dataset.u, x = u && (S.stu || []).find(s => s.username === u); if (!x) return;
+  if (!confirm('سيُحذف حساب «' + x.name + '» (' + u + ') نهائيًا مع سجل عرضه، وتُنقل إرسالاته اليومية إلى سلة المحذوفات ٣٠ يومًا. لا يمكن استعادة الحساب نفسه. متابعة؟')) return;
+  e.target.disabled = true;
+  const { error } = await sb.rpc('muqraa_admin_delete_student', { p_secret: ls('tk'), p_username: u });
+  if (error) { e.target.disabled = false; return alert('تعذّر الحذف.'); }
+  S.stu = S.stu.filter(s => s.username !== u); drawStu(); toast('تم حذف الطالب'); load(); loadWed();
 }
 
 /* ---------------- التصدير ---------------- */
