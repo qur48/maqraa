@@ -118,6 +118,13 @@ textarea{resize:none;overflow:hidden}
 .trow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd)}.trow:last-child{border-bottom:0}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:2px 0 16px}
 .stat{background:var(--card);color:var(--tx);border-radius:26px;padding:14px 6px;text-align:center;font-size:14px;box-shadow:var(--sh);border-bottom:4px solid var(--gold)}.stat b{display:block;font-size:30px;line-height:1.3;color:var(--g2)}
+.wnav{display:flex;align-items:center;justify-content:space-between;gap:8px}.wnav b{flex:1;text-align:center;color:var(--g2);font-size:16px;line-height:1.5}.wnav .btn{flex:0 0 auto}
+.stats.s4{grid-template-columns:repeat(4,1fr);gap:8px}.stats.s4 .stat{padding:10px 2px;font-size:12.5px}.stats.s4 .stat b{font-size:24px}
+.sr{padding:12px 0;border-bottom:1px solid var(--bd)}.sr:last-child{border-bottom:0}
+.sr .nm{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}.sr .nm b{font-size:16px}
+.sr .am{color:var(--g2);font-weight:700}.sr ul{margin:4px 0 8px;padding-inline-start:22px}.sr li{margin:2px 0}.sr li.cr{color:var(--wn)}
+.seg.sx button{min-width:0;padding:7px 4px;font-size:14px}
+.seg.sx button.on[data-s="missed"]{background:var(--bad);border-color:var(--bad)}.seg.sx button.on[data-s="postponed"]{background:var(--gold);border-color:var(--gold)}
 .wrap{overflow-x:auto;margin:6px -4px 0}
 table{border-collapse:collapse;width:100%;min-width:640px;font-size:14px}
 th,td{padding:9px 10px;border-bottom:1px solid var(--bd);text-align:right;vertical-align:top}
@@ -212,12 +219,12 @@ const AR = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
 const dow = d => new Date(d + 'T12:00:00Z').getUTCDay();
 const addDays = (d, n) => { const t = new Date(d + 'T12:00:00Z'); t.setUTCDate(t.getUTCDate() + n); return t.toISOString().slice(0, 10); };
 const nextWed = d => addDays(d, (3 - dow(d) + 7) % 7);
-const CYC = { start: /^\d{4}-\d\d-\d\d$/.test(ls('cyc')) ? ls('cyc') : '2026-10-28' };
-const sessionOf = (w, st = CYC.start) => (((Math.round((Date.parse(w + 'T12:00:00Z') - Date.parse(st + 'T12:00:00Z')) / 6048e5) % 4) + 4) % 4) + 1;
+const CYC = { start: /^\d{4}-\d\d-\d\d$/.test(ls('cyc')) ? ls('cyc') : '' }; /* يُقرأ من muqraa_cycle_start */
+const sessionOf = (w, st = CYC.start) => !st ? 1 : (((Math.round((Date.parse(w + 'T12:00:00Z') - Date.parse(st + 'T12:00:00Z')) / 6048e5) % 4) + 4) % 4) + 1;
 const QN = ['الأول', 'الثاني', 'الثالث', 'الرابع'];
 /* كل جزء ٤ أرباع؛ المحفوظ كله ٤×ن ربعًا يُقسم على ٤ جلسات، فلكل جلسة ن ربعًا بالضبط (ن = عدد الأجزاء) */
-function juzPlan(juz, s) {
-  const j = [...juz].sort((a, b) => a - b), N = j.length, segs = [];
+function juzPlan(juz, s, order = 'asc') {
+  const j = [...juz].sort((a, b) => order === 'desc' ? b - a : a - b), N = j.length, segs = [];
   for (let q = (s - 1) * N; q < s * N; q++) { const ju = j[Math.floor(q / 4)], qi = (q % 4) + 1, last = segs[segs.length - 1];
     if (last && last.juz === ju && last.b === qi - 1) last.b = qi; else segs.push({ juz: ju, a: qi, b: qi }); }
   return segs;
@@ -231,7 +238,7 @@ const amountText = N => { const w = Math.floor(N / 4), r = N % 4, rt = r === 1 ?
     wt = w === 1 ? 'جزء' : w === 2 ? 'جزآن' : w <= 10 ? AR(w) + ' أجزاء' : AR(w) + ' جزءًا';
   return !w ? (r === 3 ? 'ثلاثة أرباع الجزء' : rt + ' جزء') : r ? wt + ' و' + rt : wt; };
 function weeklyHTML(day) {
-  const pf = getPf(); if (!pf) return '';
+  const pf = getPf(); if (!pf || !CYC.start) return '';
   const w1 = nextWed(day), items = day === w1 ? [['اليوم', w1], ['الأربعاء القادم', addDays(w1, 7)]] : [['الأربعاء القادم', w1]], N = pf.juz.length;
   const row = ([lb, w]) => { const s = sessionOf(w);
     return `<div class="it${lb === 'اليوم' ? ' td' : ''}"><span class="tg">${lb}</span> <span class="wd">${dateLine(w)}</span><b class="pt">${amountText(N)}</b>
@@ -376,7 +383,8 @@ function login(msg) {
   $('#in').onclick = go; $('#tk').onkeydown = e => { if (e.key === 'Enter') go(); }; reveal();
 }
 
-const S = { role:'', halaqa:'', mode:'day', day:riyadh(), month:riyadh().slice(0,7), year:riyadh().slice(0,4), from:riyadh(-6*864e5), to:riyadh(), mq:'الكل', hq:'الكل', q:'', fmt:'xlsx', scope:'done', rows:[], known:[] };
+const S = { role:'', halaqa:'', mode:'day', day:riyadh(), month:riyadh().slice(0,7), year:riyadh().slice(0,4), from:riyadh(-6*864e5), to:riyadh(), mq:'الكل', hq:'الكل', q:'', fmt:'xlsx', scope:'done', rows:[], known:[], wed:'', wdata:null };
+S.wed = nextWed(riyadh());
 const isAdmin = () => S.role === 'admin';
 const range = () => { if (S.mode === 'day') return [S.day, S.day];
   if (S.mode === 'month') { const [y, m] = S.month.split('-').map(Number); return [S.month + '-01', S.month + '-' + String(new Date(Date.UTC(y, m, 0)).getUTCDate()).padStart(2, '0')]; }
@@ -406,6 +414,7 @@ async function teacher() {
   <div class="stats" id="stats"></div>
   <div class="card"><div class="wrap"><table><thead id="th"></thead><tbody id="tb"></tbody></table></div></div>
   <div class="card" id="rem" hidden></div>
+  <div class="card" id="wc" hidden><h2 class="pill">جدول عرض الأربعاء</h2><div id="wb"></div></div>
   <div class="card" id="xcard" hidden><h2 class="pill">تصدير</h2><p class="note" id="xn" style="margin-top:0"></p>
   <label>الصيغة</label><div class="seg" id="xf">${[['xlsx','Excel'],['csv','CSV'],['json','JSON'],['print','طباعة / PDF']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
   <label>المحتوى</label><div class="seg" id="xs">${[['done','من أتمّ جميع المهام'],['all','جميع الإرسالات']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
@@ -432,7 +441,7 @@ async function teacher() {
   $('#xs').onclick = e => { if (e.target.dataset.k) { S.scope = e.target.dataset.k; tabs(); } };
   $('#fm').onchange = e => { S.mq = e.target.value; draw(); }; $('#fh').onchange = e => { S.hq = e.target.value; draw(); };
   $('#fq').oninput = e => { S.q = e.target.value.trim(); draw(); };
-  $('#rf').onclick = load; $('#out').onclick = () => { ls('tk', ''); location.hash = ''; route(); };
+  $('#rf').onclick = () => { load(); loadWed(); }; $('#wc').onclick = wedClick; $('#out').onclick = () => { ls('tk', ''); location.hash = ''; route(); };
   $('#ex').onclick = doExport;
   $('#sec').onclick = async () => { const n = prompt('اكتب الرمز السري الجديد (٨ أحرف أو أرقام على الأقل):'); if (!n) return;
     const { error } = await sb.rpc('muqraa_teacher_set_secret', { p_secret: ls('tk'), p_new: n });
@@ -442,7 +451,7 @@ async function teacher() {
     const c = genCode(), { error } = await sb.rpc('muqraa_admin_set_halaqa_secret', { p_secret: ls('tk'), p_halaqa: h, p_new: c });
     if (error) return alert('تعذّر إنشاء الرمز.');
     prompt('الرمز الجديد لمعلم ' + h + ' (انسخه وأرسله له):', c.slice(0, 4) + '-' + c.slice(4)); };
-  const cyPreview = () => { const st = $('#cy_d').value || CYC.start; let w = nextWed(riyadh()), h = '';
+  const cyPreview = () => { const st = $('#cy_d').value || CYC.start; if (!st) { $('#cy_pv').innerHTML = ''; return; } let w = nextWed(riyadh()), h = '';
     for (let i = 0; i < 5; i++) { h += `<div class="trow"><span class="wd">${dateLine(w)}</span><b>الجلسة ${AR(sessionOf(w, st))}</b></div>`; w = addDays(w, 7); } $('#cy_pv').innerHTML = h; };
   $('#cy_d').onchange = () => { $('#cy_st').textContent = !$('#cy_d').value || dow($('#cy_d').value) === 3 ? '' : 'اختر يوم أربعاء.'; cyPreview(); };
   $('#cy_save').onclick = async () => { const v = $('#cy_d').value; if (!v || dow(v) !== 3) return $('#cy_st').textContent = 'اختر يوم أربعاء.';
@@ -463,6 +472,7 @@ async function load() {
   S.role = data.role; S.halaqa = data.halaqa || ''; S.rows = data.rows; S.known = data.known; msg.textContent = '';
   $('#pn1').textContent = isAdmin() ? 'تعاهد' : 'لوحة المعلم'; $('#pn').textContent = isAdmin() ? 'لوحة الإدارة' : S.halaqa;
   document.title = 'تعاهد · ' + (isAdmin() ? 'لوحة الإدارة' : S.halaqa);
+  if (!S._wl) { S._wl = 1; loadWed(); }
   $('#fhw').hidden = !isAdmin(); $('#tc').hidden = !isAdmin(); $('#cy').hidden = !isAdmin(); $('#xcard').hidden = !isAdmin();
   if (isAdmin()) { $('#cy_d').value = CYC.start; window.__cyPreview(); }
   $('#xn').textContent = 'يشمل التصدير كل الحلقات والمقرأتين في الفترة المختارة.';
@@ -471,6 +481,7 @@ async function load() {
 
 function draw() {
   if (!$('#tb')) return;
+  drawWed();
   const A = isAdmin();
   const f = r => (S.mq === 'الكل' || r.muqraa === S.mq) && (!A || S.hq === 'الكل' || r.halaqa === S.hq) && (!S.q || String(r.name).includes(S.q));
   if (S.mode === 'day') {
@@ -502,6 +513,55 @@ function draw() {
   }
 }
 
+/* ---------------- جدول عرض الأربعاء (للإدارة والمعلمين) ---------------- */
+const shDate = v => new Date(v + 'T12:00:00').toLocaleDateString('ar-SA-u-ca-gregory', { day:'numeric', month:'long' });
+/* مقرر طالب في أربعاء: جلسة ذلك الأربعاء + جلسات الأربعاوات السابقة التي تأجلت أو لم تُعرض (حتى ٤ جلسات في المجموع) */
+function wedPlan(st, W, pres, cyc) {
+  const setOf = v => st.next_from && v >= st.next_from ? { juz: st.juz_next || st.juz, order: st.order_next || st.order } : { juz: st.juz, order: st.order };
+  const stOf = v => (pres.find(p => p.sid === st.sid && p.wed === v) || {}).status || '';
+  const mk = (v, carried) => { const u = setOf(v), s = sessionOf(v, cyc); return { wed: v, s, carried, n: u.juz.length, segs: juzPlan(u.juz, s, u.order) }; };
+  const list = [mk(W, false)];
+  for (let i = 1; i <= 3; i++) { const v = addDays(W, -7 * i), t = stOf(v); if (t !== 'postponed' && t !== 'missed') break; list.push(mk(v, true)); }
+  return list.reverse();
+}
+async function loadWed() {
+  const W = S.wed, tok = S._wt = (S._wt || 0) + 1, wb = $('#wb'); if (!wb) return; wb.style.opacity = .5;
+  const { data, error } = await sb.rpc('muqraa_panel_wed', { p_secret: ls('tk'), p_wed: W });
+  if (tok !== S._wt || !$('#wb')) return; $('#wb').style.opacity = 1;
+  if (error) { if (/forbidden/.test(error.message)) { ls('tk', ''); return login('الرمز السري غير صحيح.'); }
+    $('#wc').hidden = false; if (!S.wdata) $('#wb').innerHTML = '<p class="note" style="margin-top:0">تعذّر تحميل الجدول، اضغط «تحديث».</p>'; return toast('تعذّر تحميل جدول الأربعاء'); }
+  S.wdata = data; if (/^\d{4}-\d\d-\d\d$/.test(data.cycle_start || '')) { CYC.start = data.cycle_start; ls('cyc', data.cycle_start); }
+  drawWed();
+}
+function drawWed() {
+  const d = S.wdata, wb = $('#wb'); if (!d || !wb) return; $('#wc').hidden = false;
+  const A = d.role === 'admin', W = S.wed, cyc = d.cycle_start, s = sessionOf(W, cyc), shown = (d.students || []).length;
+  const f = r => (S.mq === 'الكل' || r.muqraa === S.mq) && (!A || S.hq === 'الكل' || r.halaqa === S.hq) && (!S.q || String(r.name).includes(S.q));
+  const stat = sid => (d.pres.find(p => p.sid === sid && p.wed === W) || {}).status || '', sts = d.students.filter(f);
+  const c = k => sts.filter(x => stat(x.sid) === k).length, none = sts.filter(x => !stat(x.sid)).length;
+  const rows = sts.map(x => { const pl = wedPlan(x, W, d.pres, cyc), tot = pl.reduce((a, p) => a + p.n, 0), cur = stat(x.sid);
+    return `<div class="sr"><div class="nm"><b>${esc(x.name)}</b><span class="wd">${esc(x.muqraa)}${A ? ' · ' + esc(x.halaqa) : ''}</span></div><span class="am">${amountText(tot)}</span>
+      <ul>${pl.map(p => p.segs.map(g => `<li${p.carried ? ' class="cr"' : ''}>${segText(g)}${p.carried ? ' (مؤجَّل من أربعاء ' + shDate(p.wed) + ')' : ''}</li>`).join('')).join('')}</ul>
+      <div class="seg sx">${[['done', 'عرض'], ['missed', 'لم يعرض'], ['postponed', 'تأجل']].map(([k, t]) => `<button type="button" data-sid="${x.sid}" data-s="${k}"${cur === k ? ' class="on"' : ''}>${t}</button>`).join('')}</div></div>`; }).join('');
+  wb.innerHTML = `<div class="wnav"><button type="button" class="btn sec sm" data-w="-7">السابق</button><b>الجلسة ${AR(s)} من ٤</b><button type="button" class="btn sec sm" data-w="7">التالي</button></div>
+    <p class="note" style="text-align:center">${dateLine(W)}</p>
+    <div class="stats s4"><div class="stat"><b>${c('done')}</b>عرضوا</div><div class="stat"><b>${c('missed')}</b>لم يعرضوا</div><div class="stat"><b>${c('postponed')}</b>تأجلوا</div><div class="stat"><b>${none}</b>لم يُسجَّل</div></div>
+    ${rows || `<p class="note">${shown ? 'لا يوجد طلاب مطابقون للتصفية.' : 'لا يوجد طلاب مسجلون بعد.'}</p>`}
+    <div style="text-align:center"><button type="button" class="lnk" data-w="0">العودة للأربعاء القادم</button></div>`;
+}
+async function setPres(sid, st) {
+  const d = S.wdata, W = S.wed, cur = (d.pres.find(p => p.sid === sid && p.wed === W) || {}).status || '', nx = cur === st ? '' : st;
+  const { error } = await sb.rpc('muqraa_set_presentation', { p_secret: ls('tk'), p_sid: sid, p_wed: W, p_status: nx });
+  if (error) { toast(/forbidden/.test(error.message) ? 'لا تملك صلاحية تعديل هذا الطالب' : 'تعذّر الحفظ، حاول مرة أخرى'); return loadWed(); }
+  if (S.wdata !== d || S.wed !== W) return;
+  d.pres = d.pres.filter(p => !(p.sid === sid && p.wed === W)); if (nx) d.pres.push({ sid, wed: W, status: nx }); drawWed();
+}
+function wedClick(e) {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.w !== undefined) { S.wed = b.dataset.w === '0' ? nextWed(riyadh()) : addDays(S.wed, +b.dataset.w); return loadWed(); }
+  if (b.dataset.s && b.dataset.sid) setPres(+b.dataset.sid, b.dataset.s);
+}
+
 /* ---------------- التصدير ---------------- */
 const saveBlob = (blob, name) => { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); };
 const HEAD = ['التاريخ','اليوم','الحلقة','الاسم','رقم المحفوظ','عدد التكرار','السماع','المراجعة','الربط','الحالة'];
@@ -528,7 +588,9 @@ function doExport() {
   }
 }
 setInterval(() => { if (S.mode === 'day' && $('#tb') && ls('tk')) load(); }, 60000);
-sb.rpc('muqraa_cycle_start').then(({ data }) => { if (/^\d{4}-\d\d-\d\d$/.test(data || '') && data !== CYC.start) { CYC.start = data; ls('cyc', data); const r = $('#res .wk'); if (r) r.outerHTML = weeklyHTML(riyadh()); } }).catch(() => {});
+sb.rpc('muqraa_cycle_start').then(({ data }) => { if (/^\d{4}-\d\d-\d\d$/.test(data || '') && data !== CYC.start) { CYC.start = data; ls('cyc', data);
+  const day = riyadh(), w = weeklyHTML(day), r = $('#res .wk');
+  if (r) r.outerHTML = w; else if (w && $('#res') && doneDays().includes(day)) { $('#res').insertAdjacentHTML('beforeend', w); reveal(); } } }).catch(() => {});
 window.addEventListener('hashchange', route);
 route();
 </script>
