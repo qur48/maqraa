@@ -148,6 +148,7 @@ textarea{resize:none;overflow:hidden}
 .fbme{position:relative;display:inline-block;margin:4px 0 8px;padding:5px 16px;border-radius:99px;background:var(--goldb);color:var(--g);font-size:14px;font-weight:700;box-shadow:inset 0 0 0 1px rgba(149,127,80,.5)}.fbme[hidden]{display:none}
 @media (max-width:359px){.fb li .tm{display:none}}
 @media (prefers-reduced-motion:reduce){.fb li.st,.fb li.pop,.fbme.pop{animation:none}.bs{display:none}}
+.hd.hdr{margin:0 4px 18px;padding:12px 16px;border-radius:12px}.hd.hdr::before,.hd.hdr::after{display:none}.hd.hdr .l1{margin:0;font-size:16.5px;line-height:1.95;font-weight:400;color:var(--cream)}.hd.hdr .l1 span{color:var(--gold2)}
 .lh{font-size:12.5px;font-weight:400;color:var(--mu)}
 .b-mu{background:var(--card2);color:var(--mu);border:1px solid var(--bd)}
 .done-card{text-align:center}
@@ -512,6 +513,8 @@ const hero = (sub, extra, inner) => banner('', inner) + `<div class="meta"><span
 const hadithCard = () => `<section class="hd serif" aria-label="حديث"><p class="lbl">قال ﷺ</p><div class="ln"></div>
   <p class="l1">«تَعاهَدوا هذا القُرآنَ،</p><p class="l2">فوالذي نَفسُ مُحَمَّدٍ بيَدِه لَهو أشَدُّ تَفَلُّتًا مِنَ الإبِلِ في عُقُلِها»</p></section>`;
 
+const hadithBar = () => `<section class="hd hdr serif" aria-label="حديث"><p class="l1">قال ﷺ: «تَعاهَدوا هذا القُرآنَ، <span>فوالذي نَفسُ مُحَمَّدٍ بيَدِه لَهو أشَدُّ تَفَلُّتًا مِنَ الإبِلِ في عُقُلِها»</span></p></section>`;
+
 function route() {
   document.querySelectorAll('.ov').forEach(o => o.remove());
   if (location.hash === '#teacher') return ls('tk') ? teacher() : login();
@@ -799,7 +802,7 @@ function student() {
   try { const d = JSON.parse(ls('draft') || '{}'); if (d.day === day) draft = d.v; } catch (e) {}
   if (!draft) { try { const t = JSON.parse(ls('srv') || '{}'); if (t.day === day && t.v) draft = t.v; } catch (e) {} }
   const full = pf.first + ' ' + pf.family, vals = { ...(draft || {}), name: full };
-  app.innerHTML = hero(`${esc(full)} <small class="wd">مقرأة ${esc(pf.muqraa)} · ${esc(pf.halaqa)}</small>`, '<span class="mb"><button class="chip" id="jrb">سيري</button><button class="chip" id="pfb">بطاقتي</button><button class="chip" id="lgo">خروج</button></span>') + hadithCard() + '<div class="top">' + clockWidget() + firstBoard() + '</div>' + clockPanel() + pendNote(pf, day) + `
+  app.innerHTML = hero(`${esc(full)} <small class="wd">مقرأة ${esc(pf.muqraa)} · ${esc(pf.halaqa)}</small>`, '<span class="mb"><button class="chip" id="jrb">سيري</button><button class="chip" id="pfb">بطاقتي</button><button class="chip" id="lgo">خروج</button></span>') + '<div class="top">' + clockWidget() + firstBoard() + '</div>' + clockPanel() + hadithBar() + pendNote(pf, day) + `
   <div class="card"><h2 class="pill">مهام اليوم: <span class="dd">${dateLine(day)}</span></h2>${winNote(day)}<div class="prog"><span></span><span id="pc"></span></div><div class="bar"><i id="pb"></i></div>
   <div class="fgrid">${FIELDS.map(fieldHTML).join('')}</div>
   <button class="btn" id="go">إرسال</button><p class="note" id="st"></p></div>
