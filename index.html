@@ -605,7 +605,7 @@ async function teacher() {
   <section class="pane" data-p="rep" hidden>
   <div class="card" id="rpc" hidden><h2 class="pill">التقارير</h2>
   <div class="seg sx" id="rpt">${[['top','أفضل ٥'],['mq','المقرأتان'],['hq','الحلقات'],['pg','البرنامج']].map(([k, t]) => `<button type="button" data-rt="${k}">${t}</button>`).join('')}</div>
-  <button class="btn sm" id="rpx" type="button" style="margin:2px 0 8px">تصدير التقارير إلى Excel</button><p class="note" id="rpm"></p><div id="rpb"></div></div>
+  <p class="note" id="rpm"></p><div id="rpb"></div></div>
   </section>
   <section class="pane" data-p="stu" hidden>
   <div class="card" id="sc" hidden><h2 class="pill">الطلاب المسجلون</h2><p class="note" style="margin-top:0">ابحث بالاسم أو اسم المستخدم. حذف الطالب ينقل حسابه وإرسالاته وسجل عرضه إلى «السلة» ٣٠ يومًا، ويمكن استعادته منها.</p>
@@ -1013,7 +1013,6 @@ async function loadRep() {
 }
 function repClick(e) {
   const b = e.target.closest('button'); if (!b || b.disabled) return;
-  if (b.id === 'rpx') return rpExport(b);
   if (b.dataset.rt) R.tab = b.dataset.rt; else if (b.dataset.mq) R.mq = b.dataset.mq; else if (b.dataset.hq) R.hq = b.dataset.hq;
   else if (b.dataset.wk) { const i = R.d.weeks.indexOf(R.wk) + +b.dataset.wk; if (i >= 0 && i < R.d.weeks.length) R.wk = R.d.weeks[i]; } else return;
   drawRep();
@@ -1181,7 +1180,6 @@ function xlData(wb, title, sub, head, rows, widths, nameCols) {
   xBody(ws, 5, 1, rows.map(r => r.map((v, j) => nameCols && nameCols.includes(j) ? { v, al:'right' } : v)));
   widths.forEach((w, i) => { ws.getColumn(i + 1).width = w; }); if (rows.length) ws.autoFilter = { from:{ row:4, column:1 }, to:{ row:4 + rows.length, column:head.length } }; return ws; }
 
-async function rpExport(b) { const w = S.what, f = S.fmt; S.what = 'rep'; S.fmt = 'xlsx'; b.disabled = true; try { await doExport(); } finally { S.what = w; S.fmt = f; b.disabled = false; } }
 async function doExport() {
   let fmt = S.fmt; const what = S.what, onlyDone = S.scope === 'done', wantR = what === 'rep' || what === 'all', wantT = ['tasks', 'both', 'all'].includes(what), wantP = ['pres', 'both', 'all'].includes(what), lb = wantR && !wantT && !wantP ? riyadh() : label();
   const name = 'تعاهد-' + (what === 'pres' ? 'العرض-' : what === 'rep' ? 'التقارير-' : '') + lb;
