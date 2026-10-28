@@ -72,6 +72,7 @@ textarea{resize:none;overflow:hidden}
 .cb.p{background:var(--g);color:#fff;box-shadow:inset 0 -3px 0 rgba(0,0,0,.2)}
 .cb:active{transform:scale(.92)}
 .rng{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.qh{font-size:12.5px;line-height:1.6;margin-top:6px;padding:0 4px;color:var(--mu)}.qh:empty{display:none}.qh.ok{color:var(--g2);font-weight:700}.qh.no{color:var(--bad)}.qs{display:block;font-size:11px;color:var(--mu);font-weight:400;margin-top:2px}
 .pg{position:relative}
 .pg em{position:absolute;inset-inline-start:16px;top:50%;transform:translateY(-50%);font-size:13px;font-style:normal;color:var(--mu);pointer-events:none}
 .pg input{padding-inline-start:72px;text-align:start;font-weight:700;color:var(--g2)}
@@ -303,6 +304,130 @@ const ls = (k, v) => { try { if (v === undefined) return localStorage.getItem(k)
 const LAT = s => String(s == null ? '' : s).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
 const cnum = s => parseInt(LAT(s).replace(/\D/g, '') || '0', 10);
 const digits = (s, n) => LAT(s).replace(/\D/g, '').slice(0, n);
+/* ---------------- محلّل «نصاب اليوم»: يفهم الأوجه والآيات بأي صياغة ----------------
+   يعيد { f: عدد الأوجه، a: عدد الآيات، ok: هل فُهم شيء }.
+   الأرقام المجرّدة أوجه (٦٠ = وجه واحد). «٣ أوجه» عدد، «وجه ٦٠» رقم صفحة. ٦١-٦٢ أو من ٦١ إلى ٦٢ مدى، و٦١+٦٢ أو ٦١، ٦٢ أو ٦١ و٦٢ قائمة.
+   الآيات: بكلمة آية/آيات أو باسم سورة: «من الآية ٥ إلى ١٠»، «البقرة ١-٥»، «من البقرة ٢٥٥ إلى آل عمران ٥»، «سورة الإخلاص» (كاملة). */
+const SURAH = [['الفاتحة',7],['البقرة',286],['آل عمران',200],['النساء',176],['المائدة',120],['الأنعام',165],['الأعراف',206],['الأنفال',75],['التوبة',129],['يونس',109],['هود',123],['يوسف',111],['الرعد',43],['إبراهيم',52],['الحجر',99],['النحل',128],['الإسراء',111],['الكهف',110],['مريم',98],['طه',135],['الأنبياء',112],['الحج',78],['المؤمنون',118],['النور',64],['الفرقان',77],['الشعراء',227],['النمل',93],['القصص',88],['العنكبوت',69],['الروم',60],['لقمان',34],['السجدة',30],['الأحزاب',73],['سبأ',54],['فاطر',45],['يس',83],['الصافات',182],['ص',88],['الزمر',75],['غافر',85],['فصلت',54],['الشورى',53],['الزخرف',89],['الدخان',59],['الجاثية',37],['الأحقاف',35],['محمد',38],['الفتح',29],['الحجرات',18],['ق',45],['الذاريات',60],['الطور',49],['النجم',62],['القمر',55],['الرحمن',78],['الواقعة',96],['الحديد',29],['المجادلة',22],['الحشر',24],['الممتحنة',13],['الصف',14],['الجمعة',11],['المنافقون',11],['التغابن',18],['الطلاق',12],['التحريم',12],['الملك',30],['القلم',52],['الحاقة',52],['المعارج',44],['نوح',28],['الجن',28],['المزمل',20],['المدثر',56],['القيامة',40],['الإنسان',31],['المرسلات',50],['النبأ',40],['النازعات',46],['عبس',42],['التكوير',29],['الانفطار',19],['المطففين',36],['الانشقاق',25],['البروج',22],['الطارق',17],['الأعلى',19],['الغاشية',26],['الفجر',30],['البلد',20],['الشمس',15],['الليل',21],['الضحى',11],['الشرح',8],['التين',8],['العلق',19],['القدر',5],['البينة',8],['الزلزلة',8],['العاديات',11],['القارعة',11],['التكاثر',8],['العصر',3],['الهمزة',9],['الفيل',5],['قريش',4],['الماعون',7],['الكوثر',3],['الكافرون',6],['النصر',3],['المسد',5],['الإخلاص',4],['الفلق',5],['الناس',6]];
+const QX = {
+  norm: s => String(s == null ? '' : s).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
+    .replace(/[ً-ٰٟـ‎‏‪-‮]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه').replace(/ئ/g, 'ي').replace(/ؤ/g, 'و').replace(/ء/g, '')
+    .replace(/[–—−‑‐‒―ـ]/g, '-').replace(/[،٬]/g, ',').replace(/؛/g, ';').replace(/٫/g, '.').toLowerCase(),
+  key: w => w.replace(/^ال/, '')
+};
+QX.S = {}; SURAH.forEach(([n], i) => { QX.S[QX.key(QX.norm(n).replace(/\s+/g, ''))] = i; });
+QX.S[QX.key('بنياسرايل')] = 16; QX.S[QX.key('براءه')] = 8; QX.S[QX.key('تبارك')] = 66; QX.S[QX.key('المومن')] = 39; QX.S[QX.key('الدهر')] = 75;
+QX.S[QX.key(QX.norm('المنافقين'))] = 62; QX.S[QX.key(QX.norm('المطففون'))] = 82; QX.S[QX.key(QX.norm('الاحزاب'))] = 32;
+delete QX.S[QX.key('ص')]; delete QX.S[QX.key('ق')]; /* حرفان: لا يُفهمان سورتين إلا بعد كلمة «سورة» */
+QX.NUMW = {}; QX.UNIT = {}; QX.DUAL = {};
+Object.entries({ واحد:1, واحدة:1, اثنان:2, اثنين:2, ثنتين:2, ثلاثة:3, ثلاث:3, أربعة:4, أربع:4, خمسة:5, خمس:5, ستة:6, ست:6, سبعة:7, سبع:7, ثمانية:8, ثماني:8, تسعة:9, تسع:9, عشرة:10, عشر:10 }).forEach(([k, v]) => { QX.NUMW[QX.norm(k)] = v; });
+Object.entries({ وجه:1, أوجه:1, وجهان:1, وجهين:1, صفحة:1, صفحات:1, صفحتين:1, صفحتان:1, ص:1, ربع:5, أرباع:5, حزب:10, أحزاب:10, جزء:20, أجزاء:20, جزءان:20, جزءين:20 }).forEach(([k, v]) => { QX.UNIT[QX.norm(k)] = v; });
+Object.entries({ وجهان:2, وجهين:2, صفحتين:2, صفحتان:2, جزءان:2, جزءين:2 }).forEach(([k, v]) => { QX.DUAL[QX.norm(k)] = v; });
+const QRNG = /^(الي|حتي|-|~)$/;
+
+QX.seg = s => {
+  /* يحوّل مقطعًا واحدًا إلى {pages:Set, cnt:عدد أوجه معدود، a:آيات} */
+  const out = { pages: [], cnt: 0, a: 0, ok: false };
+  const toks = s.replace(/(\d+)/g, ' $1 ').replace(/-/g, ' - ').replace(/\.\.+|…/g, ' ~ ').replace(/[().:\/\\|]/g, ' ').trim().split(/\s+/).filter(Boolean);
+  const T = []; /* رموز مفهومة: {t:'n',v} {t:'s',i} {t:'r'} {t:'ayah'} {t:'u',m} {t:'w'} */
+  for (let i = 0; i < toks.length; i++) {
+    const w = toks[i];
+    if (/^\d+$/.test(w)) { T.push({ t:'n', v:+w }); continue; }
+    if (QRNG.test(w)) { T.push({ t:'r' }); continue; }
+    if (/^(ايه|ايات|ايتين|ايتان|الايه|الايات)$/.test(w) || /^ال?ايه$/.test(w)) { T.push({ t:'ayah' }); continue; }
+    if (w === 'سوره' || w === 'سورتي' || w === 'سور') { T.push({ t:'sw' }); continue; }
+    let k = QX.key(w), nx = toks[i + 1] ? QX.key(toks[i + 1]) : '';
+    if (w === 'ال' && nx === 'عمران') { T.push({ t:'s', i:2 }); i++; continue; }
+    if (w === 'عم') { if (!(T.length && T[T.length - 1].t === 'u')) T.push({ t:'s', i:77 }); continue; } /* «عمّ» = النبأ، إلا في «جزء عمّ» */
+    if (QX.S[k] !== undefined) { T.push({ t:'s', i:QX.S[k] }); continue; }
+    if (w.length > 2 && w[0] === 'و' && QX.S[QX.key(w.slice(1))] !== undefined) { T.push({ t:'s', i:QX.S[QX.key(w.slice(1))] }); continue; } /* «والفلق» */
+    if ((w === 'ص' || w === 'ق') && T.length && T[T.length - 1].t === 'sw') { T.push({ t:'s', i:w === 'ص' ? 37 : 49 }); continue; }
+    if (QX.DUAL[w] !== undefined) { T.push({ t:'u', m:QX.UNIT[w], c:QX.DUAL[w] }); continue; }
+    if (QX.UNIT[w] !== undefined) { T.push({ t:'u', m:QX.UNIT[w] }); continue; }
+    if (QX.NUMW[w] !== undefined) { T.push({ t:'n', v:QX.NUMW[w], word:true }); continue; }
+    if (w === 'نصف') { T.push({ t:'half' }); continue; }
+  }
+  const surahs = T.filter(x => x.t === 's').length, ayahW = T.some(x => x.t === 'ayah'), hasUnit = T.some(x => x.t === 'u');
+  /* ---- مقطع آيات ---- */
+  if (surahs || (ayahW && !hasUnit)) {
+    /* عدد قبل «آيات» مباشرة = عدد الآيات: «٥ آيات» */
+    if (T.filter(x => x.t === 'n').length === 1) for (let i = 1; i < T.length; i++) if (T[i].t === 'ayah' && T[i - 1].t === 'n') { out.a = T[i - 1].v; out.ok = out.a > 0; return out; }
+    if (!surahs) {
+      const nums = T.filter(x => x.t === 'n').map(x => x.v);
+      if (!nums.length) return out;
+      const rng = T.some(x => x.t === 'r') && nums.length > 1;
+      out.a = rng ? Math.abs(nums[nums.length - 1] - nums[0]) + 1 : nums.length;
+      out.ok = out.a > 0; return out;
+    }
+    /* مع سور: نجمع لكل ذكر سورةٍ أرقامَه (ما قبل أول سورة يُنسب إلى الأولى) */
+    const pts = []; let lead = [];
+    T.forEach(x => { if (x.t === 's') { pts.push({ i:x.i, n:lead }); lead = []; } else if (x.t === 'n') { if (pts.length) pts[pts.length - 1].n.push(x.v); else lead.push(x.v); } });
+    const len = i => SURAH[i][1], full = (a, b) => { let c = 0; for (let j = Math.min(a, b); j <= Math.max(a, b); j++) c += len(j); return c; };
+    const own = p => { const n = p.n; if (!n.length) return len(p.i); if (n.length === 1) return n[0] >= 1 && n[0] <= len(p.i) ? 1 : 0; const a = Math.max(1, Math.min(n[0], n[n.length - 1])), b = Math.min(len(p.i), Math.max(n[0], n[n.length - 1])); return b >= a ? b - a + 1 : 0; };
+    const rangeBetween = T.some(x => x.t === 'r') && pts.length >= 2;
+    if (rangeBetween && pts[0].i !== pts[pts.length - 1].i) {
+      let p1 = pts[0], p2 = pts[pts.length - 1];
+      if (p1.i > p2.i) { const t = p1; p1 = p2; p2 = t; }
+      const st = p1.n.length ? Math.max(1, Math.min(p1.n[0], len(p1.i))) : 1, en = p2.n.length ? Math.max(1, Math.min(p2.n[p2.n.length - 1], len(p2.i))) : len(p2.i);
+      out.a = (len(p1.i) - st + 1) + (p2.i - p1.i > 1 ? full(p1.i + 1, p2.i - 1) : 0) + en;
+    } else if (rangeBetween) {
+      const n = pts.reduce((c, p) => c.concat(p.n), []); out.a = n.length > 1 ? own({ i:pts[0].i, n }) : len(pts[0].i);
+    } else out.a = pts.reduce((c, p) => c + own(p), 0);
+    out.ok = out.a > 0; return out;
+  }
+  /* ---- مقطع أوجه ---- */
+  const pushPages = (a, b) => { if (a < 1 || b < 1 || a > 604 || b > 604) return false; for (let p = Math.min(a, b); p <= Math.max(a, b); p++) out.pages.push(p); return true; };
+  if (hasUnit || T.some(x => x.t === 'half')) {
+    /* «٣ أوجه» / «وجهين» / «وجه واحد» / «ربع» / «نصف جزء»: عدد × حجم الوحدة؛ «وجه ٦٠» / «ص ٦٠»: رقم صفحة */
+    for (let i = 0; i < T.length; i++) if (T[i].t === 'u') {
+      const prev = T[i - 1], next = T[i + 1], m = T[i].m;
+      if (T[i].c) { out.cnt += T[i].c * m; out.ok = true; if (next && next.t === 'n' && next.word) i++; continue; }
+      if (prev && prev.t === 'half') { out.cnt += 0.5 * m; out.ok = true; continue; }
+      if (prev && prev.t === 'n' && !prev.used) {
+        const q = T[i - 2], q2 = T[i - 3]; prev.used = true;
+        if (q && q.t === 'r' && q2 && q2.t === 'n') { q2.used = true; if (m === 1) { if (pushPages(q2.v, prev.v)) out.ok = true; } else { out.cnt += (Math.abs(prev.v - q2.v) + 1) * m; out.ok = true; } continue; }
+        if (m === 1 && prev.v > 40) { if (pushPages(prev.v, prev.v)) out.ok = true; continue; } /* «٦٠ وجه» = الوجه ٦٠ */
+        out.cnt += prev.v * m; out.ok = true; continue; }
+      if (m === 1 && next && next.t === 'n' && !next.word) { /* وجه ٦٠ */
+        let j = i + 1, a = T[j].v, b = a; if (T[j + 1] && T[j + 1].t === 'r' && T[j + 2] && T[j + 2].t === 'n') { b = T[j + 2].v; T[j + 2].used = true; }
+        T[j].used = true; if (pushPages(a, b)) out.ok = true; continue; }
+      if (next && next.t === 'n' && next.word) { next.used = true; out.cnt += next.v * m; out.ok = true; continue; }
+      out.cnt += m; out.ok = true; /* «وجه»، «ربع»، «جزء» وحدها = واحد */
+    }
+    /* أرقام لم تُستعمل (مثل «٦١ - ٦٢ وجهًا» لا تقع هنا؛ هذا للأرقام المصاحبة) */
+    const left = T.filter(x => x.t === 'n' && !x.used && !x.word);
+    if (!out.ok && left.length) { const a = left[0].v, b = left[left.length - 1].v; if (pushPages(a, b)) out.ok = true; }
+    return out;
+  }
+  /* أرقام مجرّدة: أوجه. بين رقمين رمز مدى = مدى، وإلا قائمة */
+  let i = 0;
+  while (i < T.length) {
+    if (T[i].t !== 'n') { i++; continue; }
+    let a = T[i].v, b = a, j = i + 1;
+    while (T[j] && T[j].t === 'r' && T[j + 1] && T[j + 1].t === 'n') { b = T[j + 1].v; if (pushPages(a, b)) out.ok = true; a = b; j += 2; }
+    if (j === i + 1) { if (pushPages(a, a)) out.ok = true; }
+    i = j;
+  }
+  return out;
+};
+
+/* يفهم نصاب اليوم كله: يقسّمه إلى مقاطع (فاصلة، «+»، «و»، سطر…) ثم يجمع الأوجه (بلا تكرار الصفحة نفسها) والآيات */
+QX.parse = text => {
+  let s = QX.norm(text).trim();
+  if (!s) return { f:0, a:0, ok:false };
+  s = s.replace(/(\d)\s*و\s*(?=\d)/g, '$1;').replace(/\s+و\s+/g, ';').replace(/\s+و(?=\d)/g, ';').replace(/(\d)و\s+/g, '$1;');
+  const parts = s.split(/[;,+&\n\r]+|\s*\/\s*|\s*×\s*/).map(x => x.trim()).filter(Boolean);
+  const pages = new Set(); let cnt = 0, a = 0, ok = false;
+  parts.forEach(p => { const r = QX.seg(p); r.pages.forEach(x => pages.add(x)); cnt += r.cnt; a += r.a; ok = ok || r.ok; });
+  return { f: Math.round((pages.size + cnt) * 10) / 10, a, ok };
+};
+
+const qN = (n, ar) => { const x = n % 1 ? n.toFixed(1) : String(n); return ar ? x.replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) : x; };
+const qWords = (f, a, ar) => { const p = [];
+  if (f) p.push(f === 1 ? 'وجه واحد' : f === 2 ? 'وجهان' : qN(f, ar) + (f >= 3 && f <= 10 ? ' أوجه' : ' وجهًا'));
+  if (a) p.push(a === 1 ? 'آية واحدة' : a === 2 ? 'آيتان' : qN(a, ar) + (a >= 3 && a <= 10 ? ' آيات' : ' آية'));
+  return p.join(' و'); };
+const qHint = v => { const t = String(v == null ? '' : v).trim(); if (!t) return ''; const r = QX.parse(t); return r.ok ? `<small class="qs">${qWords(r.f, r.a, true)}</small>` : ''; };
 const pageStr = (a, b) => !a ? '' : (b && b !== a ? a + ' إلى ' + b : a);
 const okf = (r, k, t) => { const v = String(r[k] == null ? '' : r[k]).trim(); return t === 'c' ? cnum(v) > 0 : t === 'p' ? /\d/.test(LAT(v)) : !!v; };
 const filled = r => FIELDS.filter(([k, , t]) => okf(r, k, t)).length;
@@ -376,7 +501,7 @@ const cntHTML = (id, k) => `<div class="cnt"${k ? ` data-k="${k}"` : ''}><button
 const fieldHTML = ([k, l, t]) => `<div class="f"><label for="f_${k}${t === 'p' ? '_from' : ''}">${l}${k === 'num' ? ' <small class="lh">أوجه أو آيات</small>' : ''}</label>` + (t === 'c' ? cntHTML('f_' + k, k)
   : t === 'p' ? `<div class="rng"><div class="pg"><em>من صفحة</em><input type="text" id="f_${k}_from" inputmode="numeric" autocomplete="off"></div><div class="pg"><em>إلى صفحة</em><input type="text" id="f_${k}_to" inputmode="numeric" autocomplete="off"></div></div>`
   : k === 'name' ? '<input type="text" id="f_name" class="ro" readonly tabindex="-1">'
-  : `<input type="text" id="f_${k}" autocomplete="off">`) + '</div>';
+  : `<input type="text" id="f_${k}" autocomplete="off"${k === 'num' ? ' maxlength="300"' : ''}>${k === 'num' ? '<div class="qh" id="qh" aria-live="polite"></div>' : ''}`) + '</div>';
 function bindCnt(box, init, onChange, max = 99999) {
   const inp = box.querySelector('input');
   const set = n => { n = Math.max(0, Math.min(max, n)); inp.value = n; onChange(n); };
@@ -624,7 +749,10 @@ function student() {
   ['reviewing', 'linking'].forEach(k => { if (vals[k + '_f'] === undefined) { const n = nums(vals[k]); vals[k + '_f'] = n[0] || ''; vals[k + '_t'] = n.length > 1 ? n[n.length - 1] : ''; } });
   ['rep', 'listening'].forEach(k => { vals[k] = String(cnum(vals[k])); });
   FIELDS.forEach(([k, , ty]) => {
-    if (ty === 't') { const el = $('#f_' + k); el.value = vals[k] || ''; if (k !== 'name') el.oninput = () => { vals[k] = el.value; save(); upd(); }; }
+    if (ty === 't') { const el = $('#f_' + k); el.value = vals[k] || '';
+      const qh = () => { const h = $('#qh'); if (!h || k !== 'num') return; const t = String(vals.num || '').trim(); if (!t) { h.className = 'qh'; h.textContent = ''; return; }
+        const r = QX.parse(t); h.className = 'qh ' + (r.ok ? 'ok' : 'no'); h.textContent = r.ok ? 'فُهم نصابك: ' + qWords(r.f, r.a, true) : 'لم يُفهم رقم أو آية في ما كتبت، ولن يظهر نصابك في التقارير. اكتب رقم الوجه أو مداه، أو الآيات من–إلى.'; };
+      if (k !== 'name') el.oninput = () => { vals[k] = el.value; save(); upd(); qh(); }; qh(); }
     else if (ty === 'c') bindCnt($(`.cnt[data-k="${k}"]`), vals[k], n => { vals[k] = String(n); save(); upd(); });
     else {
       const a = $('#f_' + k + '_from'), z = $('#f_' + k + '_to'); a.value = vals[k + '_f']; z.value = vals[k + '_t'];
@@ -833,7 +961,7 @@ function draw() {
     const miss = S.known.filter(k => !seen.has(key3(k)) && f(k)).sort(cmpN), n = sent.filter(done).length;
     $('#stats').innerHTML = `<div class="stat"><b>${n}</b>أتمّوا</div><div class="stat"><b>${sent.length - n}</b>ناقصة</div><div class="stat"><b>${miss.length}</b>لم يرسلوا</div>${sent.filter(r => tmOf(r) === 'late').length ? `<p class="note" style="grid-column:1/-1;margin:0;text-align:center">منهم ${sent.filter(r => tmOf(r) === 'late').length} أتمّوا في وقت التأخير</p>` : ''}`;
     $('#th').innerHTML = `<tr><th>الاسم</th><th>المقرأة</th>${A ? '<th>الحلقة</th>' : ''}<th>نصاب اليوم</th><th>التكرار</th><th>السماع</th><th>المراجعة</th><th>الربط</th><th>الحالة</th>${A ? '<th></th>' : ''}</tr>`;
-    $('#tb').innerHTML = sent.map(r => `<tr><td>${esc(r.name)}</td><td>${esc(r.muqraa)}</td>${A ? `<td>${esc(r.halaqa) || '—'}</td>` : ''}<td class="w">${esc(r.num) || '—'}</td><td>${cnum(r.rep) || '—'}</td><td>${cnum(r.listening) || '—'}</td><td>${esc(r.reviewing) || '—'}</td><td>${esc(r.linking) || '—'}</td>
+    $('#tb').innerHTML = sent.map(r => `<tr><td>${esc(r.name)}</td><td>${esc(r.muqraa)}</td>${A ? `<td>${esc(r.halaqa) || '—'}</td>` : ''}<td class="w">${esc(r.num) || '—'}${qHint(r.num)}</td><td>${cnum(r.rep) || '—'}</td><td>${cnum(r.listening) || '—'}</td><td>${esc(r.reviewing) || '—'}</td><td>${esc(r.linking) || '—'}</td>
       <td>${done(r) ? '<span class="badge b-ok">مكتمل</span>' + tmBadge(r) : `<span class="badge b-wn">${filled(r)}/${FIELDS.length}</span>`}</td>${A ? `<td><button class="x" data-id="${r.id}" title="حذف" aria-label="حذف">×</button></td>` : ''}</tr>`).join('')
       + miss.map(r => `<tr><td>${esc(r.name)}</td><td>${esc(r.muqraa)}</td>${A ? `<td>${esc(r.halaqa) || '—'}</td>` : ''}<td colspan="5">—</td><td><span class="badge b-mu">لم يرسل</span></td>${A ? '<td></td>' : ''}</tr>`).join('')
       || `<tr><td colspan="${A ? 10 : 8}" class="note">لا توجد إرسالات في هذا اليوم.</td></tr>`;
@@ -1017,6 +1145,7 @@ const PC = p => p == null ? '—' : Math.round(p) + '%';
 const pcl = p => p == null ? '' : p >= 80 ? 'c-ok' : p >= 60 ? 'c-wn' : 'c-bad';
 const wRange = w => shDate(addDays(w, -3)) + ' ← ' + shDate(addDays(w, 3));
 const tblR = (head, body, cls) => `<div class="wrap"><table class="${cls || 'rt'}"><thead><tr>${head.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${body.join('')}</tbody></table></div>`;
+const qT = a => qWords(a.qf, a.qa, false) || '—';
 const tdp = p => `<td class="${pcl(p)}">${PC(p)}</td>`;
 const grd = p => p == null ? '—' : GR(p);
 
@@ -1027,9 +1156,10 @@ function repCalc(rows, pd, adm) {
   const bySid = {};
   pd.students.forEach(x => { const o = mk(x); o.start = created[x.username] || cur; o.sid = x.sid; o.st = x; bySid[x.sid] = o; });
   rows.forEach(r => { const w = wkOf(r.day), o = mk(r), reg = dow(r.day) <= 4; if (w < o.start) o.start = w;
-    const c = o.w[w] = o.w[w] || { s:new Set(), d:new Set(), o:new Set(), l:new Set(), x:new Set(), m:new Set(), pg:0, rep:0, lis:0 };
+    const c = o.w[w] = o.w[w] || { s:new Set(), d:new Set(), o:new Set(), l:new Set(), x:new Set(), m:new Set(), pg:0, rep:0, lis:0, qf:0, qa:0, qu:0 };
     if (reg) { c.s.add(r.day); if (done(r)) { c.d.add(r.day); const tm = tmOf(r); if (tm === 'ok') c.o.add(r.day); else if (tm === 'late') c.l.add(r.day); } } else { c.x.add(r.day); if (done(r)) c.m.add(r.day); }
     c.pg += PG(r.reviewing) + PG(r.linking); c.rep += cnum(r.rep); c.lis += cnum(r.listening);
+    { const q = QX.parse(r.num); c.qf += q.f; c.qa += q.a; if (!q.ok && String(r.num == null ? '' : r.num).trim()) c.qu++; }
     if (reg) { const g = w + '|' + r.muqraa + '|' + (r.halaqa || ''); (dayAct[g] = dayAct[g] || new Set()).add(r.day); } });
   const act = {}; Object.keys(dayAct).forEach(g => { act[g] = dayAct[g].size; });
   const stu = Object.values(S0), weeks = [];
@@ -1041,10 +1171,10 @@ function repCalc(rows, pd, adm) {
 }
 const actN = (w, o) => R.d.act[w + '|' + o.muqraa + '|' + o.halaqa] || 0;
 function agg(list, weeks) {
-  const t = { sent:0, done:0, mk:0, num:0, den:0, pg:0, rep:0, lis:0, snd:0, pd:0, pm:0, pp:0, faces:0, on:0, lt:0, fr:0 };
+  const t = { sent:0, done:0, mk:0, num:0, den:0, pg:0, rep:0, lis:0, snd:0, pd:0, pm:0, pp:0, faces:0, on:0, lt:0, fr:0, qf:0, qa:0, qu:0 };
   list.forEach(o => weeks.forEach(w => { if (w < o.start) return; const a = actN(w, o), c = o.w[w];
     if (a) { t.den += a; if (c) { const k = Math.min(c.m.size, Math.max(0, a - c.d.size)); t.sent += c.s.size; t.done += c.d.size; t.mk += k; t.num += c.d.size + MK * k; t.on += c.o.size; t.lt += c.l.size; } t.fr += Math.max(0, a - (c ? c.o.size + c.l.size : 0)); }
-    if (c) { t.pg += c.pg; t.rep += c.rep; t.lis += c.lis; if (c.s.size || c.x.size) t.snd++; }
+    if (c) { t.pg += c.pg; t.qf += c.qf; t.qa += c.qa; t.qu += c.qu; t.rep += c.rep; t.lis += c.lis; if (c.s.size || c.x.size) t.snd++; }
     const p = o.p[w]; if (p) { if (p.st === 'done') { t.pd++; t.faces += p.f; } else if (p.st === 'missed') t.pm++; else t.pp++; } }));
   t.pct = t.den ? 100 * t.num / t.den : null; t.ot = t.den ? 100 * t.on / t.den : null; t.att = t.den ? 100 * t.sent / t.den : null; return t;
 }
@@ -1052,10 +1182,10 @@ const upTo = (list, w) => list.filter(o => o.start <= w);
 
 function wkTable(list) {
   const d = R.d, body = d.weeks.map((w, i) => { const a = agg(list, [w]);
-    return `<tr><td>${i + 1}${w === d.cur ? ' <small class="wd">(الجاري)</small>' : ''}</td><td class="wd">${wRange(w)}</td><td>${upTo(list, w).length}</td><td>${a.sent}</td>${tdp(a.att)}<td>${a.done}</td><td>${a.on}</td><td>${a.lt}</td><td>${a.fr}</td><td>${a.mk}</td>${tdp(a.pct)}<td>${a.pg}</td><td>${a.pd}</td><td>${a.faces}</td></tr>`; });
+    return `<tr><td>${i + 1}${w === d.cur ? ' <small class="wd">(الجاري)</small>' : ''}</td><td class="wd">${wRange(w)}</td><td>${upTo(list, w).length}</td><td>${a.sent}</td>${tdp(a.att)}<td>${a.done}</td><td>${a.on}</td><td>${a.lt}</td><td>${a.fr}</td><td>${a.mk}</td>${tdp(a.pct)}<td>${a.pg}</td><td>${qT(a)}</td><td>${a.pd}</td><td>${a.faces}</td></tr>`; });
   const t = agg(list, d.weeks);
-  body.push(`<tr class="tot"><td colspan="2">الإجمالي</td><td>${list.length}</td><td>${t.sent}</td>${tdp(t.att)}<td>${t.done}</td><td>${t.on}</td><td>${t.lt}</td><td>${t.fr}</td><td>${t.mk}</td>${tdp(t.pct)}<td>${t.pg}</td><td>${t.pd}</td><td>${t.faces}</td></tr>`);
-  return tblR(['الأسبوع', 'الفترة', 'الطلاب', 'الحضور', 'نسبة الحضور', 'أيام الإتمام', 'ضمن الموعد', 'تأخير', 'تفريط', 'تعويض', 'نسبة الإنجاز', 'الأوجه المقروءة', 'عرضوا', 'أوجه العرض'], body);
+  body.push(`<tr class="tot"><td colspan="2">الإجمالي</td><td>${list.length}</td><td>${t.sent}</td>${tdp(t.att)}<td>${t.done}</td><td>${t.on}</td><td>${t.lt}</td><td>${t.fr}</td><td>${t.mk}</td>${tdp(t.pct)}<td>${t.pg}</td><td>${qT(t)}</td><td>${t.pd}</td><td>${t.faces}</td></tr>`);
+  return tblR(['الأسبوع', 'الفترة', 'الطلاب', 'الحضور', 'نسبة الحضور', 'أيام الإتمام', 'ضمن الموعد', 'تأخير', 'تفريط', 'تعويض', 'نسبة الإنجاز', 'الأوجه المقروءة', 'نصاب اليوم', 'عرضوا', 'أوجه العرض'], body);
 }
 const statsR = (a, n) => `<div class="stats s4"><div class="stat"><b>${n}</b>طالب</div><div class="stat"><b>${PC(a.pct)}</b>نسبة الإنجاز</div><div class="stat"><b>${a.pg}</b>وجهًا مقروءًا</div><div class="stat"><b>${a.faces}</b>وجه عرض</div></div>`;
 
@@ -1066,20 +1196,20 @@ function repTop() {
   return nav + MQ.map(m => { const L = upTo(d.stu.filter(o => o.muqraa === m), W), av = agg(L, [W]);
     const rk = L.map(o => ({ o, a: agg([o], [W]) })).filter(x => x.a.done > 0 || x.a.mk > 0).sort((x, y) => (y.a.ot - x.a.ot) || (y.a.pct - x.a.pct) || (y.a.done - x.a.done) || (y.a.pg - x.a.pg) || ((y.a.rep + y.a.lis) - (x.a.rep + x.a.lis)) || cmpN(x.o, y.o)).slice(0, 5);
     return `<div class="gh"><span>أفضل ٥ طلاب — مقرأة ${esc(m)}</span><small>متوسط المقرأة: ${PC(av.pct)}</small></div>`
-      + (rk.length ? tblR(['#', 'الاسم', 'الإنجاز', 'التقدير', 'الأوجه'],
-        rk.map((x, j) => `<tr><td><span class="rk">${j + 1}</span></td><td>${esc(x.o.name)}<small>${esc(hShort(x.o.halaqa))} · أتمّ ${x.a.done} من ${actN(W, x.o)} (ضمن الموعد ${x.a.on}${x.a.lt ? ' · تأخير ' + x.a.lt : ''})${x.a.mk ? ' + تعويض ' + x.a.mk : ''}</small></td>${tdp(x.a.pct)}<td>${GR(x.a.pct)}</td><td>${x.a.pg}</td></tr>`), 'rt tp') : '<p class="note">لا أحد أتمّ مهامه في هذا الأسبوع.</p>'); }).join('')
+      + (rk.length ? tblR(['#', 'الاسم', 'الإنجاز', 'التقدير', 'الأوجه', 'نصاب اليوم'],
+        rk.map((x, j) => `<tr><td><span class="rk">${j + 1}</span></td><td>${esc(x.o.name)}<small>${esc(hShort(x.o.halaqa))} · أتمّ ${x.a.done} من ${actN(W, x.o)} (ضمن الموعد ${x.a.on}${x.a.lt ? ' · تأخير ' + x.a.lt : ''})${x.a.mk ? ' + تعويض ' + x.a.mk : ''}</small></td>${tdp(x.a.pct)}<td>${GR(x.a.pct)}</td><td>${x.a.pg}</td><td>${qT(x.a)}</td></tr>`), 'rt tp') : '<p class="note">لا أحد أتمّ مهامه في هذا الأسبوع.</p>'); }).join('')
     + '<p class="note">الترتيب أولًا بعدد أيام الإتمام ضمن الموعد (قبل ١١:٠٠ مساءً)، فمن أتمّ ضمن الموعد يتقدّم على من تأخّر أو فرّط واستدرك الجمعة أو السبت، ثم بنسبة الإنجاز مع التعويض، ثم الأوجه المقروءة ثم التكرار والسماع. يدخل من أتمّ مهامه يومًا واحدًا على الأقل في الأسبوع.</p>';
 }
 function repMq() {
   const d = R.d, m = R.mq, L = d.stu.filter(o => o.muqraa === m).sort(cmpN), all = agg(L, d.weeks);
-  const head = ['الاسم', 'الحلقة', ...d.weeks.map((w, i) => `<span title="${wRange(w)}">${i + 1}</span>`), 'متوسط الإنجاز', 'التقدير', 'الحضور', 'أيام الإتمام', 'ضمن الموعد', 'تأخير', 'تفريط', 'الأوجه المقروءة'];
+  const head = ['الاسم', 'الحلقة', ...d.weeks.map((w, i) => `<span title="${wRange(w)}">${i + 1}</span>`), 'متوسط الإنجاز', 'التقدير', 'الحضور', 'أيام الإتمام', 'ضمن الموعد', 'تأخير', 'تفريط', 'الأوجه المقروءة', 'نصاب اليوم'];
   const body = L.map(o => { const a = agg([o], d.weeks);
     return `<tr><td>${esc(o.name)}</td><td>${esc(hShort(o.halaqa))}</td>${d.weeks.map(w => { if (w < o.start || !actN(w, o)) return '<td></td>'; const c = o.w[w];
-      return c && (c.s.size || c.x.size) ? tdp(agg([o], [w]).pct) : '<td class="mu">غ</td>'; }).join('')}${tdp(a.pct)}<td>${grd(a.pct)}</td><td>${a.sent}</td><td>${a.done}</td><td>${a.on}</td><td>${a.lt}</td><td>${a.fr}</td><td>${a.pg}</td></tr>`; });
+      return c && (c.s.size || c.x.size) ? tdp(agg([o], [w]).pct) : '<td class="mu">غ</td>'; }).join('')}${tdp(a.pct)}<td>${grd(a.pct)}</td><td>${a.sent}</td><td>${a.done}</td><td>${a.on}</td><td>${a.lt}</td><td>${a.fr}</td><td>${a.pg}</td><td>${qT(a)}</td></tr>`; });
   const f = (lb, fn, tot) => `<tr class="tot"><td colspan="2">${lb}</td>${d.weeks.map(w => fn(agg(upTo(L, w), [w]))).join('')}${tot}</tr>`;
-  body.push(f('نسبة إنجاز المقرأة', a => tdp(a.pct), `${tdp(all.pct)}<td>${grd(all.pct)}</td><td colspan="6"></td>`),
-    f('عدد المرسلين (الحضور)', a => `<td>${a.snd}</td>`, `<td></td><td></td><td>${all.sent}</td><td colspan="5"></td>`),
-    f('الأوجه المقروءة', a => `<td>${a.pg}</td>`, `<td></td><td></td><td colspan="5"></td><td>${all.pg}</td>`));
+  body.push(f('نسبة إنجاز المقرأة', a => tdp(a.pct), `${tdp(all.pct)}<td>${grd(all.pct)}</td><td colspan="7"></td>`),
+    f('عدد المرسلين (الحضور)', a => `<td>${a.snd}</td>`, `<td></td><td></td><td>${all.sent}</td><td colspan="6"></td>`),
+    f('الأوجه المقروءة', a => `<td>${a.pg}</td>`, `<td></td><td></td><td colspan="5"></td><td>${all.pg}</td><td>${qT(all)}</td>`));
   return `<div class="seg" id="rpm2">${MQ.map(x => `<button type="button" data-mq="${x}"${x === m ? ' class="on"' : ''}>مقرأة ${x}</button>`).join('')}</div>
     <div class="stats"><div class="stat"><b>${L.length}</b>طالب</div><div class="stat"><b>${PC(all.pct)}</b>نسبة إنجاز المقرأة</div><div class="stat"><b>${all.pg}</b>وجهًا مقروءًا</div></div>`
     + (L.length ? tblR(head, body, 'rt rg') : '<p class="note">لا يوجد طلاب في هذه المقرأة بعد.</p>') + '<p class="note">«غ» = لم يرسل في ذلك الأسبوع. الخانة الفارغة = لم يكن مسجلًا أو لا دراسة فيه. رقم العمود = رقم الأسبوع.</p>';
@@ -1087,39 +1217,39 @@ function repMq() {
 function repHq() {
   const d = R.d, h = R.hq, byH = x => d.stu.filter(o => o.halaqa === x), rest = d.stu.filter(o => !HQ.includes(o.halaqa));
   const rows = HQ.map(x => { const L = byH(x), a = agg(L, d.weeks);
-    return `<tr><td>${esc(x)}</td><td>${L.filter(o => o.muqraa === MQ[0]).length}</td><td>${L.filter(o => o.muqraa === MQ[1]).length}</td><td>${L.length}</td><td>${a.sent}</td><td>${a.done}</td><td>${a.on}</td><td>${a.lt}</td><td>${a.fr}</td>${tdp(a.pct)}<td>${grd(a.pct)}</td><td>${a.pg}</td><td>${a.faces}</td></tr>`; });
+    return `<tr><td>${esc(x)}</td><td>${L.filter(o => o.muqraa === MQ[0]).length}</td><td>${L.filter(o => o.muqraa === MQ[1]).length}</td><td>${L.length}</td><td>${a.sent}</td><td>${a.done}</td><td>${a.on}</td><td>${a.lt}</td><td>${a.fr}</td>${tdp(a.pct)}<td>${grd(a.pct)}</td><td>${a.pg}</td><td>${qT(a)}</td><td>${a.faces}</td></tr>`; });
   const T = agg(d.stu, d.weeks);
-  rows.push(`<tr class="tot"><td>البرنامج</td><td>${d.stu.filter(o => o.muqraa === MQ[0]).length}</td><td>${d.stu.filter(o => o.muqraa === MQ[1]).length}</td><td>${d.stu.length}</td><td>${T.sent}</td><td>${T.done}</td><td>${T.on}</td><td>${T.lt}</td><td>${T.fr}</td>${tdp(T.pct)}<td>${grd(T.pct)}</td><td>${T.pg}</td><td>${T.faces}</td></tr>`);
+  rows.push(`<tr class="tot"><td>البرنامج</td><td>${d.stu.filter(o => o.muqraa === MQ[0]).length}</td><td>${d.stu.filter(o => o.muqraa === MQ[1]).length}</td><td>${d.stu.length}</td><td>${T.sent}</td><td>${T.done}</td><td>${T.on}</td><td>${T.lt}</td><td>${T.fr}</td>${tdp(T.pct)}<td>${grd(T.pct)}</td><td>${T.pg}</td><td>${qT(T)}</td><td>${T.faces}</td></tr>`);
   const grid = [...HQ.map(x => [x, byH(x)]), ['البرنامج', d.stu]].map(([lb, L], k) => { const a = agg(L, d.weeks);
     return `<tr${k === HQ.length ? ' class="tot"' : ''}><td>${esc(lb)}</td>${d.weeks.map(w => { const v = agg(upTo(L, w), [w]); return tdp(v.pct); }).join('')}${tdp(a.pct)}</tr>`; });
   const L = byH(h), a = agg(L, d.weeks);
   const rank = L.map(o => ({ o, a: agg([o], d.weeks) })).sort((x, y) => ((y.a.ot == null ? -1 : y.a.ot) - (x.a.ot == null ? -1 : x.a.ot)) || ((y.a.pct == null ? -1 : y.a.pct) - (x.a.pct == null ? -1 : x.a.pct)) || (y.a.done - x.a.done) || (y.a.pg - x.a.pg) || cmpN(x.o, y.o));
   return `<div class="gh"><span>تقرير الحلقات</span><small>مقارنة تراكمية</small></div>`
-    + tblR(['الحلقة', 'طلاب ' + MQ[0], 'طلاب ' + MQ[1], 'المجموع', 'الحضور', 'أيام الإتمام', 'ضمن الموعد', 'تأخير', 'تفريط', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'أوجه العرض'], rows)
+    + tblR(['الحلقة', 'طلاب ' + MQ[0], 'طلاب ' + MQ[1], 'المجموع', 'الحضور', 'أيام الإتمام', 'ضمن الموعد', 'تأخير', 'تفريط', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'نصاب اليوم', 'أوجه العرض'], rows)
     + (rest.length ? `<p class="note">${rest.length} طالب بلا حلقة معروفة، يدخلون في «البرنامج» فقط.</p>` : '')
     + `<div class="gh"><span>نسبة الإنجاز أسبوعيًا</span><small>التراكمي في آخر عمود</small></div>`
     + tblR(['الحلقة', ...d.weeks.map((w, i) => `<span title="${wRange(w)}">${i + 1}</span>`), 'التراكمي'], grid, 'rt rg')
     + `<div class="gh"><span>لوحة حلقة</span></div><div class="seg sx" id="rph">${HQ.map(x => `<button type="button" data-hq="${esc(x)}"${x === h ? ' class="on"' : ''}>${esc(hShort(x))}</button>`).join('')}</div>`
     + `<p class="note" style="text-align:center"><b>${esc(h)}</b></p>` + statsR(a, L.length)
     + `<h3 class="sub">التقرير الأسبوعي</h3>` + wkTable(L)
-    + `<h3 class="sub">طلاب الحلقة</h3>` + (L.length ? tblR(['الترتيب', 'الاسم', 'المقرأة', 'الحضور', 'أيام الإتمام', 'ضمن الموعد', 'تأخير', 'تفريط', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة'],
-      rank.map((x, j) => `<tr><td>${x.a.pct == null ? '' : j + 1}</td><td>${esc(x.o.name)}</td><td>${esc(x.o.muqraa)}</td><td>${x.a.sent}</td><td>${x.a.done}</td><td>${x.a.on}</td><td>${x.a.lt}</td><td>${x.a.fr}</td>${tdp(x.a.pct)}<td>${grd(x.a.pct)}</td><td>${x.a.pg}</td></tr>`)) : '<p class="note">لا يوجد طلاب في هذه الحلقة بعد.</p>');
+    + `<h3 class="sub">طلاب الحلقة</h3>` + (L.length ? tblR(['الترتيب', 'الاسم', 'المقرأة', 'الحضور', 'أيام الإتمام', 'ضمن الموعد', 'تأخير', 'تفريط', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'نصاب اليوم'],
+      rank.map((x, j) => `<tr><td>${x.a.pct == null ? '' : j + 1}</td><td>${esc(x.o.name)}</td><td>${esc(x.o.muqraa)}</td><td>${x.a.sent}</td><td>${x.a.done}</td><td>${x.a.on}</td><td>${x.a.lt}</td><td>${x.a.fr}</td>${tdp(x.a.pct)}<td>${grd(x.a.pct)}</td><td>${x.a.pg}</td><td>${qT(x.a)}</td></tr>`)) : '<p class="note">لا يوجد طلاب في هذه الحلقة بعد.</p>');
 }
 function repPg() {
   const d = R.d, a = agg(d.stu, d.weeks);
   return statsR(a, d.stu.length)
     + `<div class="stats s4"><div class="stat"><b>${a.sent}</b>الحضور</div><div class="stat"><b>${PC(a.att)}</b>نسبة الحضور</div><div class="stat"><b>${a.done}</b>أيام الإتمام</div><div class="stat"><b>${a.pd}</b>مرات العرض</div></div>`
     + `<div class="stats"><div class="stat"><b>${a.on}</b>أيام ضمن الموعد</div><div class="stat"><b>${a.lt}</b>أيام تأخير</div><div class="stat"><b>${a.fr}</b>أيام تفريط</div></div>`
-    + `<p class="note" style="text-align:center">التقدير العام: <b>${grd(a.pct)}</b></p><h3 class="sub">التقرير الأسبوعي</h3>` + wkTable(d.stu)
-    + `<h3 class="sub">حسب المقرأة (تراكمي)</h3>` + tblR(['المقرأة', 'الطلاب', 'الحضور', 'نسبة الحضور', 'أيام الإتمام', 'ضمن الموعد', 'تأخير', 'تفريط', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'أوجه العرض'],
-      MQ.map(m => { const L = d.stu.filter(o => o.muqraa === m), v = agg(L, d.weeks); return `<tr><td>${esc(m)}</td><td>${L.length}</td><td>${v.sent}</td>${tdp(v.att)}<td>${v.done}</td><td>${v.on}</td><td>${v.lt}</td><td>${v.fr}</td>${tdp(v.pct)}<td>${grd(v.pct)}</td><td>${v.pg}</td><td>${v.faces}</td></tr>`; }));
+    + `<p class="note" style="text-align:center">التقدير العام: <b>${grd(a.pct)}</b></p><p class="note" style="text-align:center">مجموع نصاب اليوم: <b>${qT(a)}</b>${a.qu ? ` · لم يُفهم نصاب ${a.qu} من الإرسالات` : ''}</p><h3 class="sub">التقرير الأسبوعي</h3>` + wkTable(d.stu)
+    + `<h3 class="sub">حسب المقرأة (تراكمي)</h3>` + tblR(['المقرأة', 'الطلاب', 'الحضور', 'نسبة الحضور', 'أيام الإتمام', 'ضمن الموعد', 'تأخير', 'تفريط', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'نصاب اليوم', 'أوجه العرض'],
+      MQ.map(m => { const L = d.stu.filter(o => o.muqraa === m), v = agg(L, d.weeks); return `<tr><td>${esc(m)}</td><td>${L.length}</td><td>${v.sent}</td>${tdp(v.att)}<td>${v.done}</td><td>${v.on}</td><td>${v.lt}</td><td>${v.fr}</td>${tdp(v.pct)}<td>${grd(v.pct)}</td><td>${v.pg}</td><td>${qT(v)}</td><td>${v.faces}</td></tr>`; }));
 }
 function drawRep() {
   const b = $('#rpb'); if (!b || !R.d) return;
   const d = R.d; if (!R.wk || !d.weeks.includes(R.wk)) R.wk = d.weeks.length > 1 ? d.weeks[d.weeks.length - 2] : d.weeks[0];
   document.querySelectorAll('#rpt button').forEach(x => x.classList.toggle('on', x.dataset.rt === R.tab));
   b.innerHTML = (d.stu.length ? { top:repTop, mq:repMq, hq:repHq, pg:repPg }[R.tab]() : '<p class="note">لا توجد بيانات بعد.</p>')
-    + '<p class="note">الحضور = مرات إرسال المهام اليومية. نسبة الإنجاز = أيام إتمام جميع المهام في يومها ÷ أيام الدراسة (الأحد–الخميس، والأربعاء يوم العرض). الجمعة والسبت تعويض: كل يوم يُتمّ فيه الطالب مهامه يعوّض يومًا فاته بنصف درجة. الأسبوع من الأحد إلى السبت. الأوجه المقروءة = صفحات المراجعة والربط. اليوم يبدأ ٤:٠٠ فجرًا: ضمن الموعد حتى ١٠:٥٩ مساءً، تأخير من ١١:٠٠ مساءً حتى ٣:٥٩ فجرًا، وما لم يُتمّ قبل ٤:٠٠ فجرًا فهو تفريط (ويبقى الاستدراك تعويضًا بنصف درجة).</p>';
+    + '<p class="note">الحضور = مرات إرسال المهام اليومية. نسبة الإنجاز = أيام إتمام جميع المهام في يومها ÷ أيام الدراسة (الأحد–الخميس، والأربعاء يوم العرض). الجمعة والسبت تعويض: كل يوم يُتمّ فيه الطالب مهامه يعوّض يومًا فاته بنصف درجة. الأسبوع من الأحد إلى السبت. الأوجه المقروءة = صفحات المراجعة والربط. نصاب اليوم = أوجه أو آيات يكتبها الطالب بأي صياغة (٦٠، ٦١-٦٢، ٦١+٦٢، من الآية ٥ إلى ١٠…) ويفهمها الموقع. اليوم يبدأ ٤:٠٠ فجرًا: ضمن الموعد حتى ١٠:٥٩ مساءً، تأخير من ١١:٠٠ مساءً حتى ٣:٥٩ فجرًا، وما لم يُتمّ قبل ٤:٠٠ فجرًا فهو تفريط (ويبقى الاستدراك تعويضًا بنصف درجة).</p>';
   reveal();
 }
 async function loadRep() {
@@ -1141,8 +1271,8 @@ function repClick(e) {
 
 /* ---------------- التصدير ---------------- */
 const saveBlob = (blob, name) => { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); };
-const HEAD = ['التاريخ','اليوم','الحلقة','الاسم','نصاب اليوم','عدد التكرار','السماع','المراجعة','الربط','الحالة','التوقيت','وقت الإتمام'];
-const rowArr = r => [r.day, wd(r.day), r.halaqa || '', r.name, r.num, cnum(r.rep), cnum(r.listening), r.reviewing, r.linking, done(r) ? 'مكتمل' : 'ناقص', tmOf(r) ? TMN[tmOf(r)] : '', tmOf(r) ? clockOf(r) : ''];
+const HEAD = ['التاريخ','اليوم','الحلقة','الاسم','نصاب اليوم','عدد التكرار','السماع','المراجعة','الربط','الحالة','التوقيت','وقت الإتمام','أوجه النصاب','آيات النصاب'];
+const rowArr = r => [r.day, wd(r.day), r.halaqa || '', r.name, r.num, cnum(r.rep), cnum(r.listening), r.reviewing, r.linking, done(r) ? 'مكتمل' : 'ناقص', tmOf(r) ? TMN[tmOf(r)] : '', tmOf(r) ? clockOf(r) : '', QX.parse(r.num).f, QX.parse(r.num).a];
 const pick = onlyDone => S.rows.filter(r => !onlyDone || done(r)).sort((a, b) => a.day.localeCompare(b.day) || cmpN(a, b));
 const PHEAD = ['الأربعاء','الجلسة','المقرأة','الحلقة','الاسم','المقرر','الأرباع','الأوجه','الحالة','الأوجه المحسوبة'];
 const PST = { done: 'عرض', missed: 'لم يعرض', postponed: 'تأجل', '': 'لم يُسجَّل' };
@@ -1207,12 +1337,12 @@ const xlOrder = () => R.d.stu.slice().sort((a, b) => (MQ.indexOf(a.muqraa) - MQ.
 function xlEntry(wb) {
   const d = R.d, ws = xSheet(wb, 'الإدخال', { freeze:[0, 4] }), L = xlOrder(), no = new Map(L.map((o, i) => [o, i + 1]));
   xTitle(ws, 'الإدخال الأسبوعي', 'يُجمَّع تلقائيًا من إدخال الطلبة اليومي · رقم الطالب كما في ورقة «الطلاب» · الحضور = أيام الإرسال (الأحد–الخميس) · التعويض = الجمعة والسبت');
-  const head = ['الأسبوع', 'المقرأة', 'الحلقة', 'رقم الطالب', 'اسم الطالب', 'الحضور (أيام الإرسال)', 'أيام الإتمام', 'تعويض', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'مجموع التكرار', 'مجموع السماع', 'حالة العرض', 'أوجه العرض', 'ضمن الموعد', 'تأخير', 'تفريط'];
+  const head = ['الأسبوع', 'المقرأة', 'الحلقة', 'رقم الطالب', 'اسم الطالب', 'الحضور (أيام الإرسال)', 'أيام الإتمام', 'تعويض', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'أوجه النصاب', 'آيات النصاب', 'مجموع التكرار', 'مجموع السماع', 'حالة العرض', 'أوجه العرض', 'ضمن الموعد', 'تأخير', 'تفريط'];
   xHead(ws, 4, 1, head, { nf:head.map((h, j) => j === 0 ? XWK : undefined), h:36 }); const ST = { done:'عرض', missed:'لم يعرض', postponed:'تأجل' }, rows = [];
   d.weeks.forEach((w, i) => L.forEach(o => { if (w < o.start) return; const a = agg([o], [w]), c = o.w[w], p = o.p[w];
-    rows.push([{ v:i + 1, nf:XWK, b:true }, o.muqraa, hShort(o.halaqa), no.get(o), { v:o.name, al:'right', b:true }, a.sent, a.done, a.mk, actN(w, o) ? xp(a.pct) : { v:'' }, actN(w, o) ? xg(a.pct) : { v:'' }, a.pg, a.rep, a.lis, p ? ST[p.st] : '—', a.faces, a.on, a.lt, a.fr]); }));
+    rows.push([{ v:i + 1, nf:XWK, b:true }, o.muqraa, hShort(o.halaqa), no.get(o), { v:o.name, al:'right', b:true }, a.sent, a.done, a.mk, actN(w, o) ? xp(a.pct) : { v:'' }, actN(w, o) ? xg(a.pct) : { v:'' }, a.pg, a.qf, a.qa, a.rep, a.lis, p ? ST[p.st] : '—', a.faces, a.on, a.lt, a.fr]); }));
   xBody(ws, 5, 1, rows); if (rows.length) { xScale(ws, xRef(5, 9, 4 + rows.length, 9)); ws.autoFilter = { from:{ row:4, column:1 }, to:{ row:4 + rows.length, column:head.length } }; }
-  xWidths(ws, [9, 10, 12, 9, 24, 13, 10, 8, 11, 12, 12, 11, 11, 11, 10, 10, 9, 9]); }
+  xWidths(ws, [9, 10, 12, 9, 24, 13, 10, 8, 11, 12, 12, 11, 11, 11, 11, 10, 10, 9, 9]); }
 
 function xlStudents(wb) {
   const d = R.d, ws = xSheet(wb, 'الطلاب'); xTitle(ws, 'الطلاب وتوزيعهم', 'عدد الطلاب المسجلين: ' + d.stu.length);
@@ -1227,16 +1357,16 @@ function xlStudents(wb) {
 function xlMq(wb, m) {
   const d = R.d, n = d.weeks.length, L = d.stu.filter(o => o.muqraa === m).sort(cmpN), all = agg(L, d.weeks), ws = xSheet(wb, 'تقرير مقرأة ' + m, { freeze:[3, 5] });
   xTitle(ws, 'تقرير مقرأة ' + m + ' — نسبة إنجاز الطلاب أسبوعيًا'); xLabel(ws, 3, 2, 'المقرأة:'); xc(ws, 3, 3, m, { sz:12, b:true, col:XL.G, bd:false, al:'right' });
-  const c0 = 4, cs = c0 + n, heads = ['م', 'اسم الطالب', 'الحلقة', ...d.weeks.map((w, i) => i + 1), 'متوسط الإنجاز', 'التقدير', 'الحضور', 'أيام الإتمام', 'تعويض', 'الأوجه المقروءة'];
+  const c0 = 4, cs = c0 + n, heads = ['م', 'اسم الطالب', 'الحلقة', ...d.weeks.map((w, i) => i + 1), 'متوسط الإنجاز', 'التقدير', 'الحضور', 'أيام الإتمام', 'تعويض', 'الأوجه المقروءة', 'أوجه النصاب', 'آيات النصاب'];
   xHead(ws, 5, 1, heads, { nf:heads.map((h, j) => j >= 3 && j < 3 + n ? XWK : undefined), h:36 });
   const rows = L.map((o, i) => { const a = agg([o], d.weeks);
     return [i + 1, { v:o.name, al:'right', b:true, sz:9 }, hShort(o.halaqa), ...d.weeks.map(w => { if (w < o.start || !actN(w, o)) return { v:'' }; const c = o.w[w];
-      return c && (c.s.size || c.x.size) ? xp(agg([o], [w]).pct) : { v:'غ', col:XL.RED, fill:XL.REDB, b:true }; }), { ...xp(a.pct), b:true }, xg(a.pct), a.sent, a.done, a.mk, a.pg]; });
+      return c && (c.s.size || c.x.size) ? xp(agg([o], [w]).pct) : { v:'غ', col:XL.RED, fill:XL.REDB, b:true }; }), { ...xp(a.pct), b:true }, xg(a.pct), a.sent, a.done, a.mk, a.pg, a.qf, a.qa]; });
   const end = xBody(ws, 6, 1, rows), f = (lb, fn, tail) => [{ v:lb, b:true, al:'right' }, '', '', ...d.weeks.map(w => fn(agg(upTo(L, w), [w]))), ...tail];
-  const foot = [f('نسبة إنجاز المقرأة', a => xp(a.pct), [xp(all.pct), xg(all.pct), '', '', '', '']), f('عدد الحضور (المرسلون)', a => ({ v:a.snd }), ['', '', all.sent, '', '', '']), f('الأوجه المقروءة', a => ({ v:a.pg }), ['', '', '', '', '', all.pg])];
-  const e2 = xBody(ws, end, 1, foot, { tot:[0, 1, 2] }); for (let i = 0; i < 3; i++) ws.mergeCells(end + i, 1, end + i, 3);
+  const foot = [f('نسبة إنجاز المقرأة', a => xp(a.pct), [xp(all.pct), xg(all.pct), '', '', '', '', '', '']), f('عدد الحضور (المرسلون)', a => ({ v:a.snd }), ['', '', all.sent, '', '', '', '', '']), f('الأوجه المقروءة', a => ({ v:a.pg }), ['', '', '', '', '', all.pg, '', '']), f('أوجه النصاب', a => ({ v:a.qf }), ['', '', '', '', '', '', all.qf, all.qa])];
+  const e2 = xBody(ws, end, 1, foot, { tot:[0, 1, 2, 3] }); for (let i = 0; i < 4; i++) ws.mergeCells(end + i, 1, end + i, 3);
   if (L.length) xScale(ws, xRef(6, c0, 5 + L.length, cs)); xScale(ws, xRef(end, c0, end, cs));
-  xWidths(ws, [5, 24, 15, ...d.weeks.map(() => 8.4), 12, 13, 8, 10, 8, 12]); ws.getColumn(1).width = 5; return e2; }
+  xWidths(ws, [5, 24, 15, ...d.weeks.map(() => 8.4), 12, 13, 8, 10, 8, 12, 11, 11]); ws.getColumn(1).width = 5; return e2; }
 
 function xlTop(wb) {
   const d = R.d, W = R.wk, i = d.weeks.indexOf(W), ws = xSheet(wb, 'أفضل 5 طلاب');
@@ -1246,11 +1376,11 @@ function xlTop(wb) {
   MQ.forEach(m => { const L = upTo(d.stu.filter(o => o.muqraa === m), W), av = agg(L, [W]);
     const rk = L.map(o => ({ o, a:agg([o], [W]) })).filter(x => x.a.done > 0 || x.a.mk > 0).sort((x, y) => (y.a.ot - x.a.ot) || (y.a.pct - x.a.pct) || (y.a.done - x.a.done) || (y.a.pg - x.a.pg) || ((y.a.rep + y.a.lis) - (x.a.rep + x.a.lis)) || cmpN(x.o, y.o)).slice(0, 5);
     xLabel(ws, r, 2, 'مقرأة ' + m, 14); xc(ws, r, 5, 'متوسط المقرأة هذا الأسبوع:', { col:XL.MUTE, bd:false, al:'right', wrap:false }); xc(ws, r, 7, xf(av.pct), { sz:11, b:true, col:XL.G, nf:'0%', bd:false });
-    r = xHead(ws, r + 1, 2, ['الترتيب', 'اسم الطالب', 'الحلقة', 'أيام الإتمام', 'تعويض', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة'], { h:30 });
-    const rows = [0, 1, 2, 3, 4].map(j => { const x = rk[j]; if (!x) return [{ v:j + 1, col:'FF937D50', b:true }, '', '', '', '', '', '', '']; const f = j === 0 ? XL.HI : undefined;
-      return [{ v:j + 1, col:'FF937D50', b:true, fill:f }, { v:x.o.name, al:'right', b:true, fill:f }, { v:hShort(x.o.halaqa), fill:f }, { v:x.a.done + ' من ' + actN(W, x.o), fill:f }, { v:x.a.mk, fill:f }, { ...xp(x.a.pct), fill:f, b:true }, { ...xg(x.a.pct), fill:f }, { v:x.a.pg, fill:f }]; });
+    r = xHead(ws, r + 1, 2, ['الترتيب', 'اسم الطالب', 'الحلقة', 'أيام الإتمام', 'تعويض', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'أوجه النصاب', 'آيات النصاب'], { h:30 });
+    const rows = [0, 1, 2, 3, 4].map(j => { const x = rk[j]; if (!x) return [{ v:j + 1, col:'FF937D50', b:true }, '', '', '', '', '', '', '', '', '']; const f = j === 0 ? XL.HI : undefined;
+      return [{ v:j + 1, col:'FF937D50', b:true, fill:f }, { v:x.o.name, al:'right', b:true, fill:f }, { v:hShort(x.o.halaqa), fill:f }, { v:x.a.done + ' من ' + actN(W, x.o), fill:f }, { v:x.a.mk, fill:f }, { ...xp(x.a.pct), fill:f, b:true }, { ...xg(x.a.pct), fill:f }, { v:x.a.pg, fill:f }, { v:x.a.qf, fill:f }, { v:x.a.qa, fill:f }]; });
     r = xBody(ws, r, 2, rows, { h:24 }) + 2; });
-  xWidths(ws, [3, 10, 26, 16, 14, 10, 14, 12, 14]); }
+  xWidths(ws, [3, 10, 26, 16, 14, 10, 14, 12, 14, 12, 12]); }
 
 function xlHalaqat(wb) {
   const d = R.d, ws = xSheet(wb, 'تقرير الحلقات'), nW = d.weeks.length, byH = h => d.stu.filter(o => o.halaqa === h), groups = [...HQ.map(h => [h, byH(h)]), ['البرنامج', d.stu]];
@@ -1261,37 +1391,37 @@ function xlHalaqat(wb) {
     if (pctCols) xScale(ws, xRef(r, 3, e - 1, 3 + nW)); r = e + 1; };
   wk('نسبة الإنجاز', a => xp(a.pct), true); wk('عدد الحضور (مرات الإرسال)', a => ({ v:a.sent }), false); wk('نسبة الحضور', a => xp(a.att), true);
   xc(ws, r, 2, 'ملخص الحلقات (تراكمي)', { sz:11, b:true, col:XL.G, al:'right', bd:false, wrap:false });
-  r = xHead(ws, r + 1, 2, ['الحلقة', 'عدد الطلاب', 'طلاب ' + MQ[0], 'طلاب ' + MQ[1], 'مرات الحضور', 'أيام الإتمام', 'تعويض', 'نسبة الحضور', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'أوجه العرض']);
-  xBody(ws, r, 2, groups.map(([h, L]) => { const a = agg(L, d.weeks); return [{ v:h, al:'right', b:true, sz:9 }, L.length, L.filter(o => o.muqraa === MQ[0]).length, L.filter(o => o.muqraa === MQ[1]).length, a.sent, a.done, a.mk, xp(a.att), xp(a.pct), xg(a.pct), a.pg, a.faces]; }), { tot:[HQ.length] });
-  xWidths(ws, [3, 26, ...Array(Math.max(nW + 1, 11)).fill(10.5)]); }
+  r = xHead(ws, r + 1, 2, ['الحلقة', 'عدد الطلاب', 'طلاب ' + MQ[0], 'طلاب ' + MQ[1], 'مرات الحضور', 'أيام الإتمام', 'تعويض', 'نسبة الحضور', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'أوجه النصاب', 'آيات النصاب', 'أوجه العرض']);
+  xBody(ws, r, 2, groups.map(([h, L]) => { const a = agg(L, d.weeks); return [{ v:h, al:'right', b:true, sz:9 }, L.length, L.filter(o => o.muqraa === MQ[0]).length, L.filter(o => o.muqraa === MQ[1]).length, a.sent, a.done, a.mk, xp(a.att), xp(a.pct), xg(a.pct), a.pg, a.qf, a.qa, a.faces]; }), { tot:[HQ.length] });
+  xWidths(ws, [3, 26, ...Array(Math.max(nW + 1, 13)).fill(10.5)]); }
 
-const xWeekRows = L => { const d = R.d; return d.weeks.map((w, i) => { const a = agg(L, [w]); return [{ v:i + 1, nf:XWK, b:true }, xRng(w) + (w === d.cur ? ' (الجاري)' : ''), upTo(L, w).length, a.sent, xp(a.att), a.done, a.mk, xp(a.pct), a.pg, a.pd, a.faces, a.on, a.lt, a.fr]; }); };
-const xWeekHead = ['الأسبوع', 'الفترة', 'الطلاب', 'الحضور', 'نسبة الحضور', 'أيام الإتمام', 'تعويض', 'نسبة الإنجاز', 'الأوجه المقروءة', 'عرضوا', 'أوجه العرض', 'ضمن الموعد', 'تأخير', 'تفريط'];
+const xWeekRows = L => { const d = R.d; return d.weeks.map((w, i) => { const a = agg(L, [w]); return [{ v:i + 1, nf:XWK, b:true }, xRng(w) + (w === d.cur ? ' (الجاري)' : ''), upTo(L, w).length, a.sent, xp(a.att), a.done, a.mk, xp(a.pct), a.pg, a.qf, a.qa, a.pd, a.faces, a.on, a.lt, a.fr]; }); };
+const xWeekHead = ['الأسبوع', 'الفترة', 'الطلاب', 'الحضور', 'نسبة الحضور', 'أيام الإتمام', 'تعويض', 'نسبة الإنجاز', 'الأوجه المقروءة', 'أوجه النصاب', 'آيات النصاب', 'عرضوا', 'أوجه العرض', 'ضمن الموعد', 'تأخير', 'تفريط'];
 function xWeekTable(ws, r, L) {
   const d = R.d, t = agg(L, d.weeks); r = xHead(ws, r, 2, xWeekHead);
-  const rows = xWeekRows(L); rows.push(['الإجمالي', '', L.length, t.sent, xp(t.att), t.done, t.mk, xp(t.pct), t.pg, t.pd, t.faces, t.on, t.lt, t.fr]);
+  const rows = xWeekRows(L); rows.push(['الإجمالي', '', L.length, t.sent, xp(t.att), t.done, t.mk, xp(t.pct), t.pg, t.qf, t.qa, t.pd, t.faces, t.on, t.lt, t.fr]);
   const e = xBody(ws, r, 2, rows, { tot:[rows.length - 1] }); xScale(ws, xRef(r, 6, e - 1, 6)); xScale(ws, xRef(r, 9, e - 1, 9)); return e + 1; }
 const xKpi = (ws, r, heads, vals) => { xHead(ws, r, 2, heads, { h:32 }); vals.forEach((v, j) => xc(ws, r + 1, 2 + j, v && typeof v === 'object' ? v.v : v, { sz:15, b:true, col:XL.G, fill:XL.TOT, nf:v && v.nf })); ws.getRow(r + 1).height = 30; return r + 3; };
 
 function xlProgram(wb) {
   const d = R.d, ws = xSheet(wb, 'تقرير البرنامج'), a = agg(d.stu, d.weeks);
   xTitle(ws, 'تقرير البرنامج الكامل', 'يُحدَّث من إدخال الطلبة · الحضور = مرات إرسال المهام · الجمعة والسبت تعويض بنصف درجة');
-  let r = xKpi(ws, 4, ['عدد الطلاب', 'إجمالي الحضور', 'نسبة الحضور', 'أيام الإتمام', 'تعويض', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'أوجه العرض'], [d.stu.length, a.sent, xp(a.att), a.done, a.mk, xp(a.pct), a.pct == null ? '' : GR(a.pct), a.pg, a.faces]);
+  let r = xKpi(ws, 4, ['عدد الطلاب', 'إجمالي الحضور', 'نسبة الحضور', 'أيام الإتمام', 'تعويض', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'أوجه النصاب', 'آيات النصاب', 'أوجه العرض'], [d.stu.length, a.sent, xp(a.att), a.done, a.mk, xp(a.pct), a.pct == null ? '' : GR(a.pct), a.pg, a.qf, a.qa, a.faces]);
   xLabel(ws, r, 2, 'التقرير الأسبوعي'); r = xWeekTable(ws, r + 1, d.stu) + 1;
-  xLabel(ws, r, 2, 'حسب المقرأة (تراكمي)'); r = xHead(ws, r + 1, 2, ['المقرأة', 'عدد الطلاب', 'مرات الحضور', 'نسبة الحضور', 'أيام الإتمام', 'تعويض', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'أوجه العرض']);
-  xBody(ws, r, 2, MQ.map(m => { const L = d.stu.filter(o => o.muqraa === m), v = agg(L, d.weeks); return [{ v:'مقرأة ' + m, b:true }, L.length, v.sent, xp(v.att), v.done, v.mk, xp(v.pct), xg(v.pct), v.pg, v.faces]; }));
-  xWidths(ws, [3, 12, 30, 12, 12, 13, 12, 10, 13, 15, 12, 13]); }
+  xLabel(ws, r, 2, 'حسب المقرأة (تراكمي)'); r = xHead(ws, r + 1, 2, ['المقرأة', 'عدد الطلاب', 'مرات الحضور', 'نسبة الحضور', 'أيام الإتمام', 'تعويض', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'أوجه النصاب', 'آيات النصاب', 'أوجه العرض']);
+  xBody(ws, r, 2, MQ.map(m => { const L = d.stu.filter(o => o.muqraa === m), v = agg(L, d.weeks); return [{ v:'مقرأة ' + m, b:true }, L.length, v.sent, xp(v.att), v.done, v.mk, xp(v.pct), xg(v.pct), v.pg, v.qf, v.qa, v.faces]; }));
+  xWidths(ws, [3, 12, 30, 12, 12, 13, 12, 10, 13, 15, 12, 13, 12, 12, 12]); }
 
 function xlHalaqa(wb, h) {
   const d = R.d, ws = xSheet(wb, h, { tab:XL.TAB }), L = d.stu.filter(o => o.halaqa === h), a = agg(L, d.weeks);
   xTitle(ws, 'لوحة معلومات ' + h, 'تُحدَّث من إدخال الطلبة · الحضور = مرات إرسال المهام · الجمعة والسبت تعويض بنصف درجة');
   xLabel(ws, 3, 2, 'الحلقة:', 10); xc(ws, 3, 3, h, { sz:12, b:true, col:'FF008000', fill:XL.TOT, bd:false }); ws.mergeCells(3, 3, 3, 5);
-  let r = xKpi(ws, 5, ['عدد الطلاب', 'إجمالي الحضور', 'نسبة الحضور', 'أيام الإتمام', 'تعويض', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'أوجه العرض'], [L.length, a.sent, xp(a.att), a.done, a.mk, xp(a.pct), a.pct == null ? '' : GR(a.pct), a.pg, a.faces]);
+  let r = xKpi(ws, 5, ['عدد الطلاب', 'إجمالي الحضور', 'نسبة الحضور', 'أيام الإتمام', 'تعويض', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'أوجه النصاب', 'آيات النصاب', 'أوجه العرض'], [L.length, a.sent, xp(a.att), a.done, a.mk, xp(a.pct), a.pct == null ? '' : GR(a.pct), a.pg, a.qf, a.qa, a.faces]);
   xLabel(ws, r, 2, 'التقرير الأسبوعي', 12); r = xWeekTable(ws, r + 1, L) + 1;
-  xLabel(ws, r, 2, 'طلاب الحلقة'); r = xHead(ws, r + 1, 2, ['الترتيب', 'اسم الطالب', 'المقرأة', 'الحضور', 'أيام الإتمام', 'تعويض', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة']);
+  xLabel(ws, r, 2, 'طلاب الحلقة'); r = xHead(ws, r + 1, 2, ['الترتيب', 'اسم الطالب', 'المقرأة', 'الحضور', 'أيام الإتمام', 'تعويض', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'أوجه النصاب', 'آيات النصاب']);
   const rank = L.map(o => ({ o, a:agg([o], d.weeks) })).sort((x, y) => ((y.a.ot == null ? -1 : y.a.ot) - (x.a.ot == null ? -1 : x.a.ot)) || ((y.a.pct == null ? -1 : y.a.pct) - (x.a.pct == null ? -1 : x.a.pct)) || (y.a.done - x.a.done) || (y.a.pg - x.a.pg) || cmpN(x.o, y.o));
-  xBody(ws, r, 2, rank.map((x, j) => [x.a.pct == null ? '' : j + 1, { v:x.o.name, al:'right', b:true }, x.o.muqraa, x.a.sent, x.a.done, x.a.mk, xp(x.a.pct), xg(x.a.pct), x.a.pg]));
-  xWidths(ws, [3, 12, 30, 15, 12, 13, 12, 12, 13, 12, 12]); }
+  xBody(ws, r, 2, rank.map((x, j) => [x.a.pct == null ? '' : j + 1, { v:x.o.name, al:'right', b:true }, x.o.muqraa, x.a.sent, x.a.done, x.a.mk, xp(x.a.pct), xg(x.a.pct), x.a.pg, x.a.qf, x.a.qa]));
+  xWidths(ws, [3, 12, 30, 15, 12, 13, 12, 12, 13, 12, 12, 12, 12]); }
 
 function xlReports(wb) { xlStudents(wb); xlEntry(wb); MQ.forEach(m => xlMq(wb, m)); xlTop(wb); xlHalaqat(wb); xlProgram(wb); HQ.forEach(h => xlHalaqa(wb, h)); }
 
@@ -1328,13 +1458,13 @@ async function doExport0() {
     if (XJ) { try {
       const wb = new XJ.Workbook(); wb.creator = 'تعاهد'; const per = what === 'all' ? 'كامل البرنامج' : 'الفترة: ' + String(lb).replace(/_/g, ' ');
       if (wantR) xlReports(wb);
-      if (wantT) { MQ.forEach(m => xlData(wb, 'مهام مقرأة ' + m, per, HEAD, rows.filter(r => r.muqraa === m).map(rowArr), [12, 10, 22, 24, 28, 14, 12, 18, 18, 10, 11, 12], [2, 3]));
+      if (wantT) { MQ.forEach(m => xlData(wb, 'مهام مقرأة ' + m, per, HEAD, rows.filter(r => r.muqraa === m).map(rowArr), [12, 10, 22, 24, 28, 14, 12, 18, 18, 10, 11, 12, 11, 11], [2, 3]));
         if (S.mode !== 'day') xlData(wb, 'ملخص المهام', per, ['المقرأة', 'الحلقة', 'الاسم', 'أيام الإرسال', 'أيام الإتمام', 'أيام الدراسة', 'نسبة الالتزام %', 'ضمن الموعد', 'تأخير', 'تفريط'], sm.map(o => [o.muqraa, o.halaqa, o.name, o.sent, o.done, o.active, o.pct, o.ot, o.lt, o.fr]), [12, 22, 24, 14, 14, 14, 16, 11, 11, 11], [1, 2]); }
       if (wantP) { const ps = presSum(pr); xlData(wb, 'العرض الأسبوعي', per, PHEAD, pr, [12, 8, 10, 22, 24, 52, 9, 9, 12, 14], [3, 4, 5]); xlData(wb, 'أوجه العرض', per, ps[0], ps.slice(1), [14, 20, 20, 20, 22, 14], []); }
       const buf = await wb.xlsx.writeBuffer(); saveBlob(new Blob([buf], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), name + '.xlsx'); toast('تم التصدير'); return;
     } catch (e) { console.error(e); toast('تعذّر إنشاء الملف المنسّق'); if (what === 'rep') return; } }
     const wb = XLSX.utils.book_new(), add = (title, aoa, cols) => { const ws = XLSX.utils.aoa_to_sheet(aoa); ws['!cols'] = cols.map(w => ({ wch:w })); XLSX.utils.book_append_sheet(wb, ws, title); };
-    if (wantT) { MQ.forEach(m => add('مقرأة ' + m, [HEAD, ...rows.filter(r => r.muqraa === m).map(rowArr)], [12,10,22,24,28,14,12,18,18,10,11,12]));
+    if (wantT) { MQ.forEach(m => add('مقرأة ' + m, [HEAD, ...rows.filter(r => r.muqraa === m).map(rowArr)], [12,10,22,24,28,14,12,18,18,10,11,12,11,11]));
       if (S.mode !== 'day') add('ملخص', [['المقرأة','الحلقة','الاسم','أيام الإرسال','أيام الإتمام','أيام الدراسة','نسبة الالتزام %','ضمن الموعد','تأخير','تفريط'], ...sm.map(o => [o.muqraa, o.halaqa, o.name, o.sent, o.done, o.active, o.pct, o.ot, o.lt, o.fr])], [12,22,24,14,14,14,16,11,11,11]); }
     if (wantP) { add('العرض الأسبوعي', [PHEAD, ...pr], [12,8,10,22,24,52,9,9,12,14]); add('أوجه العرض', presSum(pr), [14, 20, 20, 20, 22, 14]); }
     wb.Workbook = { Views:[{ RTL:true }] }; XLSX.writeFile(wb, name + '.xlsx');
