@@ -539,7 +539,7 @@ function profileForm(edit, admin) {
     <label>الأجزاء التي تحفظها <span class="wd" id="jz_n"></span></label><div class="jzg" id="pf_jz">${Array.from({ length: 30 }, (_, i) => `<button type="button" data-j="${i + 1}">${AR(i + 1)}</button>`).join('')}</div>
     <div style="text-align:end"><button class="lnk" id="jz_clr" type="button">مسح الكل</button></div>
     <label>ترتيب العرض</label><div class="seg" id="pf_od"><button type="button" data-o="asc">تصاعدي</button><button type="button" data-o="desc">تنازلي</button></div>
-    <p class="note" style="margin-top:4px">تصاعدي: يبدأ بأصغر جزء عندك، وتنازلي: يبدأ بأكبر جزء.${edit ? ' تغيير الأجزاء أو الترتيب يسري من بداية الدورة القادمة.' : ''}</p>
+    <p class="note" style="margin-top:4px">تصاعدي: يبدأ بأصغر جزء عندك، وتنازلي: يبدأ بأكبر جزء.</p>
     <p class="note" id="pf_st" style="color:var(--bad)"></p><button class="btn" id="pf_save">${admin ? 'إضافة الطالب' : 'حفظ'}</button></div>`, null, () => (edit || admin) ? o.remove() : welcome('start'));
   const q = x => o.querySelector(x);
   q('#pf_un').value = pf ? pf.username : ''; q('#pf_first').value = pf ? pf.first : ''; q('#pf_family').value = pf ? pf.family : '';
