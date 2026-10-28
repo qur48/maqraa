@@ -1082,10 +1082,22 @@ const xRng = w => shDate(addDays(w, -3)) + ' إلى ' + shDate(addDays(w, 3));
 const xlCol = n => { let s = ''; for (n++; n > 0; n = Math.floor((n - 1) / 26)) s = String.fromCharCode(65 + (n - 1) % 26) + s; return s; }; /* فهرس من صفر → حرف العمود */
 const xRef = (r1, c1, r2, c2) => xlCol(c1 - 1) + r1 + ':' + xlCol(c2 - 1) + r2;
 
+const xlOrder = () => R.d.stu.slice().sort((a, b) => (MQ.indexOf(a.muqraa) - MQ.indexOf(b.muqraa)) || (HQ.indexOf(a.halaqa) - HQ.indexOf(b.halaqa)) || cmpN(a, b));
+/* ورقة «الإدخال»: صف لكل طالب في كل أسبوع، مأخوذ من إدخال الطلبة اليومي (تقابل ورقة الإدخال الأسبوعي في الإكسل) */
+function xlEntry(wb) {
+  const d = R.d, ws = xSheet(wb, 'الإدخال', { freeze:[0, 4] }), L = xlOrder(), no = new Map(L.map((o, i) => [o, i + 1]));
+  xTitle(ws, 'الإدخال الأسبوعي', 'يُجمَّع تلقائيًا من إدخال الطلبة اليومي · رقم الطالب كما في ورقة «الطلاب» · الحضور = أيام الإرسال (الأحد–الخميس) · التعويض = الجمعة والسبت');
+  const head = ['الأسبوع', 'المقرأة', 'الحلقة', 'رقم الطالب', 'اسم الطالب', 'الحضور (أيام الإرسال)', 'أيام الإتمام', 'تعويض', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'مجموع التكرار', 'مجموع السماع', 'حالة العرض', 'أوجه العرض'];
+  xHead(ws, 4, 1, head, { nf:head.map((h, j) => j === 0 ? XWK : undefined), h:36 }); const ST = { done:'عرض', missed:'لم يعرض', postponed:'تأجل' }, rows = [];
+  d.weeks.forEach((w, i) => L.forEach(o => { if (w < o.start) return; const a = agg([o], [w]), c = o.w[w], p = o.p[w];
+    rows.push([{ v:i + 1, nf:XWK, b:true }, o.muqraa, hShort(o.halaqa), no.get(o), { v:o.name, al:'right', b:true }, a.sent, a.done, a.mk, actN(w, o) ? xp(a.pct) : { v:'' }, actN(w, o) ? xg(a.pct) : { v:'' }, a.pg, a.rep, a.lis, p ? ST[p.st] : '—', a.faces]); }));
+  xBody(ws, 5, 1, rows); if (rows.length) { xScale(ws, xRef(5, 9, 4 + rows.length, 9)); ws.autoFilter = { from:{ row:4, column:1 }, to:{ row:4 + rows.length, column:head.length } }; }
+  xWidths(ws, [9, 10, 12, 9, 24, 13, 10, 8, 11, 12, 12, 11, 11, 11, 10]); }
+
 function xlStudents(wb) {
   const d = R.d, ws = xSheet(wb, 'الطلاب'); xTitle(ws, 'الطلاب وتوزيعهم', 'عدد الطلاب المسجلين: ' + d.stu.length);
   xHead(ws, 4, 1, ['م', 'اسم الطالب', 'المقرأة', 'الحلقة']);
-  const L = d.stu.slice().sort((a, b) => (MQ.indexOf(a.muqraa) - MQ.indexOf(b.muqraa)) || (HQ.indexOf(a.halaqa) - HQ.indexOf(b.halaqa)) || cmpN(a, b));
+  const L = xlOrder();
   xBody(ws, 5, 1, L.map((o, i) => [i + 1, { v:o.name, al:'right', b:true }, o.muqraa, o.halaqa]));
   xHead(ws, 4, 6, ['الحلقة', ...MQ.map(m => 'مقرأة ' + m), 'المجموع']);
   const c = (h, m) => d.stu.filter(o => o.halaqa === h && o.muqraa === m).length, rows = HQ.map(h => [{ v:h, al:'right' }, c(h, MQ[0]), c(h, MQ[1]), c(h, MQ[0]) + c(h, MQ[1])]);
@@ -1161,7 +1173,7 @@ function xlHalaqa(wb, h) {
   xBody(ws, r, 2, rank.map((x, j) => [x.a.pct == null ? '' : j + 1, { v:x.o.name, al:'right', b:true }, x.o.muqraa, x.a.sent, x.a.done, x.a.mk, xp(x.a.pct), xg(x.a.pct), x.a.pg]));
   xWidths(ws, [3, 12, 30, 15, 12, 13, 12, 12, 13, 12, 12]); }
 
-function xlReports(wb) { xlStudents(wb); MQ.forEach(m => xlMq(wb, m)); xlTop(wb); xlHalaqat(wb); xlProgram(wb); HQ.forEach(h => xlHalaqa(wb, h)); }
+function xlReports(wb) { xlStudents(wb); xlEntry(wb); MQ.forEach(m => xlMq(wb, m)); xlTop(wb); xlHalaqat(wb); xlProgram(wb); HQ.forEach(h => xlHalaqa(wb, h)); }
 
 /* جداول المهام والعرض بنفس التنسيق */
 function xlData(wb, title, sub, head, rows, widths, nameCols) {
