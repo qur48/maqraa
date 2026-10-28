@@ -86,7 +86,7 @@ textarea{resize:none;overflow:hidden}
 .bar{height:9px;border-radius:9px;background:var(--bd);overflow:hidden;margin:8px 0 2px}
 .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--g2));width:0;transition:width .35s}
 .badge{display:inline-block;padding:1px 12px;border-radius:99px;font-size:13px;white-space:nowrap}
-.b-ok{background:var(--okb);color:var(--ok)}.b-wn{background:var(--wnb);color:var(--wn)}.b-bad{background:#f4ddd6;color:var(--bad)}.tmb{display:inline-block;padding:3px 14px;border-radius:99px;font-size:13.5px;margin:4px 0}.tmb.ok{background:var(--okb);color:var(--ok)}.tmb.late{background:var(--wnb);color:var(--wn)}.tmb.miss{background:#f4ddd6;color:var(--bad)}.tmw{margin:2px 0 8px;font-size:13px}.b-mu{background:var(--card2);color:var(--mu);border:1px solid var(--bd)}
+.b-ok{background:var(--okb);color:var(--ok)}.b-wn{background:var(--wnb);color:var(--wn)}.b-bad{background:#f4ddd6;color:var(--bad)}.tmb{display:inline-block;padding:3px 14px;border-radius:99px;font-size:13.5px;margin:4px 0}.tmb.ok{background:var(--okb);color:var(--ok)}.tmb.late{background:var(--wnb);color:var(--wn)}.tmb.miss{background:#f4ddd6;color:var(--bad)}.tmw{margin:2px 0 8px;font-size:13px}.svclk{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 12px;background:var(--card);border-radius:20px;padding:10px 14px;margin:0 0 12px;box-shadow:var(--sh);border-bottom:3px solid var(--gold);text-align:center}.svclk .lb{font-size:12.5px;color:var(--mu);flex-basis:100%}.svclk b{font-size:24px;color:var(--g2);font-variant-numeric:tabular-nums;direction:ltr}.svclk .tmb{margin:0}.svclk small{font-size:12px;color:var(--mu);flex-basis:100%}.b-mu{background:var(--card2);color:var(--mu);border:1px solid var(--bd)}
 .done-card{text-align:center}
 .tick{width:52px;height:52px;margin:10px auto 16px;background:var(--gold);border-radius:15px;transform:rotate(45deg);display:grid;place-items:center;box-shadow:0 4px 12px rgba(0,0,0,.2)}.tick b{transform:rotate(-45deg);color:#fff;font-size:26px;line-height:1}
 .streak{display:flex;gap:10px;justify-content:center;margin-top:10px}
@@ -254,7 +254,8 @@ const MQ = ['شعبة','حفص'];
 const HQ = ['حلقة حسان بن ثابت', 'حلقة ابن رجب', 'حلقة أبيّ بن مالك', 'حلقة عبدالرحمن بن النعمان'];
 const FIELDS = [['name','الاسم','t'],['num','رقم المحفوظ','t'],['rep','عدد التكرار','c'],['listening','السماع','c'],['reviewing','المراجعة','p'],['linking','الربط','p']];
 /* يوم المهام يبدأ ٤:٠٠ فجرًا بتوقيت الرياض (يطابق muqraa_task_day في القاعدة) */
-const riyadh = (ms = 0) => new Date(Date.now() + ms - 4 * 36e5).toLocaleDateString('en-CA', {timeZone:'Asia/Riyadh'});
+let SRV_OFF = 0; /* فرق ساعة الخادم عن ساعة الجهاز (مللي ثانية) */
+const riyadh = (ms = 0) => new Date(Date.now() + SRV_OFF + ms - 4 * 36e5).toLocaleDateString('en-CA', {timeZone:'Asia/Riyadh'});
 const prevDay = d => { const t = new Date(d + 'T12:00:00Z'); t.setUTCDate(t.getUTCDate() - 1); return t.toISOString().slice(0, 10); };
 const wd = d => new Date(d + 'T12:00:00').toLocaleDateString('ar-SA', {weekday:'long'});
 const ls = (k, v) => { try { if (v === undefined) return localStorage.getItem(k) || ''; localStorage.setItem(k, v); } catch (e) { return ''; } };
@@ -274,7 +275,18 @@ const clockOf = r => { try { return new Date(r.completed_at || r.updated_at).toL
 const tmBadge = r => { const t = tmOf(r); if (!t) return ''; const c = clockOf(r);
   return ` <span class="badge ${t === 'ok' ? 'b-ok' : t === 'late' ? 'b-wn' : 'b-bad'}">${TMN[t]}</span>` + (c ? `<small class="wd"> ${esc(c)}</small>` : ''); };
 const tmMsg = t => t ? `<p class="tmb ${t}">${t === 'ok' ? 'سُجّل إتمامك في الوقت' : t === 'late' ? 'سُجّل إتمامك في وقت التأخير' : 'سُجّل إتمامك بعد الموعد'}</p>` : '';
-const winNote = day => { let hr = 12; try { hr = +new Intl.DateTimeFormat('en-GB', { timeZone:'Asia/Riyadh', hour:'numeric', hourCycle:'h23' }).format(new Date()); } catch (e) {}
+const clockBar = () => '<div class="svclk" id="svclk"><span class="lb">ساعة الخادم · توقيت الرياض</span><b id="svt">--:--:--</b><span id="svp" class="tmb"></span><small id="svn"></small></div>';
+function clockTick() { const t = document.getElementById('svt'); if (!t) { clearInterval(window.__clk); return; }
+  const d = new Date(Date.now() + SRV_OFF), o = { timeZone:'Asia/Riyadh' };
+  t.textContent = d.toLocaleTimeString('ar-SA', { ...o, hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true });
+  let hr = 12; try { hr = +new Intl.DateTimeFormat('en-GB', { ...o, hour:'numeric', hourCycle:'h23' }).format(d); } catch (e) {}
+  const late = hr >= 23 || hr < 4, p = document.getElementById('svp'), n = document.getElementById('svn');
+  p.className = 'tmb ' + (late ? 'late' : 'ok'); p.textContent = late ? 'وقت التأخير' : 'في الوقت';
+  n.textContent = late ? 'ينتهي اليوم عند ٤:٠٠ فجرًا، وما بعده تفريط' : 'يبدأ التأخير عند ١١:٠٠ مساءً'; }
+async function clockSync() { try { const t0 = Date.now(), { data, error } = await sb.rpc('muqraa_now'); if (error || !data) return;
+    const t1 = Date.now(), sv = Date.parse(data); if (!isNaN(sv)) SRV_OFF = sv + (t1 - t0) / 2 - t1; } catch (e) {} clockTick(); }
+function clockStart() { clearInterval(window.__clk); clockTick(); window.__clk = setInterval(clockTick, 1000); clockSync(); if (!window.__cks) window.__cks = setInterval(clockSync, 300000); }
+const winNote = day => { let hr = 12; try { hr = +new Intl.DateTimeFormat('en-GB', { timeZone:'Asia/Riyadh', hour:'numeric', hourCycle:'h23' }).format(new Date(Date.now() + SRV_OFF)); } catch (e) {}
   const late = (hr >= 23 || hr < 4) && !doneDays().includes(day);
   return '<p class="note tmw">في الوقت: من ٤:٠٠ فجرًا حتى ١٠:٥٩ مساءً · تأخير: من ١١:٠٠ مساءً حتى ٣:٥٩ فجرًا · بعد ٤:٠٠ فجرًا يُعدّ تفريطًا.</p>'
     + (late ? '<p class="tmb late">أنت الآن في وقت التأخير، بادر بإتمام مهامك قبل ٤:٠٠ فجرًا.</p>' : ''); };
@@ -542,7 +554,7 @@ function student() {
   try { const d = JSON.parse(ls('draft') || '{}'); if (d.day === day) draft = d.v; } catch (e) {}
   if (!draft) { try { const t = JSON.parse(ls('srv') || '{}'); if (t.day === day && t.v) draft = t.v; } catch (e) {} }
   const full = pf.first + ' ' + pf.family, vals = { ...(draft || {}), name: full };
-  app.innerHTML = hero(`${esc(full)} <small class="wd">مقرأة ${esc(pf.muqraa)} · ${esc(pf.halaqa)}</small>`, '<span class="mb"><button class="chip" id="jrb">مسيرتي</button><button class="chip" id="pfb">بطاقتي</button><button class="chip" id="lgo">خروج</button></span>') + hadithCard() + pendNote(pf, day) + `
+  app.innerHTML = hero(`${esc(full)} <small class="wd">مقرأة ${esc(pf.muqraa)} · ${esc(pf.halaqa)}</small>`, '<span class="mb"><button class="chip" id="jrb">مسيرتي</button><button class="chip" id="pfb">بطاقتي</button><button class="chip" id="lgo">خروج</button></span>') + clockBar() + hadithCard() + pendNote(pf, day) + `
   <div class="card"><h2 class="pill">مهام اليوم: <span class="dd">${dateLine(day)}</span></h2>${winNote(day)}<div class="prog"><span></span><span id="pc"></span></div><div class="bar"><i id="pb"></i></div>
   <div class="fgrid">${FIELDS.map(fieldHTML).join('')}</div>
   <button class="btn" id="go">إرسال</button><p class="note" id="st"></p></div>
@@ -562,7 +574,7 @@ function student() {
       a.oninput = z.oninput = sync; vals[k] = pageStr(vals[k + '_f'], vals[k + '_t']); mark();
     }
   });
-  upd();
+  upd(); clockStart();
   if (doneDays().includes(day)) $('#res').innerHTML = weeklyHTML(day);
   reveal();
   $('#pfb').onclick = () => profileForm(true); $('#jrb').onclick = journey; pwaTip();
