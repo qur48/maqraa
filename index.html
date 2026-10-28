@@ -559,7 +559,7 @@ function login(msg) {
   $('#in').onclick = go; $('#tk').onkeydown = e => { if (e.key === 'Enter') go(); }; reveal();
 }
 
-const S = { role:'', halaqa:'', mode:'day', day:riyadh(), month:riyadh().slice(0,7), year:riyadh().slice(0,4), from:riyadh(-6*864e5), to:riyadh(), mq:'الكل', hq:'الكل', q:'', fmt:'xlsx', scope:'done', rows:[], known:[], wed:'', wdata:null, tab:'home', what:'tasks', trash:null };
+const S = { role:'', halaqa:'', mode:'day', day:riyadh(), month:riyadh().slice(0,7), year:riyadh().slice(0,4), from:riyadh(-6*864e5), to:riyadh(), mq:'الكل', hq:'الكل', q:'', fmt:'xlsx', scope:'all', rows:[], known:[], wed:'', wdata:null, tab:'home', what:'tasks', trash:null };
 S.wed = nextWed(riyadh());
 const isAdmin = () => S.role === 'admin';
 const range = () => { if (S.mode === 'day') return [S.day, S.day];
@@ -620,7 +620,7 @@ async function teacher() {
   <div class="card" id="xcard" hidden><h2 class="pill">تصدير</h2><p class="note" id="xn" style="margin-top:0"></p><button type="button" class="lnk" id="xp" style="margin:0 0 4px">تغيير الفترة</button>
   <label>ما الذي يُصدَّر؟</label><div class="seg" id="xw">${[['tasks','المهام'],['pres','العرض الأسبوعي'],['both','المهام والعرض'],['rep','التقارير'],['all','الكل']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
   <label>الصيغة</label><div class="seg" id="xf">${[['xlsx','Excel'],['csv','CSV'],['json','JSON'],['print','طباعة / PDF']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
-  <label>المحتوى</label><div class="seg" id="xs">${[['done',''],['all','']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
+  <label>المحتوى</label><div class="seg" id="xs">${[['all',''],['done','']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
   <button class="btn" id="ex">تصدير</button></div>
   </section>
   <section class="pane" data-p="set" hidden>
