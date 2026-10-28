@@ -314,7 +314,7 @@ const tmAt = (day, iso) => { if (!iso || !/^\d{4}-\d\d-\d\d$/.test(day || '')) r
 const tmOf = r => done(r) ? tmAt(r.day, r.completed_at || r.updated_at) : '';
 const clockOf = r => { try { return new Date(r.completed_at || r.updated_at).toLocaleTimeString('ar-SA', { timeZone:'Asia/Riyadh', hour:'numeric', minute:'2-digit' }); } catch (e) { return ''; } };
 const tmBadge = r => { const t = tmOf(r); if (!t) return ''; const c = clockOf(r);
-  return ` <span class="badge ${t === 'ok' ? 'b-ok' : t === 'late' ? 'b-wn' : 'b-bad'}">${TMN[t]}</span>` + (c ? `<small class="wd"> ${esc(c)}</small>` : ''); };
+  return (t === 'ok' ? '' : ` <span class="badge ${t === 'late' ? 'b-wn' : 'b-bad'}">${TMN[t]}</span>`) + (c ? `<small class="wd"> ${esc(c)}</small>` : ''); };
 const tmMsg = t => t ? `<p class="tmb ${t}">${t === 'ok' ? 'سُجّل إتمامك ضمن الموعد' : t === 'late' ? 'سُجّل إتمامك في وقت التأخير' : 'سُجّل إتمامك بعد الموعد'}</p>` : '';
 /* ودجيت الوقت بجانب الحديث: عدّ تنازلي (ساعة/دقيقة/ثانية) حتى ٤ فجرًا + شريط ليوم المهام: ٧٩٫١٧٪ ضمن الموعد (حتى ١١ م) و٢٠٫٨٣٪ تأخير؛ الضغط عليه يفتح تفاصيل المراحل */
 const clockWidget = () => `<button type="button" class="svw" id="svclk" data-ph="ok" aria-expanded="false" aria-controls="svpanel" aria-label="الوقت المتبقي على نهاية اليوم، اضغط لعرض التفاصيل">
@@ -689,7 +689,7 @@ function summarize() {
 }
 
 async function teacher() {
-  app.innerHTML = hero('', '<span class="mb"><button class="chip" id="rf">تحديث</button><button class="chip" id="out">خروج</button></span>') + `
+  app.innerHTML = hero('', '<span class="mb"><button class="chip" id="rf">تحديث</button><button class="chip" id="out">خروج</button></span>') + '<div class="top">' + clockWidget() + hadithCard() + '</div>' + clockPanel() + `
   <div class="ptl"><small id="pn1"></small><h2 class="serif" id="pn"></h2></div>
   <div class="card" id="flt"><h2 class="pill">التصفية</h2>
   <div class="grid3"><div><label for="fm">المقرأة</label><select id="fm"><option>الكل</option>${MQ.map(m => `<option>${m}</option>`).join('')}</select></div>
@@ -763,6 +763,7 @@ async function teacher() {
   $('#sadd').onclick = () => profileForm(false, true); $('#tl').onclick = trashClick;
   $('#fm').onchange = e => { S.mq = e.target.value; draw(); }; $('#fh').onchange = e => { S.hq = e.target.value; draw(); };
   $('#fq').oninput = e => { S.q = e.target.value.trim(); draw(); };
+  clockStart(); $('#svclk').onclick = () => { const p = $('#svpanel'), o = p.hidden; p.hidden = !o; $('#svclk').setAttribute('aria-expanded', String(o)); };
   $('#rf').onclick = () => { load(); loadWed(); if (isAdmin()) { loadStu(); loadTrash(); if (S.tab === 'rep') loadRep(); } }; $('#wc').onclick = wedClick; $('#rpc').onclick = repClick; $('#sl').onclick = stuClick; $('#sq').oninput = drawStu; $('#out').onclick = () => { ls('tk', ''); location.hash = ''; route(); };
   $('#ex').onclick = doExport; $('#xp').onclick = () => setTab('home');
   { const bk = $('#bkp'), bn = $('#bk_n'), note = () => { const d = ls('bk'); bn.textContent = d ? 'آخر نسخة: ' + dateLine(d) + '. يُنصح بنسخة أسبوعيًا.' : 'لم تُنزَّل نسخة بعد، يُنصح بنسخة أسبوعيًا.'; };
@@ -830,7 +831,7 @@ function draw() {
   if (S.mode === 'day') {
     const sent = S.rows.filter(f).sort(cmpN), seen = new Set(S.rows.map(key3));
     const miss = S.known.filter(k => !seen.has(key3(k)) && f(k)).sort(cmpN), n = sent.filter(done).length;
-    $('#stats').innerHTML = `<div class="stat"><b>${n}</b>أتمّوا</div><div class="stat"><b>${sent.length - n}</b>ناقصة</div><div class="stat"><b>${miss.length}</b>لم يرسلوا</div>${n ? `<p class="note" style="grid-column:1/-1;margin:0;text-align:center">من أتمّوا: ${sent.filter(r => tmOf(r) === 'ok').length} ضمن الموعد · ${sent.filter(r => tmOf(r) === 'late').length} تأخير</p>` : ''}`;
+    $('#stats').innerHTML = `<div class="stat"><b>${n}</b>أتمّوا</div><div class="stat"><b>${sent.length - n}</b>ناقصة</div><div class="stat"><b>${miss.length}</b>لم يرسلوا</div>${sent.filter(r => tmOf(r) === 'late').length ? `<p class="note" style="grid-column:1/-1;margin:0;text-align:center">منهم ${sent.filter(r => tmOf(r) === 'late').length} أتمّوا في وقت التأخير</p>` : ''}`;
     $('#th').innerHTML = `<tr><th>الاسم</th><th>المقرأة</th>${A ? '<th>الحلقة</th>' : ''}<th>نصاب اليوم</th><th>التكرار</th><th>السماع</th><th>المراجعة</th><th>الربط</th><th>الحالة</th>${A ? '<th></th>' : ''}</tr>`;
     $('#tb').innerHTML = sent.map(r => `<tr><td>${esc(r.name)}</td><td>${esc(r.muqraa)}</td>${A ? `<td>${esc(r.halaqa) || '—'}</td>` : ''}<td class="w">${esc(r.num) || '—'}</td><td>${cnum(r.rep) || '—'}</td><td>${cnum(r.listening) || '—'}</td><td>${esc(r.reviewing) || '—'}</td><td>${esc(r.linking) || '—'}</td>
       <td>${done(r) ? '<span class="badge b-ok">مكتمل</span>' + tmBadge(r) : `<span class="badge b-wn">${filled(r)}/${FIELDS.length}</span>`}</td>${A ? `<td><button class="x" data-id="${r.id}" title="حذف" aria-label="حذف">×</button></td>` : ''}</tr>`).join('')
