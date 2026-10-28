@@ -104,7 +104,11 @@ textarea{resize:none;overflow:hidden}
 .svclk .lg li{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;padding:7px 14px;border-radius:14px;background:rgba(255,255,255,.05);border-inline-start:4px solid transparent;font-size:13px;color:rgba(245,238,230,.82)}
 .svclk .lg li b{font-size:13.5px;color:#fff}.svclk .lg li.ok{border-color:#5aa886}.svclk .lg li.late{border-color:#e0b95a}.svclk .lg li.miss{border-color:#d9806c}
 .svclk .lg li.now{background:rgba(214,193,138,.2);box-shadow:inset 0 0 0 1px rgba(214,193,138,.55)}
-.lh{font-size:12.5px;font-weight:400;color:var(--mu)}.b-mu{background:var(--card2);color:var(--mu);border:1px solid var(--bd)}
+.lh{font-size:12.5px;font-weight:400;color:var(--mu)}
+.svclk[hidden]{display:none}.svclk.svp{margin:6px 4px 18px;padding:16px 16px 12px}.svclk .sn{margin:0 0 4px;font-size:12.5px;line-height:1.8;color:var(--gold2)}
+.svmini{position:absolute;top:9px;inset-inline-end:38px;z-index:3;display:flex;align-items:center;gap:5px;direction:ltr;margin:0;padding:3px 10px;min-height:0;height:auto;border:1px solid rgba(214,193,138,.55);border-radius:99px;background:rgba(16,42,29,.62);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);color:var(--cream);font:inherit;font-size:11px;line-height:1.4;cursor:pointer;-webkit-appearance:none;appearance:none;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.svmini b{font-weight:500;font-variant-numeric:tabular-nums;letter-spacing:.2px;white-space:nowrap}.svmini svg{width:11px;height:11px;flex:none;color:var(--gold2)}
+.svmini .sep{display:block;width:1px;height:10px;background:rgba(214,193,138,.5)}.svmini .dot{display:block;width:6px;height:6px;border-radius:50%;background:#5aa886;flex:none}.svmini[data-ph="late"] .dot{background:#e0b95a}.b-mu{background:var(--card2);color:var(--mu);border:1px solid var(--bd)}
 .done-card{text-align:center}
 .tick{width:52px;height:52px;margin:10px auto 16px;background:var(--gold);border-radius:15px;transform:rotate(45deg);display:grid;place-items:center;box-shadow:0 4px 12px rgba(0,0,0,.2)}.tick b{transform:rotate(-45deg);color:#fff;font-size:26px;line-height:1}
 .streak{display:flex;gap:10px;justify-content:center;margin-top:10px}
@@ -299,8 +303,11 @@ const clockOf = r => { try { return new Date(r.completed_at || r.updated_at).toL
 const tmBadge = r => { const t = tmOf(r); if (!t) return ''; const c = clockOf(r);
   return ` <span class="badge ${t === 'ok' ? 'b-ok' : t === 'late' ? 'b-wn' : 'b-bad'}">${TMN[t]}</span>` + (c ? `<small class="wd"> ${esc(c)}</small>` : ''); };
 const tmMsg = t => t ? `<p class="tmb ${t}">${t === 'ok' ? 'سُجّل إتمامك ضمن الموعد' : t === 'late' ? 'سُجّل إتمامك في وقت التأخير' : 'سُجّل إتمامك بعد الموعد'}</p>` : '';
-const clockBar = () => '<div class="svclk" id="svclk"><span class="lb">ساعة الخادم · توقيت مكة المكرمة</span>'
-  + '<div class="cr"><div class="cc"><small>الوقت الآن</small><b id="svt">--:--:--</b></div><div class="cc rm"><small>المتبقي على نهاية اليوم</small><b id="svr">--:--:--</b></div></div>'
+const IC_CLK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.6V8l2.3 1.4"/></svg>';
+const IC_HG = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2h7M4.5 14h7M5 2c0 3 3 3.6 3 6s-3 3-3 6M11 2c0 3-3 3.6-3 6s3 3 3 6"/></svg>';
+/* شريط صغير في أعلى الصورة: الوقت الآن + المتبقي على نهاية اليوم؛ الضغط عليه يفتح شرح المواعيد */
+const clockMini = () => `<button type="button" class="svmini" id="svclk" aria-expanded="false" aria-controls="svpanel" aria-label="الوقت الآن والمتبقي على نهاية اليوم، اضغط للتفاصيل"><i class="dot"></i>${IC_CLK}<b id="svt">--:--:--</b><i class="sep"></i>${IC_HG}<b id="svr">--:--:--</b></button>`;
+const clockPanel = () => '<div class="svclk svp" id="svpanel" hidden><p class="sn">الأول: الوقت الآن بتوقيت مكة المكرمة. والثاني: المتبقي على نهاية اليوم عند ٤:٠٠ فجرًا.</p>'
   + '<div class="tl" aria-hidden="true"><i class="ok"></i><i class="late"></i><u id="svm"></u></div><div class="tk" aria-hidden="true"><span>٤:٠٠ ف</span><span>١١:٠٠ م</span><span>٤:٠٠ ف</span></div>'
   + '<ul class="lg"><li class="ok" id="lg_ok"><b>ضمن الموعد</b><span>من ٤:٠٠ فجرًا إلى ١٠:٥٩ مساءً</span></li>'
   + '<li class="late" id="lg_late"><b>التأخير</b><span>من ١١:٠٠ مساءً إلى ٣:٥٩ فجرًا</span></li>'
@@ -330,8 +337,8 @@ const reveal = () => {
   document.querySelectorAll('.card:not(.rv),.hd:not(.rv),.stat:not(.rv),.vision:not(.rv),.back:not(.rv)').forEach((el, i) => { el.classList.add('rv'); el.style.setProperty('--d', (i % 3) * 90 + 'ms'); io.observe(el); });
 };
 const toast = t => { const e = document.createElement('div'); e.className = 'toast'; e.textContent = t; document.body.appendChild(e); setTimeout(() => e.remove(), 2400); };
-const banner = (cls = '') => `<div class="banner ${cls}"><h1 class="logo-h"><span class="logo" role="img" aria-label="تعاهد"></span></h1></div>`;
-const hero = (sub, extra) => banner() + `<div class="meta"><span id="hsub">${sub}</span>${extra || ''}</div>`;
+const banner = (cls = '', inner = '') => `<div class="banner ${cls}"><h1 class="logo-h"><span class="logo" role="img" aria-label="تعاهد"></span></h1>${inner}</div>`;
+const hero = (sub, extra, inner) => banner('', inner) + `<div class="meta"><span id="hsub">${sub}</span>${extra || ''}</div>`;
 const hadithCard = () => `<section class="hd serif" aria-label="حديث"><p class="lbl">قال ﷺ</p><div class="ln"></div>
   <p class="l1">«تَعاهَدوا هذا القُرآنَ،</p><p class="l2">فوالذي نَفسُ مُحَمَّدٍ بيَدِه لَهو أشَدُّ تَفَلُّتًا مِنَ الإبِلِ في عُقُلِها»</p></section>`;
 
@@ -588,7 +595,7 @@ function student() {
   try { const d = JSON.parse(ls('draft') || '{}'); if (d.day === day) draft = d.v; } catch (e) {}
   if (!draft) { try { const t = JSON.parse(ls('srv') || '{}'); if (t.day === day && t.v) draft = t.v; } catch (e) {} }
   const full = pf.first + ' ' + pf.family, vals = { ...(draft || {}), name: full };
-  app.innerHTML = hero(`${esc(full)} <small class="wd">مقرأة ${esc(pf.muqraa)} · ${esc(pf.halaqa)}</small>`, '<span class="mb"><button class="chip" id="jrb">سيري</button><button class="chip" id="pfb">بطاقتي</button><button class="chip" id="lgo">خروج</button></span>') + clockBar() + hadithCard() + pendNote(pf, day) + `
+  app.innerHTML = hero(`${esc(full)} <small class="wd">مقرأة ${esc(pf.muqraa)} · ${esc(pf.halaqa)}</small>`, '<span class="mb"><button class="chip" id="jrb">سيري</button><button class="chip" id="pfb">بطاقتي</button><button class="chip" id="lgo">خروج</button></span>', clockMini()) + hadithCard() + clockPanel() + pendNote(pf, day) + `
   <div class="card"><h2 class="pill">مهام اليوم: <span class="dd">${dateLine(day)}</span></h2>${winNote(day)}<div class="prog"><span></span><span id="pc"></span></div><div class="bar"><i id="pb"></i></div>
   <div class="fgrid">${FIELDS.map(fieldHTML).join('')}</div>
   <button class="btn" id="go">إرسال</button><p class="note" id="st"></p></div>
@@ -608,7 +615,7 @@ function student() {
       a.oninput = z.oninput = sync; vals[k] = pageStr(vals[k + '_f'], vals[k + '_t']); mark();
     }
   });
-  upd(); clockStart();
+  upd(); clockStart(); $('#svclk').onclick = () => { const p = $('#svpanel'), o = p.hidden; p.hidden = !o; $('#svclk').setAttribute('aria-expanded', String(o)); };
   if (doneDays().includes(day)) $('#res').innerHTML = weeklyHTML(day);
   reveal();
   $('#pfb').onclick = () => profileForm(true); $('#jrb').onclick = journey; pwaTip();
