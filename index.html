@@ -135,7 +135,6 @@ textarea{resize:none;overflow:hidden}
 .fb li.e{background:transparent;border:1px dashed var(--fieldbd)}.fb li.e .nm{color:var(--mu);font-weight:400}.fb li.e .rk{background:transparent;border:1px solid var(--fieldbd);color:var(--mu)}
 .fb li.r1 .rk{background:var(--gold);color:#fff}
 .fb li.me{background:var(--g)}.fb li.me .nm{color:var(--cream)}.fb li.me .tm{color:var(--gold2)}.fb li.me .rk{background:var(--gold2);color:var(--g)}
-.fb .ft{margin:1px 0 0;text-align:center;font-size:10.5px;color:var(--mu)}.fb .ft[hidden]{display:none}
 .fb li.st{animation:fbin .5s ease both;animation-delay:var(--d,0ms)}
 .fb li.pop,.fbme.pop{animation:fbpop .75s cubic-bezier(.2,1.4,.4,1) both}
 @keyframes fbin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -532,7 +531,7 @@ const fbRow = (it, i, cls) => it
   ? `<li class="${cls}"><span class="rk">${AR(i + 1)}</span><span class="nm">${esc(it.name)}</span><small class="tm">${esc(clockOf({ completed_at: it.at }))}</small></li>`
   : `<li class="e"><span class="rk">${AR(i + 1)}</span><span class="nm">بانتظارك</span></li>`;
 const firstBoard = () => `<section class="fb" id="fb" aria-label="السابقون إلى إتمام مهام اليوم"><div class="fh"><i></i><b>السابقون اليوم</b><i></i></div><p class="fs" id="fbs">كن أول المنجزين اليوم</p>
-  <ol id="fbl" aria-live="polite">${Array.from({ length: FB_N }, (_, i) => fbRow(null, i, '')).join('')}</ol><p class="ft" id="fbt" hidden></p></section>`;
+  <ol id="fbl" aria-live="polite">${Array.from({ length: FB_N }, (_, i) => fbRow(null, i, '')).join('')}</ol></section>`;
 function fbBurst(el, mid) {
   if (!el || (window.matchMedia && matchMedia('(prefers-reduced-motion:reduce)').matches)) return;
   const bs = document.createElement('div'); bs.className = 'bs'; bs.style.top = '50%';
@@ -547,9 +546,8 @@ function fbRender(d, me) {
   const ol = document.getElementById('fbl'); if (!ol || !d || !Array.isArray(d.list)) return 0;
   const list = d.list.slice(0, FB_N), keys = list.map(it => it.name + '|' + it.at), prev = window.__fbk, rank = list.findIndex(it => it.name === me) + 1;
   window.__fbk = keys;
-  const sub = document.getElementById('fbs'), ft = document.getElementById('fbt');
+  const sub = document.getElementById('fbs');
   if (sub) sub.textContent = rank ? 'أنت من أوائل المنجزين اليوم' : list.length ? 'أوائل من أتمّوا مهام اليوم' : 'كن أول المنجزين اليوم';
-  if (ft) { const more = (+d.total || 0) - list.length; ft.hidden = more <= 0; ft.textContent = more > 0 ? 'وأتمّ بعدهم ' + AR(more) + (more === 1 ? ' طالب' : more === 2 ? ' طالبان' : more <= 10 ? ' طلاب' : ' طالبًا') : ''; }
   if (prev && prev.join('#') === keys.join('#')) return rank;
   ol.innerHTML = Array.from({ length: FB_N }, (_, i) => { const it = list[i]; if (!it) return fbRow(null, i, '');
     return fbRow(it, i, (i === 0 ? 'r1 ' : '') + (it.name === me ? 'me ' : '') + (prev && !prev.includes(keys[i]) ? 'pop' : 'st')); }).join('');
