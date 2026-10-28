@@ -86,13 +86,13 @@ textarea{resize:none;overflow:hidden}
 .bar{height:9px;border-radius:9px;background:var(--bd);overflow:hidden;margin:8px 0 2px}
 .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--g2));width:0;transition:width .35s}
 .badge{display:inline-block;padding:1px 12px;border-radius:99px;font-size:13px;white-space:nowrap}
-.b-ok{background:var(--okb);color:var(--ok)}.b-wn{background:var(--wnb);color:var(--wn)}.b-bad{background:#f4ddd6;color:var(--bad)}.tmb{display:inline-block;padding:3px 14px;border-radius:99px;font-size:13.5px;margin:4px 0}.tmb.ok{background:var(--okb);color:var(--ok)}.tmb.late{background:var(--wnb);color:var(--wn)}.tmb.miss{background:#f4ddd6;color:var(--bad)}.tmw{margin:2px 0 8px;font-size:13px}.top{display:grid;grid-template-columns:minmax(0,1fr) 128px;gap:10px;align-items:stretch;margin:28px 4px 18px}
+.b-ok{background:var(--okb);color:var(--ok)}.b-wn{background:var(--wnb);color:var(--wn)}.b-bad{background:#f4ddd6;color:var(--bad)}.tmb{display:inline-block;padding:3px 14px;border-radius:99px;font-size:13.5px;margin:4px 0}.tmb.ok{background:var(--okb);color:var(--ok)}.tmb.late{background:var(--wnb);color:var(--wn)}.tmb.miss{background:#f4ddd6;color:var(--bad)}.tmw{margin:2px 0 8px;font-size:13px}.top{display:grid;grid-template-columns:128px minmax(0,1fr);gap:10px;align-items:stretch;margin:28px 4px 18px}
 .top .hd{margin:0;padding:26px 10px 16px;border-radius:26px;display:flex;flex-direction:column;justify-content:center}
 .top .hd .lbl{font-size:13.5px}.top .hd .ln{width:44px;margin:8px auto 6px}.top .hd .l1{font-size:19px;line-height:1.6}.top .hd .l2{font-size:14.5px;line-height:1.85}
 .svw{display:flex;flex-direction:column;align-items:center;gap:3px;margin:0;padding:12px 6px 8px;min-height:0;height:auto;border:1px solid var(--bd);border-radius:26px;background:var(--card);color:var(--tx);font:inherit;text-align:center;cursor:pointer;-webkit-appearance:none;appearance:none;box-shadow:var(--sh);-webkit-tap-highlight-color:transparent}
 .svw:focus-visible{outline:3px solid var(--gold2);outline-offset:2px}
 .svw .ttl{font-size:11px;line-height:1.4;color:var(--mu)}
-.svw .cd{display:flex;gap:5px;width:100%;justify-content:center;direction:rtl}
+.svw .cd{display:flex;gap:5px;width:100%;justify-content:center;direction:ltr}
 .svw .u{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center}
 .svw .u b{position:relative;display:block;width:100%;height:38px;border-radius:9px;background:linear-gradient(180deg,#285a43 0 50%,#1c4531 50% 100%);color:var(--cream);font-size:19px;line-height:38px;font-weight:700;font-variant-numeric:tabular-nums;box-shadow:0 2px 5px rgba(31,65,47,.28),inset 0 1px 0 rgba(255,255,255,.12)}
 .svw .u b::after{content:"";position:absolute;inset-inline:0;top:50%;height:1px;background:rgba(0,0,0,.4)}
@@ -105,7 +105,9 @@ textarea{resize:none;overflow:hidden}
 .svw .pb u{position:absolute;top:50%;width:12px;height:12px;margin:-6px -6px 0 0;border-radius:50%;background:#fff;border:3px solid var(--g);box-shadow:0 1px 3px rgba(0,0,0,.35);text-decoration:none}.svw[data-ph="late"] .pb u{border-color:#b07a1c}
 .svw .ph{display:flex;align-items:center;gap:5px;margin-top:4px;font-size:12.5px;font-weight:700;color:var(--g)}
 .svw .ph i{display:block;width:7px;height:7px;border-radius:50%;background:var(--g2)}.svw[data-ph="late"] .ph i{background:#c79a3c}
-.svw .nw{font-size:11px;color:var(--mu);font-variant-numeric:tabular-nums}
+.svw .ph[hidden]{display:none}
+.svw .nw{display:flex;align-items:center;justify-content:center;gap:4px;margin-top:2px;font-size:11px;color:var(--tx);font-variant-numeric:tabular-nums}.svw .nw .clk{width:15px;height:15px;flex:none;color:var(--gold)}
+.svw .tz{font-size:9.5px;line-height:1.3;color:var(--mu)}
 .svw .chev{width:12px;height:12px;margin-top:1px;color:var(--gold);transition:transform .2s}.svw[aria-expanded="true"] .chev{transform:rotate(180deg)}
 .svclk{margin:-4px 4px 18px;padding:14px;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:26px;box-shadow:var(--sh);text-align:center}
 .svclk[hidden]{display:none}
@@ -117,7 +119,7 @@ textarea{resize:none;overflow:hidden}
 .svclk .p.ok{border-top-color:var(--g2)}.svclk .p.lt{border-top-color:#c79a3c}.svclk .p.ms{border-top-color:var(--bad)}
 .svclk[data-ph="ok"] .p.ok,.svclk[data-ph="late"] .p.lt{background:var(--goldb);color:var(--tx);box-shadow:inset 0 0 0 1px rgba(149,127,80,.5)}
 .svclk .fn{margin:10px 0 0;font-size:12px;color:var(--mu)}
-@media(min-width:560px){.top{grid-template-columns:minmax(0,1fr) 190px}.svw .u b{height:46px;line-height:46px;font-size:23px}.svw .ttl{font-size:12px}.top .hd .l1{font-size:26px}.top .hd .l2{font-size:18px}.top .hd .lbl{font-size:15px}}
+@media(min-width:560px){.top{grid-template-columns:190px minmax(0,1fr)}.svw .u b{height:46px;line-height:46px;font-size:23px}.svw .ttl{font-size:12px}.top .hd .l1{font-size:26px}.top .hd .l2{font-size:18px}.top .hd .lbl{font-size:15px}}
 .lh{font-size:12.5px;font-weight:400;color:var(--mu)}
 .b-mu{background:var(--card2);color:var(--mu);border:1px solid var(--bd)}
 .done-card{text-align:center}
@@ -319,10 +321,10 @@ const clockWidget = () => `<button type="button" class="svw" id="svclk" data-ph=
   <small class="ttl">ينتهي اليوم بعد</small>
   <div class="cd"><div class="u"><b id="svh">--</b><em>ساعة</em></div><div class="u"><b id="svn">--</b><em>دقيقة</em></div><div class="u sc"><b id="svs">--</b><em>ثانية</em></div></div>
   <div class="pb" aria-hidden="true"><i class="ok"><s id="svo"></s></i><i class="lt"><s id="svq"></s></i><u id="svk"></u></div>
-  <div class="ph"><i></i><span id="svp">ضمن الموعد</span></div><div class="nw" id="svt">--:--:--</div>
+  <div class="ph" id="svph" hidden><i></i><span>التأخير</span></div><div class="nw"><svg class="clk" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="6.6"/><path d="M8 2.6v.9M8 12.5v.9M2.6 8h.9M12.5 8h.9" stroke-width="1"/><path id="svch" d="M8 8V5" transform="rotate(0 8 8)"/><path id="svcm" d="M8 8V3.7" stroke-width="1.1" transform="rotate(0 8 8)"/></svg><span id="svt">--:--:--</span></div><small class="tz">بتوقيت مكة المكرمة</small>
   <svg class="chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg></button>`;
 const clockPanel = () => `<div class="svclk" id="svpanel" data-ph="ok" hidden><p class="sl" id="svl"></p>
-  <div class="ph3"><div class="p ok"><b>ضمن الموعد</b><span>٤:٠٠ ف – ١٠:٥٩ م</span></div><div class="p lt"><b>التأخير</b><span>١١:٠٠ م – ٣:٥٩ ف</span></div><div class="p ms"><b>التفريط</b><span>بعد ٤:٠٠ ف</span></div></div>
+  <div class="ph3"><div class="p ok"><b>مكتمل</b><span>٤:٠٠ ف – ١٠:٥٩ م</span></div><div class="p lt"><b>التأخير</b><span>١١:٠٠ م – ٣:٥٩ ف</span></div><div class="p ms"><b>التفريط</b><span>بعد ٤:٠٠ ف</span></div></div>
   <p class="fn">يُحسب تفريطًا اليومُ الذي لم تُتمَّ مهامُّه قبل ٤:٠٠ فجرًا.</p></div>`;
 const pad2 = n => String(n).padStart(2, '0');
 const hms = sec => AR(pad2(Math.floor(sec / 3600)) + ':' + pad2(Math.floor(sec % 3600 / 60)) + ':' + pad2(sec % 60));
@@ -334,7 +336,9 @@ function clockTick() { const t = document.getElementById('svt'); if (!t) { clear
   document.getElementById('svh').textContent = AR(pad2(Math.floor(left / 3600))); document.getElementById('svn').textContent = AR(pad2(Math.floor(left % 3600 / 60))); document.getElementById('svs').textContent = AR(pad2(left % 60));
   document.getElementById('svo').style.width = (Math.min(f, A) / A * 100).toFixed(2) + '%'; document.getElementById('svq').style.width = (Math.max(0, f - A) / (1 - A) * 100).toFixed(2) + '%';
   document.getElementById('svk').style.insetInlineStart = (f * 100).toFixed(2) + '%';
-  ['svclk', 'svpanel'].forEach(i => { document.getElementById(i).dataset.ph = late ? 'late' : 'ok'; }); document.getElementById('svp').textContent = late ? 'التأخير' : 'ضمن الموعد';
+  ['svclk', 'svpanel'].forEach(i => { document.getElementById(i).dataset.ph = late ? 'late' : 'ok'; }); document.getElementById('svph').hidden = !late;
+  { const r = new Date(now + 3 * 36e5), mi = r.getUTCMinutes(), se = r.getUTCSeconds();
+    document.getElementById('svch').setAttribute('transform', 'rotate(' + (((r.getUTCHours() % 12) + mi / 60) * 30).toFixed(1) + ' 8 8)'); document.getElementById('svcm').setAttribute('transform', 'rotate(' + ((mi + se / 60) * 6).toFixed(1) + ' 8 8)'); }
   document.getElementById('svl').textContent = late ? 'أنت الآن في وقت التأخير' : 'يبدأ وقت التأخير بعد ' + hms(Math.max(0, Math.ceil((H19 - el) / 1000))); }
 async function clockSync() { try { const t0 = Date.now(), { data, error } = await sb.rpc('muqraa_now'); if (error || !data) return;
     const t1 = Date.now(), sv = Date.parse(data); if (!isNaN(sv)) SRV_OFF = sv + (t1 - t0) / 2 - t1; } catch (e) {} clockTick(); }
@@ -609,7 +613,7 @@ function student() {
   try { const d = JSON.parse(ls('draft') || '{}'); if (d.day === day) draft = d.v; } catch (e) {}
   if (!draft) { try { const t = JSON.parse(ls('srv') || '{}'); if (t.day === day && t.v) draft = t.v; } catch (e) {} }
   const full = pf.first + ' ' + pf.family, vals = { ...(draft || {}), name: full };
-  app.innerHTML = hero(`${esc(full)} <small class="wd">مقرأة ${esc(pf.muqraa)} · ${esc(pf.halaqa)}</small>`, '<span class="mb"><button class="chip" id="jrb">سيري</button><button class="chip" id="pfb">بطاقتي</button><button class="chip" id="lgo">خروج</button></span>') + '<div class="top">' + hadithCard() + clockWidget() + '</div>' + clockPanel() + pendNote(pf, day) + `
+  app.innerHTML = hero(`${esc(full)} <small class="wd">مقرأة ${esc(pf.muqraa)} · ${esc(pf.halaqa)}</small>`, '<span class="mb"><button class="chip" id="jrb">سيري</button><button class="chip" id="pfb">بطاقتي</button><button class="chip" id="lgo">خروج</button></span>') + '<div class="top">' + clockWidget() + hadithCard() + '</div>' + clockPanel() + pendNote(pf, day) + `
   <div class="card"><h2 class="pill">مهام اليوم: <span class="dd">${dateLine(day)}</span></h2>${winNote(day)}<div class="prog"><span></span><span id="pc"></span></div><div class="bar"><i id="pb"></i></div>
   <div class="fgrid">${FIELDS.map(fieldHTML).join('')}</div>
   <button class="btn" id="go">إرسال</button><p class="note" id="st"></p></div>
