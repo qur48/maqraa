@@ -91,16 +91,18 @@ textarea{resize:none;overflow:hidden}
 .top .hd .lbl{font-size:13.5px}.top .hd .ln{width:44px;margin:8px auto 6px}.top .hd .l1{font-size:19px;line-height:1.6}.top .hd .l2{font-size:14.5px;line-height:1.85}
 .svw{display:flex;flex-direction:column;align-items:center;gap:3px;margin:0;padding:12px 6px 8px;min-height:0;height:auto;border:1px solid var(--bd);border-radius:26px;background:var(--card);color:var(--tx);font:inherit;text-align:center;cursor:pointer;-webkit-appearance:none;appearance:none;box-shadow:var(--sh);-webkit-tap-highlight-color:transparent}
 .svw:focus-visible{outline:3px solid var(--gold2);outline-offset:2px}
-.svw .rg{position:relative;width:100%;max-width:108px;aspect-ratio:1}
-.svw .rg svg{display:block;width:100%;height:100%;overflow:visible}
-.svw .tkr{fill:none;stroke:#bfae86;stroke-width:5}
-.svw .base,.svw .on{fill:none;stroke-width:11}
-.svw .base.ok{stroke:var(--g2);opacity:.15}.svw .base.lt{stroke:#c79a3c;opacity:.24}
-.svw .on.ok{stroke:url(#gOk)}.svw .on.lt{stroke:url(#gLt)}
-.svw .mk{fill:#fff;stroke:var(--g);stroke-width:4;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}.svw[data-ph="late"] .mk{stroke:#b07a1c}
-.svw .cn{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.svw .cn small{font-size:9.5px;line-height:1.4;color:var(--mu)}
-.svw .cn b{font-size:15px;line-height:1.3;font-weight:700;color:var(--g);font-variant-numeric:tabular-nums;direction:ltr}
+.svw .ttl{font-size:11px;line-height:1.4;color:var(--mu)}
+.svw .cd{display:flex;gap:5px;width:100%;justify-content:center;direction:rtl}
+.svw .u{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center}
+.svw .u b{position:relative;display:block;width:100%;height:38px;border-radius:9px;background:linear-gradient(180deg,#285a43 0 50%,#1c4531 50% 100%);color:var(--cream);font-size:19px;line-height:38px;font-weight:700;font-variant-numeric:tabular-nums;box-shadow:0 2px 5px rgba(31,65,47,.28),inset 0 1px 0 rgba(255,255,255,.12)}
+.svw .u b::after{content:"";position:absolute;inset-inline:0;top:50%;height:1px;background:rgba(0,0,0,.4)}
+.svw .u.sc b{color:var(--gold2)}
+.svw .u em{margin-top:3px;font-size:9.5px;font-style:normal;color:var(--mu)}
+.svw .pb{position:relative;display:flex;direction:rtl;width:100%;height:6px;margin:8px 0 4px;border-radius:99px;background:var(--bd)}
+.svw .pb i{position:relative;display:block;height:100%;overflow:hidden}
+.svw .pb i.ok{width:79.17%;border-radius:0 99px 99px 0;background:rgba(26,81,68,.18)}.svw .pb i.lt{width:20.83%;border-radius:99px 0 0 99px;background:rgba(199,154,60,.3)}
+.svw .pb s{position:absolute;inset-block:0;inset-inline-start:0;display:block;width:0}.svw .pb i.ok s{background:linear-gradient(90deg,#1a5144,#3f8a69)}.svw .pb i.lt s{background:linear-gradient(90deg,#b07a1c,#e0b95a)}
+.svw .pb u{position:absolute;top:50%;width:12px;height:12px;margin:-6px -6px 0 0;border-radius:50%;background:#fff;border:3px solid var(--g);box-shadow:0 1px 3px rgba(0,0,0,.35);text-decoration:none}.svw[data-ph="late"] .pb u{border-color:#b07a1c}
 .svw .ph{display:flex;align-items:center;gap:5px;margin-top:4px;font-size:12.5px;font-weight:700;color:var(--g)}
 .svw .ph i{display:block;width:7px;height:7px;border-radius:50%;background:var(--g2)}.svw[data-ph="late"] .ph i{background:#c79a3c}
 .svw .nw{font-size:11px;color:var(--mu);font-variant-numeric:tabular-nums}
@@ -115,7 +117,7 @@ textarea{resize:none;overflow:hidden}
 .svclk .p.ok{border-top-color:var(--g2)}.svclk .p.lt{border-top-color:#c79a3c}.svclk .p.ms{border-top-color:var(--bad)}
 .svclk[data-ph="ok"] .p.ok,.svclk[data-ph="late"] .p.lt{background:var(--goldb);color:var(--tx);box-shadow:inset 0 0 0 1px rgba(149,127,80,.5)}
 .svclk .fn{margin:10px 0 0;font-size:12px;color:var(--mu)}
-@media(min-width:560px){.top{grid-template-columns:minmax(0,1fr) 172px}.svw .rg{max-width:136px}.svw .cn b{font-size:19px}.svw .cn small{font-size:11px}.top .hd .l1{font-size:26px}.top .hd .l2{font-size:18px}.top .hd .lbl{font-size:15px}}
+@media(min-width:560px){.top{grid-template-columns:minmax(0,1fr) 190px}.svw .u b{height:46px;line-height:46px;font-size:23px}.svw .ttl{font-size:12px}.top .hd .l1{font-size:26px}.top .hd .l2{font-size:18px}.top .hd .lbl{font-size:15px}}
 .lh{font-size:12.5px;font-weight:400;color:var(--mu)}
 .b-mu{background:var(--card2);color:var(--mu);border:1px solid var(--bd)}
 .done-card{text-align:center}
@@ -312,18 +314,11 @@ const clockOf = r => { try { return new Date(r.completed_at || r.updated_at).toL
 const tmBadge = r => { const t = tmOf(r); if (!t) return ''; const c = clockOf(r);
   return ` <span class="badge ${t === 'ok' ? 'b-ok' : t === 'late' ? 'b-wn' : 'b-bad'}">${TMN[t]}</span>` + (c ? `<small class="wd"> ${esc(c)}</small>` : ''); };
 const tmMsg = t => t ? `<p class="tmb ${t}">${t === 'ok' ? 'سُجّل إتمامك ضمن الموعد' : t === 'late' ? 'سُجّل إتمامك في وقت التأخير' : 'سُجّل إتمامك بعد الموعد'}</p>` : '';
-/* ودجيت الوقت بجانب الحديث: حلقة تمثّل يوم المهام (٤ فجرًا ← ٤ فجرًا): ٧٩٫١٧٪ ضمن الموعد (حتى ١١ م) و٢٠٫٨٣٪ تأخير؛ الضغط عليه يفتح تفاصيل المراحل */
-const clockWidget = () => `<button type="button" class="svw" id="svclk" data-ph="ok" aria-expanded="false" aria-controls="svpanel" aria-label="الوقت المتبقي على نهاية اليوم، اضغط لعرض التفاصيل"><div class="rg"><svg viewBox="0 0 200 200" aria-hidden="true">
-  <defs><linearGradient id="gOk" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a5144"/><stop offset="1" stop-color="#3f8a69"/></linearGradient><linearGradient id="gLt" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b07a1c"/><stop offset="1" stop-color="#e0b95a"/></linearGradient></defs>
-  <circle class="tkr" cx="100" cy="100" r="95" pathLength="24" stroke-dasharray="0.07 0.93"/>
-  <g transform="rotate(-90 100 100)">
-    <circle class="base ok" cx="100" cy="100" r="82" pathLength="100" stroke-dasharray="79.17 100"/>
-    <circle class="base lt" cx="100" cy="100" r="82" pathLength="100" stroke-dasharray="20.83 100" stroke-dashoffset="-79.17"/>
-    <circle class="on ok" id="svo" cx="100" cy="100" r="82" pathLength="100" stroke-dasharray="0 100"/>
-    <circle class="on lt" id="svq" cx="100" cy="100" r="82" pathLength="100" stroke-dasharray="0 100" stroke-dashoffset="-79.17"/>
-  </g>
-  <g id="svk" transform="rotate(0 100 100)"><circle class="mk" cx="100" cy="18" r="8"/></g></svg>
-  <div class="cn"><small>ينتهي اليوم بعد</small><b id="svr">--:--:--</b></div></div>
+/* ودجيت الوقت بجانب الحديث: عدّ تنازلي (ساعة/دقيقة/ثانية) حتى ٤ فجرًا + شريط ليوم المهام: ٧٩٫١٧٪ ضمن الموعد (حتى ١١ م) و٢٠٫٨٣٪ تأخير؛ الضغط عليه يفتح تفاصيل المراحل */
+const clockWidget = () => `<button type="button" class="svw" id="svclk" data-ph="ok" aria-expanded="false" aria-controls="svpanel" aria-label="الوقت المتبقي على نهاية اليوم، اضغط لعرض التفاصيل">
+  <small class="ttl">ينتهي اليوم بعد</small>
+  <div class="cd"><div class="u"><b id="svh">--</b><em>ساعة</em></div><div class="u"><b id="svn">--</b><em>دقيقة</em></div><div class="u sc"><b id="svs">--</b><em>ثانية</em></div></div>
+  <div class="pb" aria-hidden="true"><i class="ok"><s id="svo"></s></i><i class="lt"><s id="svq"></s></i><u id="svk"></u></div>
   <div class="ph"><i></i><span id="svp">ضمن الموعد</span></div><div class="nw" id="svt">--:--:--</div>
   <svg class="chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg></button>`;
 const clockPanel = () => `<div class="svclk" id="svpanel" data-ph="ok" hidden><p class="sl" id="svl"></p>
@@ -336,10 +331,9 @@ function clockTick() { const t = document.getElementById('svt'); if (!t) { clear
   t.textContent = d.toLocaleTimeString('ar-SA', { ...o, hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true });
   /* يوم المهام يبدأ ٤:٠٠ فجرًا بتوقيت الرياض (UTC+3)، أي بعد ساعة من منتصف الليل بتوقيت UTC */
   const DAY = 864e5, H19 = 19 * 36e5, el = (((now - 36e5) % DAY) + DAY) % DAY, left = Math.max(0, Math.ceil((DAY - el) / 1000)), late = el >= H19, f = el / DAY, A = H19 / DAY;
-  document.getElementById('svr').textContent = hms(left);
-  document.getElementById('svo').setAttribute('stroke-dasharray', (Math.min(f, A) * 100).toFixed(3) + ' 100');
-  document.getElementById('svq').setAttribute('stroke-dasharray', (Math.max(0, f - A) * 100).toFixed(3) + ' 100');
-  document.getElementById('svk').setAttribute('transform', 'rotate(' + (f * 360).toFixed(3) + ' 100 100)');
+  document.getElementById('svh').textContent = AR(pad2(Math.floor(left / 3600))); document.getElementById('svn').textContent = AR(pad2(Math.floor(left % 3600 / 60))); document.getElementById('svs').textContent = AR(pad2(left % 60));
+  document.getElementById('svo').style.width = (Math.min(f, A) / A * 100).toFixed(2) + '%'; document.getElementById('svq').style.width = (Math.max(0, f - A) / (1 - A) * 100).toFixed(2) + '%';
+  document.getElementById('svk').style.insetInlineStart = (f * 100).toFixed(2) + '%';
   ['svclk', 'svpanel'].forEach(i => { document.getElementById(i).dataset.ph = late ? 'late' : 'ok'; }); document.getElementById('svp').textContent = late ? 'التأخير' : 'ضمن الموعد';
   document.getElementById('svl').textContent = late ? 'أنت الآن في وقت التأخير' : 'يبدأ وقت التأخير بعد ' + hms(Math.max(0, Math.ceil((H19 - el) / 1000))); }
 async function clockSync() { try { const t0 = Date.now(), { data, error } = await sb.rpc('muqraa_now'); if (error || !data) return;
