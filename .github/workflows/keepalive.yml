@@ -1,0 +1,17 @@
+name: keepalive
+# يستدعي دالة قراءة عامة في Supabase كل ٣ أيام حتى لا يتوقف المشروع المجاني بعد أسبوع بلا نشاط.
+# المفتاح هنا هو مفتاح anon العام نفسه الموجود في index.html (ليس سرًا).
+on:
+  schedule:
+    - cron: '17 3 */3 * *'
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase
+        run: |
+          curl -fsS --retry 3 --retry-delay 10 -X POST "https://apubcgjusejsrvrdppwn.supabase.co/rest/v1/rpc/muqraa_cycle_start" \
+            -H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwdWJjZ2p1c2Vqc3J2cmRwcHduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI4MTY2NTksImV4cCI6MjEwODM5MjY1OX0.xq8Hv7NPp9JC9Guc9jPYDs4xyOtliKU4tHlQBm4hvsY" \
+            -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwdWJjZ2p1c2Vqc3J2cmRwcHduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI4MTY2NTksImV4cCI6MjEwODM5MjY1OX0.xq8Hv7NPp9JC9Guc9jPYDs4xyOtliKU4tHlQBm4hvsY" \
+            -H "Content-Type: application/json" -d '{}'
