@@ -275,7 +275,7 @@ const clockOf = r => { try { return new Date(r.completed_at || r.updated_at).toL
 const tmBadge = r => { const t = tmOf(r); if (!t) return ''; const c = clockOf(r);
   return ` <span class="badge ${t === 'ok' ? 'b-ok' : t === 'late' ? 'b-wn' : 'b-bad'}">${TMN[t]}</span>` + (c ? `<small class="wd"> ${esc(c)}</small>` : ''); };
 const tmMsg = t => t ? `<p class="tmb ${t}">${t === 'ok' ? 'سُجّل إتمامك في الوقت' : t === 'late' ? 'سُجّل إتمامك في وقت التأخير' : 'سُجّل إتمامك بعد الموعد'}</p>` : '';
-const clockBar = () => '<div class="svclk" id="svclk"><span class="lb">ساعة الخادم · توقيت الرياض</span><b id="svt">--:--:--</b><span id="svp" class="tmb"></span><small id="svn"></small></div>';
+const clockBar = () => '<div class="svclk" id="svclk"><span class="lb">ساعة الخادم · توقيت مكة المكرمة</span><b id="svt">--:--:--</b><span id="svp" class="tmb"></span><small id="svn"></small></div>';
 function clockTick() { const t = document.getElementById('svt'); if (!t) { clearInterval(window.__clk); return; }
   const d = new Date(Date.now() + SRV_OFF), o = { timeZone:'Asia/Riyadh' };
   t.textContent = d.toLocaleTimeString('ar-SA', { ...o, hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true });
