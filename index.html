@@ -121,6 +121,34 @@ textarea{resize:none;overflow:hidden}
 .svclk[data-ph="ok"] .p.ok,.svclk[data-ph="late"] .p.lt{background:var(--goldb);color:var(--tx);box-shadow:inset 0 0 0 1px rgba(149,127,80,.5)}
 .svclk .fn{margin:10px 0 0;font-size:12px;color:var(--mu)}
 @media(min-width:560px){.top{grid-template-columns:190px minmax(0,1fr)}.svw .u b{height:46px;line-height:46px;font-size:23px}.svw .ttl{font-size:12px}.top .hd .l1{font-size:26px}.top .hd .l2{font-size:18px}.top .hd .lbl{font-size:15px}}
+/* لوحة السابقين: أول ٥ أتمّوا مهام اليوم، بجانب الساعة */
+.fb{position:relative;display:flex;flex-direction:column;gap:6px;min-width:0;margin:0;padding:12px 9px 10px;border:1px solid var(--bd);border-radius:26px;background:var(--card);color:var(--tx);box-shadow:var(--sh)}
+.fb .fh{display:flex;align-items:center;justify-content:center;gap:7px;text-align:center}
+.fb .fh i{display:block;width:7px;height:7px;flex:none;transform:rotate(45deg);border-radius:2px;background:var(--gold)}
+.fb .fh b{font-size:14.5px;line-height:1.4;color:var(--g)}
+.fb .fs{margin:-3px 0 1px;text-align:center;font-size:11px;line-height:1.45;color:var(--mu)}
+.fb ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
+.fb li{position:relative;display:flex;align-items:center;gap:7px;min-height:30px;padding-block:3px;padding-inline:4px 9px;border-radius:99px;background:var(--card2);font-size:12.5px;line-height:1.3}
+.fb li .rk{flex:none;display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--goldb);color:var(--gold);font-size:12px;font-weight:700}
+.fb li .nm{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--g);font-weight:700}
+.fb li .tm{flex:none;font-size:10.5px;color:var(--mu);font-variant-numeric:tabular-nums}
+.fb li.e{background:transparent;border:1px dashed var(--fieldbd)}.fb li.e .nm{color:var(--mu);font-weight:400}.fb li.e .rk{background:transparent;border:1px solid var(--fieldbd);color:var(--mu)}
+.fb li.r1 .rk{background:var(--gold);color:#fff}
+.fb li.me{background:var(--g)}.fb li.me .nm{color:var(--cream)}.fb li.me .tm{color:var(--gold2)}.fb li.me .rk{background:var(--gold2);color:var(--g)}
+.fb .ft{margin:1px 0 0;text-align:center;font-size:10.5px;color:var(--mu)}.fb .ft[hidden]{display:none}
+.fb li.st{animation:fbin .5s ease both;animation-delay:var(--d,0ms)}
+.fb li.pop,.fbme.pop{animation:fbpop .75s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes fbin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes fbpop{0%{opacity:0;transform:scale(.35)}55%{opacity:1;transform:scale(1.12)}100%{opacity:1;transform:none}}
+.bs{position:absolute;width:0;height:0;pointer-events:none;z-index:5}
+.bs span{position:absolute;top:0;left:0;display:block;width:8px;height:8px;margin:-4px 0 0 -4px;animation:fbfly .9s cubic-bezier(.15,.8,.3,1) forwards}
+.bs span.d{transform:rotate(45deg);border-radius:2px}.bs span.c{border-radius:50%;width:6px;height:6px;margin:-3px 0 0 -3px}
+.bs b{position:absolute;top:0;left:0;display:block;width:22px;height:22px;margin:-11px 0 0 -11px;border:2px solid var(--gold2);border-radius:50%;animation:fbring .8s ease-out forwards}
+@keyframes fbfly{0%{transform:translate(0,0) scale(.3) rotate(0);opacity:1}70%{opacity:1}100%{transform:translate(var(--x),var(--y)) scale(1) rotate(var(--r));opacity:0}}
+@keyframes fbring{0%{transform:scale(.4);opacity:.95}100%{transform:scale(3.4);opacity:0}}
+.fbme{position:relative;display:inline-block;margin:4px 0 8px;padding:5px 16px;border-radius:99px;background:var(--goldb);color:var(--g);font-size:14px;font-weight:700;box-shadow:inset 0 0 0 1px rgba(149,127,80,.5)}.fbme[hidden]{display:none}
+@media (max-width:359px){.fb li .tm{display:none}}
+@media (prefers-reduced-motion:reduce){.fb li.st,.fb li.pop,.fbme.pop{animation:none}.bs{display:none}}
 .lh{font-size:12.5px;font-weight:400;color:var(--mu)}
 .b-mu{background:var(--card2);color:var(--mu);border:1px solid var(--bd)}
 .done-card{text-align:center}
@@ -497,6 +525,41 @@ function streak() { const s = new Set(doneDays()); let d = riyadh(), n = 0; if (
 function confetti() { for (let i = 0; i < 26; i++) { const e = document.createElement('span'); e.className = 'conf'; e.textContent = ['✦','✧','❖','✦'][i % 4];
   e.style.left = Math.random() * 100 + 'vw'; e.style.animationDelay = Math.random() * .6 + 's'; e.style.color = i % 2 ? '#d6c18a' : '#f5eee6'; document.body.appendChild(e); setTimeout(() => e.remove(), 3200); } }
 
+/* لوحة السابقين: أول ٥ أتمّوا مهام يوم المهام الحالي (الاسم ووقت الإتمام فقط، بلا اسم المستخدم).
+   تُحدَّث كل ٣٠ ث وبعد إتمام الطالب؛ كل اسم يظهر حديثًا تصحبه فرقعة بألوان الهوية. */
+const FB_N = 5, FB_ORD = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس'], FB_COL = ['#957f50', '#d6c18a', '#1f412f', '#1a5144'];
+const fbRow = (it, i, cls) => it
+  ? `<li class="${cls}"><span class="rk">${AR(i + 1)}</span><span class="nm">${esc(it.name)}</span><small class="tm">${esc(clockOf({ completed_at: it.at }))}</small></li>`
+  : `<li class="e"><span class="rk">${AR(i + 1)}</span><span class="nm">بانتظارك</span></li>`;
+const firstBoard = () => `<section class="fb" id="fb" aria-label="السابقون إلى إتمام مهام اليوم"><div class="fh"><i></i><b>السابقون اليوم</b><i></i></div><p class="fs" id="fbs">كن أول المنجزين اليوم</p>
+  <ol id="fbl" aria-live="polite">${Array.from({ length: FB_N }, (_, i) => fbRow(null, i, '')).join('')}</ol><p class="ft" id="fbt" hidden></p></section>`;
+function fbBurst(el, mid) {
+  if (!el || (window.matchMedia && matchMedia('(prefers-reduced-motion:reduce)').matches)) return;
+  const bs = document.createElement('div'); bs.className = 'bs'; bs.style.top = '50%';
+  if (mid) bs.style.left = '50%'; else bs.style.insetInlineStart = '15px';
+  bs.appendChild(document.createElement('b'));
+  for (let k = 0; k < 14; k++) { const s = document.createElement('span'), a = Math.PI * 2 * k / 14 + Math.random() * .4, r = 30 + Math.random() * 34;
+    s.className = k % 3 ? (k % 3 === 1 ? 'd' : 'c') : 'd'; s.style.background = FB_COL[k % FB_COL.length];
+    s.style.setProperty('--x', Math.round(Math.cos(a) * r) + 'px'); s.style.setProperty('--y', Math.round(Math.sin(a) * r * .8) + 'px'); s.style.setProperty('--r', Math.round(Math.random() * 260 - 130) + 'deg'); bs.appendChild(s); }
+  el.appendChild(bs); setTimeout(() => bs.remove(), 1200);
+}
+function fbRender(d, me) {
+  const ol = document.getElementById('fbl'); if (!ol || !d || !Array.isArray(d.list)) return 0;
+  const list = d.list.slice(0, FB_N), keys = list.map(it => it.name + '|' + it.at), prev = window.__fbk, rank = list.findIndex(it => it.name === me) + 1;
+  window.__fbk = keys;
+  const sub = document.getElementById('fbs'), ft = document.getElementById('fbt');
+  if (sub) sub.textContent = rank ? 'أنت من أوائل المنجزين اليوم' : list.length ? 'أوائل من أتمّوا مهام اليوم' : 'كن أول المنجزين اليوم';
+  if (ft) { const more = (+d.total || 0) - list.length; ft.hidden = more <= 0; ft.textContent = more > 0 ? 'وأتمّ بعدهم ' + AR(more) + (more === 1 ? ' طالب' : more === 2 ? ' طالبان' : more <= 10 ? ' طلاب' : ' طالبًا') : ''; }
+  if (prev && prev.join('#') === keys.join('#')) return rank;
+  ol.innerHTML = Array.from({ length: FB_N }, (_, i) => { const it = list[i]; if (!it) return fbRow(null, i, '');
+    return fbRow(it, i, (i === 0 ? 'r1 ' : '') + (it.name === me ? 'me ' : '') + (prev && !prev.includes(keys[i]) ? 'pop' : 'st')); }).join('');
+  ol.querySelectorAll('li').forEach((li, i) => { li.style.setProperty('--d', i * 70 + 'ms'); if (li.classList.contains('pop')) fbBurst(li, false); });
+  return rank;
+}
+async function fbLoad(me, cb) { try { const { data, error } = await sb.rpc('muqraa_first_finishers'); if (error || !data) return; const r = fbRender(data, me); if (cb) cb(r); } catch (e) {} }
+function fbStart(me) { clearInterval(window.__fb); window.__fbk = undefined; fbLoad(me);
+  window.__fb = setInterval(() => { if (!document.getElementById('fbl')) return clearInterval(window.__fb); if (!document.hidden) fbLoad(me); }, 30000); }
+
 const cntHTML = (id, k) => `<div class="cnt"${k ? ` data-k="${k}"` : ''}><button type="button" class="cb m" aria-label="إنقاص">−</button><input type="text" id="${id}" inputmode="numeric" autocomplete="off"><button type="button" class="cb p" aria-label="زيادة">+</button></div>`;
 const fieldHTML = ([k, l, t]) => `<div class="f"><label for="f_${k}${t === 'p' ? '_from' : ''}">${l}${k === 'num' ? ' <small class="lh">أوجه أو آيات</small>' : ''}</label>` + (t === 'c' ? cntHTML('f_' + k, k)
   : t === 'p' ? `<div class="rng"><div class="pg"><em>من صفحة</em><input type="text" id="f_${k}_from" inputmode="numeric" autocomplete="off"></div><div class="pg"><em>إلى صفحة</em><input type="text" id="f_${k}_to" inputmode="numeric" autocomplete="off"></div></div>`
@@ -738,7 +801,7 @@ function student() {
   try { const d = JSON.parse(ls('draft') || '{}'); if (d.day === day) draft = d.v; } catch (e) {}
   if (!draft) { try { const t = JSON.parse(ls('srv') || '{}'); if (t.day === day && t.v) draft = t.v; } catch (e) {} }
   const full = pf.first + ' ' + pf.family, vals = { ...(draft || {}), name: full };
-  app.innerHTML = hero(`${esc(full)} <small class="wd">مقرأة ${esc(pf.muqraa)} · ${esc(pf.halaqa)}</small>`, '<span class="mb"><button class="chip" id="jrb">سيري</button><button class="chip" id="pfb">بطاقتي</button><button class="chip" id="lgo">خروج</button></span>') + '<div class="top">' + clockWidget() + hadithCard() + '</div>' + clockPanel() + pendNote(pf, day) + `
+  app.innerHTML = hero(`${esc(full)} <small class="wd">مقرأة ${esc(pf.muqraa)} · ${esc(pf.halaqa)}</small>`, '<span class="mb"><button class="chip" id="jrb">سيري</button><button class="chip" id="pfb">بطاقتي</button><button class="chip" id="lgo">خروج</button></span>') + hadithCard() + '<div class="top">' + clockWidget() + firstBoard() + '</div>' + clockPanel() + pendNote(pf, day) + `
   <div class="card"><h2 class="pill">مهام اليوم: <span class="dd">${dateLine(day)}</span></h2>${winNote(day)}<div class="prog"><span></span><span id="pc"></span></div><div class="bar"><i id="pb"></i></div>
   <div class="fgrid">${FIELDS.map(fieldHTML).join('')}</div>
   <button class="btn" id="go">إرسال</button><p class="note" id="st"></p></div>
@@ -761,7 +824,7 @@ function student() {
       a.oninput = z.oninput = sync; vals[k] = pageStr(vals[k + '_f'], vals[k + '_t']); mark();
     }
   });
-  upd(); clockStart(); $('#svclk').onclick = () => { const p = $('#svpanel'), o = p.hidden; p.hidden = !o; $('#svclk').setAttribute('aria-expanded', String(o)); };
+  upd(); clockStart(); fbStart(full); $('#svclk').onclick = () => { const p = $('#svpanel'), o = p.hidden; p.hidden = !o; $('#svclk').setAttribute('aria-expanded', String(o)); };
   if (doneDays().includes(day)) $('#res').innerHTML = weeklyHTML(day);
   reveal();
   $('#pfb').onclick = () => profileForm(true); $('#jrb').onclick = journey; pwaTip();
@@ -778,11 +841,12 @@ function student() {
     $('#st').textContent = '';
     let ds = doneDays().filter(d => d !== day); const ok = done(vals); if (ok) ds.push(day); ls('done', JSON.stringify(ds.slice(-400)));
     let tm = ''; if (ok) { try { const { data: jd } = await sb.rpc('muqraa_my_journey', { p_username: pf.username }); const sub = jd && (jd.subs || []).find(x => x.day === day); tm = sub ? tmAt(day, sub.completed_at) : ''; } catch (e) {} if (!tm) tm = tmAt(day, new Date().toISOString()); }
-    $('#res').innerHTML = ok ? `<div class="card done-card"><div class="tick"><b>✓</b></div><h2 class="serif">بارك الله فيك، أتممتَ مهام اليوم</h2>${tmMsg(tm)}
+    $('#res').innerHTML = ok ? `<div class="card done-card"><div class="tick"><b>✓</b></div><h2 class="serif">بارك الله فيك، أتممتَ مهام اليوم</h2>${tmMsg(tm)}<p class="fbme" id="fbme" hidden></p>
       <div class="streak"><div><b>${streak()}</b>أيام متتالية</div><div><b>${ds.length}</b>أيام الإتمام</div></div>
       <p class="note">يمكنك تعديل إجاباتك وإعادة الإرسال اليوم.</p></div>` + weeklyHTML(day)
       : `<div class="card done-card"><h2>تم الإرسال، ${FIELDS.length - filled(vals) === 1 ? 'وبقيت مهمة واحدة' : 'وبقيت ' + (FIELDS.length - filled(vals)) + ' مهام'}</h2><p class="note">أكمل الباقي ثم أعد الإرسال في اليوم نفسه.</p></div>`;
     reveal(); if (ok) confetti(); $('#res').scrollIntoView({ behavior: 'smooth' });
+    fbLoad(full, r => { const m = $('#fbme'); if (ok && r && m) { m.textContent = 'ما شاء الله! أنت ' + FB_ORD[r - 1] + ' بين السابقين اليوم'; m.hidden = false; m.classList.add('pop'); fbBurst(m, true); } });
   };
   syncProfile();
 }
