@@ -643,7 +643,7 @@ async function teacher() {
     const L = { tasks: ['من أتمّ جميع المهام', 'جميع الإرسالات'], pres: ['من عرض فقط', 'جميع الطلاب'], both: ['من أتمّ / من عرض فقط', 'الجميع'], rep: ['', ''], all: ['من أتمّ / من عرض فقط', 'الجميع'] }[S.what];
     document.querySelectorAll('#xs button').forEach(b => { b.textContent = L[b.dataset.k === 'done' ? 0 : 1]; });
     const xl = document.querySelector('#xs').previousElementSibling; if (xl) xl.textContent = S.what === 'pres' ? 'المحتوى (حالة العرض)' : 'المحتوى';
-    const hid = S.what === 'rep'; $('#xs').style.display = hid ? 'none' : ''; if (xl) xl.style.display = hid ? 'none' : ''; };
+    const hid = S.what === 'rep' || S.what === 'all'; $('#xs').style.display = hid ? 'none' : ''; if (xl) xl.style.display = hid ? 'none' : ''; };
   $('#md').onclick = e => { if (e.target.dataset.k) { S.mode = e.target.dataset.k; tabs(); pickers(); load(); } };
   $('#xf').onclick = e => { if (e.target.dataset.k) { S.fmt = e.target.dataset.k; tabs(); } };
   $('#xs').onclick = e => { if (e.target.dataset.k) { S.scope = e.target.dataset.k; tabs(); } };
@@ -701,7 +701,7 @@ async function load() {
   document.querySelectorAll('#nav [data-a]').forEach(b => b.hidden = !isAdmin());
   if (!isAdmin() && (S.tab === 'stu' || S.tab === 'exp' || S.tab === 'trs' || S.tab === 'rep')) S.tab = 'home';
   setTab(S.tab);
-  $('#xn').textContent = 'يشمل التصدير كل الحلقات والمقرأتين في الفترة: ' + label().replace(/_/g, ' ') + '. تُحدَّد الفترة من قسم «المتابعة». المهام تُصدَّر من الإرسالات اليومية، والعرض من جدول الأربعاوات الواقعة في الفترة. التقارير تُصدَّر بصيغة Excel منسّقة لكل الأسابيع بغضّ النظر عن الفترة.';
+  $('#xn').textContent = 'يشمل التصدير كل الحلقات والمقرأتين في الفترة: ' + label().replace(/_/g, ' ') + '. تُحدَّد الفترة من قسم «المتابعة». المهام تُصدَّر من الإرسالات اليومية، والعرض من جدول الأربعاوات الواقعة في الفترة. التقارير تُصدَّر بصيغة Excel منسّقة لكل الأسابيع بغضّ النظر عن الفترة. «الكل» = كامل البرنامج بلا فترة وبكل الإرسالات (المكتمل وغيره) والعرض والتقارير.';
   draw();
 }
 
@@ -1180,9 +1180,19 @@ function xlData(wb, title, sub, head, rows, widths, nameCols) {
   xBody(ws, 5, 1, rows.map(r => r.map((v, j) => nameCols && nameCols.includes(j) ? { v, al:'right' } : v)));
   widths.forEach((w, i) => { ws.getColumn(i + 1).width = w; }); if (rows.length) ws.autoFilter = { from:{ row:4, column:1 }, to:{ row:4 + rows.length, column:head.length } }; return ws; }
 
+/* «الكل» = كامل البرنامج بكل التفاصيل: بلا فترة، وجميع الإرسالات (لا المكتمل فقط) */
 async function doExport() {
+  if (S.what !== 'all') return doExport0();
+  const to = riyadh(), from = addDays(to, -396), btn = $('#ex'); btn.disabled = true;
+  const { data, error } = await sb.rpc('muqraa_panel_range', { p_secret: ls('tk'), p_from: from, p_to: to }); btn.disabled = false;
+  if (error) return alert(/forbidden/.test(error.message) ? 'الرمز السري غير صحيح.' : 'تعذّر تحميل بيانات البرنامج.');
+  const old = { rows:S.rows, mode:S.mode, from:S.from, to:S.to, scope:S.scope };
+  Object.assign(S, { rows:data.rows, mode:'custom', from, to, scope:'all' });
+  try { await doExport0(); } finally { Object.assign(S, old); }
+}
+async function doExport0() {
   let fmt = S.fmt; const what = S.what, onlyDone = S.scope === 'done', wantR = what === 'rep' || what === 'all', wantT = ['tasks', 'both', 'all'].includes(what), wantP = ['pres', 'both', 'all'].includes(what), lb = wantR && !wantT && !wantP ? riyadh() : label();
-  const name = 'تعاهد-' + (what === 'pres' ? 'العرض-' : what === 'rep' ? 'التقارير-' : '') + lb;
+  const name = what === 'all' ? 'تعاهد-كامل-البرنامج-' + riyadh() : 'تعاهد-' + (what === 'pres' ? 'العرض-' : what === 'rep' ? 'التقارير-' : '') + lb;
   let pr = [];
   if (wantP) { const [f, t] = range(), btn = $('#ex'); btn.disabled = true;
     const { data, error } = await sb.rpc('muqraa_panel_pres_range', { p_secret: ls('tk'), p_from: f, p_to: t }); btn.disabled = false;
@@ -1195,7 +1205,7 @@ async function doExport() {
   if (fmt === 'xlsx') {
     let XJ = null; try { XJ = await xlLib(); } catch (e) { toast(wantR ? 'تعذّر تحميل مكتبة التنسيق، تأكد من الاتصال بالإنترنت' : 'تعذّر تحميل مكتبة التنسيق، سيُصدَّر ملف بسيط'); if (what === 'rep') return; }
     if (XJ) { try {
-      const wb = new XJ.Workbook(); wb.creator = 'تعاهد'; const per = 'الفترة: ' + String(lb).replace(/_/g, ' ');
+      const wb = new XJ.Workbook(); wb.creator = 'تعاهد'; const per = what === 'all' ? 'كامل البرنامج' : 'الفترة: ' + String(lb).replace(/_/g, ' ');
       if (wantR) xlReports(wb);
       if (wantT) { MQ.forEach(m => xlData(wb, 'مهام مقرأة ' + m, per, HEAD, rows.filter(r => r.muqraa === m).map(rowArr), [12, 10, 22, 24, 28, 14, 12, 18, 18, 10], [2, 3]));
         if (S.mode !== 'day') xlData(wb, 'ملخص المهام', per, ['المقرأة', 'الحلقة', 'الاسم', 'أيام الإرسال', 'أيام الإتمام', 'أيام الدراسة', 'نسبة الالتزام %'], sm.map(o => [o.muqraa, o.halaqa, o.name, o.sent, o.done, o.active, o.pct]), [12, 22, 24, 14, 14, 14, 16], [1, 2]); }
