@@ -86,7 +86,25 @@ textarea{resize:none;overflow:hidden}
 .bar{height:9px;border-radius:9px;background:var(--bd);overflow:hidden;margin:8px 0 2px}
 .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--g2));width:0;transition:width .35s}
 .badge{display:inline-block;padding:1px 12px;border-radius:99px;font-size:13px;white-space:nowrap}
-.b-ok{background:var(--okb);color:var(--ok)}.b-wn{background:var(--wnb);color:var(--wn)}.b-bad{background:#f4ddd6;color:var(--bad)}.tmb{display:inline-block;padding:3px 14px;border-radius:99px;font-size:13.5px;margin:4px 0}.tmb.ok{background:var(--okb);color:var(--ok)}.tmb.late{background:var(--wnb);color:var(--wn)}.tmb.miss{background:#f4ddd6;color:var(--bad)}.tmw{margin:2px 0 8px;font-size:13px}.svclk{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 12px;background:var(--card);border-radius:20px;padding:10px 14px;margin:0 0 12px;box-shadow:var(--sh);border-bottom:3px solid var(--gold);text-align:center}.svclk .lb{font-size:12.5px;color:var(--mu);flex-basis:100%}.svclk b{font-size:24px;color:var(--g2);font-variant-numeric:tabular-nums;direction:ltr}.svclk .tmb{margin:0}.svclk small{font-size:12px;color:var(--mu);flex-basis:100%}.b-mu{background:var(--card2);color:var(--mu);border:1px solid var(--bd)}
+.b-ok{background:var(--okb);color:var(--ok)}.b-wn{background:var(--wnb);color:var(--wn)}.b-bad{background:#f4ddd6;color:var(--bad)}.tmb{display:inline-block;padding:3px 14px;border-radius:99px;font-size:13.5px;margin:4px 0}.tmb.ok{background:var(--okb);color:var(--ok)}.tmb.late{background:var(--wnb);color:var(--wn)}.tmb.miss{background:#f4ddd6;color:var(--bad)}.tmw{margin:2px 0 8px;font-size:13px}.svclk{position:relative;margin:22px 4px 16px;padding:20px 16px 14px;border:1.5px solid rgba(214,193,138,.55);border-radius:28px;color:var(--cream);text-align:center;background:radial-gradient(120% 90% at 50% 0,rgba(214,193,138,.16),transparent 60%),linear-gradient(165deg,#2a5a43,#1a4a3a 55%,#163d30);box-shadow:var(--sh),inset 0 1px 0 rgba(255,255,255,.12)}
+.svclk::before{content:"";position:absolute;top:-13px;left:50%;width:24px;height:24px;transform:translateX(-50%) rotate(45deg);background:var(--bg);border:1.5px solid var(--gold2);border-radius:6px}
+.svclk::after{content:"";position:absolute;top:-4px;left:50%;width:6px;height:6px;transform:translateX(-50%) rotate(45deg);background:var(--gold2)}
+.svclk .lb{display:block;font-size:12.5px;color:var(--gold2);letter-spacing:.4px;margin-bottom:10px}
+.svclk .cr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.svclk .cc{background:rgba(0,0,0,.2);border:1px solid rgba(214,193,138,.28);border-radius:18px;padding:9px 6px 8px}
+.svclk .cc small{display:block;font-size:12px;color:var(--gold2);margin-bottom:2px}
+.svclk .cc b{display:block;font-size:22px;line-height:1.4;color:#fff;font-variant-numeric:tabular-nums;direction:ltr;text-shadow:0 1px 6px rgba(0,0,0,.35)}
+.svclk .cc.rm b{color:var(--gold2)}
+.svclk .tl{position:relative;display:flex;direction:rtl;height:8px;margin:16px 4px 4px;border-radius:99px;background:rgba(0,0,0,.25)}
+.svclk .tl i{display:block;height:100%}.svclk .tl i.ok{width:79.17%;background:linear-gradient(90deg,#3f8a69,#5aa886);border-radius:0 99px 99px 0}.svclk .tl i.late{width:20.83%;background:linear-gradient(90deg,#c79a3c,#e0b95a);border-radius:99px 0 0 99px}
+.svclk .tl u{position:absolute;top:50%;width:16px;height:16px;margin:-8px -8px 0 0;border-radius:50%;background:#fff;border:3px solid var(--gold);box-shadow:0 0 0 4px rgba(255,255,255,.14),0 2px 6px rgba(0,0,0,.4);text-decoration:none}
+.svclk .tk{position:relative;direction:rtl;height:16px;margin:0 4px 12px;font-size:11px;color:rgba(245,238,230,.65)}
+.svclk .tk span{position:absolute;top:0;white-space:nowrap}.svclk .tk span:nth-child(1){inset-inline-start:0}.svclk .tk span:nth-child(2){inset-inline-start:79.17%;transform:translateX(50%)}.svclk .tk span:nth-child(3){inset-inline-end:0}
+.svclk .lg{list-style:none;margin:0;padding:0;display:grid;gap:6px;text-align:start}
+.svclk .lg li{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;padding:7px 14px;border-radius:14px;background:rgba(255,255,255,.05);border-inline-start:4px solid transparent;font-size:13px;color:rgba(245,238,230,.82)}
+.svclk .lg li b{font-size:13.5px;color:#fff}.svclk .lg li.ok{border-color:#5aa886}.svclk .lg li.late{border-color:#e0b95a}.svclk .lg li.miss{border-color:#d9806c}
+.svclk .lg li.now{background:rgba(214,193,138,.2);box-shadow:inset 0 0 0 1px rgba(214,193,138,.55)}
+.lh{font-size:12.5px;font-weight:400;color:var(--mu)}.b-mu{background:var(--card2);color:var(--mu);border:1px solid var(--bd)}
 .done-card{text-align:center}
 .tick{width:52px;height:52px;margin:10px auto 16px;background:var(--gold);border-radius:15px;transform:rotate(45deg);display:grid;place-items:center;box-shadow:0 4px 12px rgba(0,0,0,.2)}.tick b{transform:rotate(-45deg);color:#fff;font-size:26px;line-height:1}
 .streak{display:flex;gap:10px;justify-content:center;margin-top:10px}
@@ -197,7 +215,7 @@ table.rg td:first-child,table.rg th:first-child{position:sticky;right:0;backgrou
 h3.sub{margin:18px 0 4px;color:var(--g2);font-size:16px}#rpb .wnav{display:flex;justify-content:space-between;align-items:center;gap:8px}
 @media (max-width:420px){.tabbar button{font-size:11px}.tabbar button svg{width:22px;height:22px}}
 @media print{body{background:#fff!important}body::before{display:none}main,.ov,.toast{display:none!important}#pr{display:block;color:#000;background:#fff;padding:12px}#pr table{min-width:0;font-size:12px}#pr th,#pr td{border:1px solid #999;color:#000;background:#fff}}
-/* مسيرتي */
+/* سيري */
 .modal.jr{max-width:620px}
 .jr-b{padding:0 18px;text-align:start}
 .jr-sec{margin:22px 0 0}
@@ -258,7 +276,7 @@ const app = document.getElementById('app'), $ = s => document.querySelector(s);
 const esc = t => String(t == null ? '' : t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const MQ = ['شعبة','حفص'];
 const HQ = ['حلقة حسان بن ثابت', 'حلقة ابن رجب', 'حلقة أبيّ بن مالك', 'حلقة عبدالرحمن بن النعمان'];
-const FIELDS = [['name','الاسم','t'],['num','رقم المحفوظ','t'],['rep','عدد التكرار','c'],['listening','السماع','c'],['reviewing','المراجعة','p'],['linking','الربط','p']];
+const FIELDS = [['name','الاسم','t'],['num','نصاب اليوم','t'],['rep','عدد التكرار','c'],['listening','السماع','c'],['reviewing','المراجعة','p'],['linking','الربط','p']];
 /* يوم المهام يبدأ ٤:٠٠ فجرًا بتوقيت الرياض (يطابق muqraa_task_day في القاعدة) */
 let SRV_OFF = 0; /* فرق ساعة الخادم عن ساعة الجهاز (مللي ثانية) */
 const riyadh = (ms = 0) => new Date(Date.now() + SRV_OFF + ms - 4 * 36e5).toLocaleDateString('en-CA', {timeZone:'Asia/Riyadh'});
@@ -272,30 +290,37 @@ const pageStr = (a, b) => !a ? '' : (b && b !== a ? a + ' إلى ' + b : a);
 const okf = (r, k, t) => { const v = String(r[k] == null ? '' : r[k]).trim(); return t === 'c' ? cnum(v) > 0 : t === 'p' ? /\d/.test(LAT(v)) : !!v; };
 const filled = r => FIELDS.filter(([k, , t]) => okf(r, k, t)).length;
 const done = r => filled(r) === FIELDS.length;
-/* توقيت الإتمام: في الوقت من ٤:٠٠ فجرًا حتى ١٠:٥٩ مساءً، وتأخير من ١١:٠٠ مساءً حتى ٣:٥٩ فجرًا، وما بعد ٤:٠٠ فجرًا تفريط (يُحسب لمن لم يُتمّ يومه) */
-const TMN = { ok:'في الوقت', late:'تأخير', miss:'تفريط' };
+/* توقيت الإتمام: ضمن الموعد من ٤:٠٠ فجرًا حتى ١٠:٥٩ مساءً، وتأخير من ١١:٠٠ مساءً حتى ٣:٥٩ فجرًا، وما بعد ٤:٠٠ فجرًا تفريط (يُحسب لمن لم يُتمّ يومه) */
+const TMN = { ok:'ضمن الموعد', late:'تأخير', miss:'تفريط' };
 const tmAt = (day, iso) => { if (!iso || !/^\d{4}-\d\d-\d\d$/.test(day || '')) return ''; const t = new Date(iso).getTime(); if (isNaN(t)) return '';
   const [y, m, d] = day.split('-').map(Number), off = (t + 3 * 36e5 - Date.UTC(y, m - 1, d)) / 6e4; return off < 1380 ? 'ok' : off < 1680 ? 'late' : 'miss'; };
 const tmOf = r => done(r) ? tmAt(r.day, r.completed_at || r.updated_at) : '';
 const clockOf = r => { try { return new Date(r.completed_at || r.updated_at).toLocaleTimeString('ar-SA', { timeZone:'Asia/Riyadh', hour:'numeric', minute:'2-digit' }); } catch (e) { return ''; } };
 const tmBadge = r => { const t = tmOf(r); if (!t) return ''; const c = clockOf(r);
   return ` <span class="badge ${t === 'ok' ? 'b-ok' : t === 'late' ? 'b-wn' : 'b-bad'}">${TMN[t]}</span>` + (c ? `<small class="wd"> ${esc(c)}</small>` : ''); };
-const tmMsg = t => t ? `<p class="tmb ${t}">${t === 'ok' ? 'سُجّل إتمامك في الوقت' : t === 'late' ? 'سُجّل إتمامك في وقت التأخير' : 'سُجّل إتمامك بعد الموعد'}</p>` : '';
-const clockBar = () => '<div class="svclk" id="svclk"><span class="lb">ساعة الخادم · توقيت مكة المكرمة</span><b id="svt">--:--:--</b><span id="svp" class="tmb"></span><small id="svn"></small></div>';
+const tmMsg = t => t ? `<p class="tmb ${t}">${t === 'ok' ? 'سُجّل إتمامك ضمن الموعد' : t === 'late' ? 'سُجّل إتمامك في وقت التأخير' : 'سُجّل إتمامك بعد الموعد'}</p>` : '';
+const clockBar = () => '<div class="svclk" id="svclk"><span class="lb">ساعة الخادم · توقيت مكة المكرمة</span>'
+  + '<div class="cr"><div class="cc"><small>الوقت الآن</small><b id="svt">--:--:--</b></div><div class="cc rm"><small>المتبقي على نهاية اليوم</small><b id="svr">--:--:--</b></div></div>'
+  + '<div class="tl" aria-hidden="true"><i class="ok"></i><i class="late"></i><u id="svm"></u></div><div class="tk" aria-hidden="true"><span>٤:٠٠ ف</span><span>١١:٠٠ م</span><span>٤:٠٠ ف</span></div>'
+  + '<ul class="lg"><li class="ok" id="lg_ok"><b>ضمن الموعد</b><span>من ٤:٠٠ فجرًا إلى ١٠:٥٩ مساءً</span></li>'
+  + '<li class="late" id="lg_late"><b>التأخير</b><span>من ١١:٠٠ مساءً إلى ٣:٥٩ فجرًا</span></li>'
+  + '<li class="miss"><b>التفريط</b><span>لمن لم يُتمّ مهامه قبل ٤:٠٠ فجرًا</span></li></ul></div>';
+const pad2 = n => String(n).padStart(2, '0');
 function clockTick() { const t = document.getElementById('svt'); if (!t) { clearInterval(window.__clk); return; }
-  const d = new Date(Date.now() + SRV_OFF), o = { timeZone:'Asia/Riyadh' };
+  const now = Date.now() + SRV_OFF, d = new Date(now), o = { timeZone:'Asia/Riyadh' };
   t.textContent = d.toLocaleTimeString('ar-SA', { ...o, hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true });
-  let hr = 12; try { hr = +new Intl.DateTimeFormat('en-GB', { ...o, hour:'numeric', hourCycle:'h23' }).format(d); } catch (e) {}
-  const late = hr >= 23 || hr < 4, p = document.getElementById('svp'), n = document.getElementById('svn');
-  p.className = 'tmb ' + (late ? 'late' : 'ok'); p.textContent = late ? 'وقت التأخير' : 'في الوقت';
-  n.textContent = late ? 'ينتهي اليوم عند ٤:٠٠ فجرًا، وما بعده تفريط' : 'يبدأ التأخير عند ١١:٠٠ مساءً'; }
+  /* يوم المهام يبدأ ٤:٠٠ فجرًا بتوقيت الرياض (UTC+3)، أي بعد ساعة من منتصف الليل بتوقيت UTC */
+  const DAY = 864e5, el = (((now - 36e5) % DAY) + DAY) % DAY, left = Math.max(0, Math.ceil((DAY - el) / 1000)), late = el >= 19 * 36e5;
+  document.getElementById('svr').textContent = AR(pad2(Math.floor(left / 3600)) + ':' + pad2(Math.floor(left % 3600 / 60)) + ':' + pad2(left % 60));
+  document.getElementById('svm').style.insetInlineStart = (el / DAY * 100).toFixed(2) + '%';
+  document.getElementById('svclk').dataset.ph = late ? 'late' : 'ok';
+  document.getElementById('lg_ok').classList.toggle('now', !late); document.getElementById('lg_late').classList.toggle('now', late); }
 async function clockSync() { try { const t0 = Date.now(), { data, error } = await sb.rpc('muqraa_now'); if (error || !data) return;
     const t1 = Date.now(), sv = Date.parse(data); if (!isNaN(sv)) SRV_OFF = sv + (t1 - t0) / 2 - t1; } catch (e) {} clockTick(); }
 function clockStart() { clearInterval(window.__clk); clockTick(); window.__clk = setInterval(clockTick, 1000); clockSync(); if (!window.__cks) window.__cks = setInterval(clockSync, 300000); }
 const winNote = day => { let hr = 12; try { hr = +new Intl.DateTimeFormat('en-GB', { timeZone:'Asia/Riyadh', hour:'numeric', hourCycle:'h23' }).format(new Date(Date.now() + SRV_OFF)); } catch (e) {}
   const late = (hr >= 23 || hr < 4) && !doneDays().includes(day);
-  return '<p class="note tmw">في الوقت: من ٤:٠٠ فجرًا حتى ١٠:٥٩ مساءً · تأخير: من ١١:٠٠ مساءً حتى ٣:٥٩ فجرًا · بعد ٤:٠٠ فجرًا يُعدّ تفريطًا.</p>'
-    + (late ? '<p class="tmb late">أنت الآن في وقت التأخير، بادر بإتمام مهامك قبل ٤:٠٠ فجرًا.</p>' : ''); };
+  return late ? '<p class="tmb late">أنت الآن في وقت التأخير؛ بادر بإتمام مهامك قبل ٤:٠٠ فجرًا.</p>' : ''; };
 const dateLine = day => { const d = new Date(day + 'T12:00:00'), f = (cal, o) => { try { return d.toLocaleDateString('ar-SA-u-ca-' + cal, o); } catch (e) { return ''; } };
   const g = f('gregory', { day:'numeric', month:'long', year:'numeric' }).replace(/\s*م$/, '') + ' م', h = f('islamic-umalqura', { day:'numeric', month:'long', year:'numeric' }).replace(/\s*هـ$/, '') + ' هـ';
   return `${f('gregory', { weekday:'long' })} · ${h} · ${g}`; };
@@ -323,7 +348,7 @@ function confetti() { for (let i = 0; i < 26; i++) { const e = document.createEl
   e.style.left = Math.random() * 100 + 'vw'; e.style.animationDelay = Math.random() * .6 + 's'; e.style.color = i % 2 ? '#d6c18a' : '#f5eee6'; document.body.appendChild(e); setTimeout(() => e.remove(), 3200); } }
 
 const cntHTML = (id, k) => `<div class="cnt"${k ? ` data-k="${k}"` : ''}><button type="button" class="cb m" aria-label="إنقاص">−</button><input type="text" id="${id}" inputmode="numeric" autocomplete="off"><button type="button" class="cb p" aria-label="زيادة">+</button></div>`;
-const fieldHTML = ([k, l, t]) => `<div class="f"><label for="f_${k}${t === 'p' ? '_from' : ''}">${l}</label>` + (t === 'c' ? cntHTML('f_' + k, k)
+const fieldHTML = ([k, l, t]) => `<div class="f"><label for="f_${k}${t === 'p' ? '_from' : ''}">${l}${k === 'num' ? ' <small class="lh">أوجه أو آيات</small>' : ''}</label>` + (t === 'c' ? cntHTML('f_' + k, k)
   : t === 'p' ? `<div class="rng"><div class="pg"><em>من صفحة</em><input type="text" id="f_${k}_from" inputmode="numeric" autocomplete="off"></div><div class="pg"><em>إلى صفحة</em><input type="text" id="f_${k}_to" inputmode="numeric" autocomplete="off"></div></div>`
   : k === 'name' ? '<input type="text" id="f_name" class="ro" readonly tabindex="-1">'
   : `<input type="text" id="f_${k}" autocomplete="off">`) + '</div>';
@@ -364,14 +389,14 @@ const amountText = N => { const w = Math.floor(N / 4), r = N % 4, rt = r === 1 ?
   return !w ? (r === 3 ? 'ثلاثة أرباع الجزء' : rt + ' جزء') : r ? wt + ' و' + rt : wt; };
 function weeklyHTML(day) {
   const pf = getPf(); if (!pf || !CYC.start) return '';
-  const w1 = nextWed(day), items = day === w1 ? [['اليوم', w1], ['الأربعاء القادم', addDays(w1, 7)]] : [['الأربعاء القادم', w1]], N = pf.juz.length;
+  const w1 = nextWed(day), items = day === w1 ? [['اليوم', w1]] : [['الأربعاء القادم', w1]], N = pf.juz.length;
   const row = ([lb, w]) => { const s = sessionOf(w);
     return `<div class="it${lb === 'اليوم' ? ' td' : ''}"><span class="tg">${lb}</span> <span class="wd">${dateLine(w)}</span><b class="pt">${amountText(N)}</b>
-      <ul class="sg">${juzPlan(pf.juz, s).map(g => `<li>${segText(g)}</li>`).join('')}</ul><small>الجلسة ${AR(s)} من ٤</small></div>`; };
+      <ul class="sg">${juzPlan(pf.juz, s, pf.order).map(g => `<li>${segText(g)}</li>`).join('')}</ul><small>الجلسة ${AR(s)} من ٤</small></div>`; };
   return `<div class="card wk"><h2 class="pill">العرض الأسبوعي</h2><p class="note" style="margin-top:0">محفوظك ${cntText(N)}، تعرضه كاملًا كل ٤ أسابيع على ٤ جلسات يوم الأربعاء.</p>${items.map(row).join('')}</div>`;
 }
 
-/* ---- مسيرتي: عرض تفصيلي لمشوار الطالب وحساب التفريطات ---- */
+/* ---- سيري: عرض تفصيلي لمشوار الطالب وحساب التفريطات ---- */
 /* التفريط = يوم (من تاريخ التسجيل حتى أمس) لم تكتمل فيه المهام الستّ، أو أربعاء فاته العرض (حالة «لم يعرض»). اليوم الجاري لا يُحسب حتى ينتهي. */
 const OFF_DOW = []; /* أيام أسبوع تُستثنى من الحساب (٥ = الجمعة)؛ فارغة = تُحسب كل الأيام */
 const pgCount = v => { const n = LAT(v).match(/\d+/g) || []; if (!n.length) return 0; const a = +n[0], b = +n[n.length - 1]; return n.length > 1 && b >= a ? b - a + 1 : 1; };
@@ -401,8 +426,8 @@ function journeyHTML(j) {
   const months = []; j.days.forEach(o => { const k = o.day.slice(0, 7); let m = months[months.length - 1]; if (!m || m.k !== k) months.push(m = { k, list: [] }); m.list.push(o); });
   const bad = j.days.filter(o => o.st === 'miss' || o.st === 'part').reverse(), subsDays = j.days.filter(o => o.s).reverse();
   const row = o => { const s = o.s;
-    return `<details class="jr-d"><summary><span>${esc(shortDate(o.day))}</span><span class="jr-tag ${s.ok ? 'done' : 'postponed'}">${s.ok ? 'مكتمل' + ({ ok:' · في الوقت', late:' · تأخير' }[tmAt(o.day, s.completed_at)] || '') : 'ناقص'}</span></summary><dl>
-      <dt>رقم المحفوظ</dt><dd>${esc(s.num || '—')}</dd><dt>التكرار</dt><dd>${esc(s.rep || '—')}</dd><dt>السماع</dt><dd>${esc(s.listening || '—')}</dd>
+    return `<details class="jr-d"><summary><span>${esc(shortDate(o.day))}</span><span class="jr-tag ${s.ok ? 'done' : 'postponed'}">${s.ok ? 'مكتمل' + ({ ok:' · ضمن الموعد', late:' · تأخير' }[tmAt(o.day, s.completed_at)] || '') : 'ناقص'}</span></summary><dl>
+      <dt>نصاب اليوم</dt><dd>${esc(s.num || '—')}</dd><dt>التكرار</dt><dd>${esc(s.rep || '—')}</dd><dt>السماع</dt><dd>${esc(s.listening || '—')}</dd>
       <dt>المراجعة</dt><dd>${esc(s.reviewing || '—')}</dd><dt>الربط</dt><dd>${esc(s.linking || '—')}</dd></dl></details>`; };
   return `<div class="jr-b">
     <p class="note" style="text-align:center">منذ تسجيلك في ${esc(shortDate(j.created, { day: 'numeric', month: 'long', year: 'numeric' }))}</p>
@@ -411,7 +436,7 @@ function journeyHTML(j) {
       <div class="jr-bar" role="img" aria-label="نسبة الالتزام ${j.pct}٪"><i style="width:${j.pct}%"></i></div>
       <p class="note" style="margin:0">نسبة الإتمام ${AR(j.pct)}٪ من ${AR(j.due)} ${j.due === 1 ? 'يوم' : j.due === 2 ? 'يومين' : j.due <= 10 ? 'أيام' : 'يومًا'} مضت</p></div>
     <div class="jr-sec"><h3>حساب التفريطات</h3>
-      <p class="note" style="margin:0 0 8px">من أيام إتمامك: ${AR(j.onT)} في الوقت و${AR(j.lt)} في وقت التأخير. ومن لم يُتمّ مهام يومه قبل ٤:٠٠ فجرًا يُحسب عليه تفريط.</p>
+      <p class="note" style="margin:0 0 8px">أيام إتمامك: ${AR(j.onT)} ضمن الموعد، و${AR(j.lt)} في وقت التأخير. ويُحسب تفريطًا كلُّ يومٍ لم تُتمَّ مهامُّه قبل ٤:٠٠ فجرًا.</p>
       <div class="jr-grid">${st(j.miss, 'يوم بلا إرسال', j.miss ? 'bad' : '')}${st(j.part, 'يوم ناقص المهام', j.part ? 'wn' : '')}${st(j.pMissed, 'أربعاء فاتك العرض فيه', j.pMissed ? 'bad' : '')}${st(j.pPost, 'عرض مؤجَّل', j.pPost ? 'wn' : '')}</div>
       <div class="jr-tot">مجموع التفريطات<b>${AR(j.tafreet)}</b></div>
       ${bad.length ? `<p class="note" style="margin:12px 0 6px">أيام التفريط${bad.length > 40 ? ' (آخر ٤٠ يومًا)' : ''}:</p><div class="jr-ch">${bad.slice(0, 40).map(o => `<span class="${o.st}">${esc(shortDate(o.day, { day: 'numeric', month: 'short' }))}</span>`).join('')}</div>` : '<p class="note" style="text-align:center">لا تفريط حتى الآن، بارك الله فيك.</p>'}</div>
@@ -430,7 +455,7 @@ function journeyHTML(j) {
 }
 async function journey() {
   const pf = getPf(); if (!pf) return;
-  const o = overlay('<h2 class="serif">مسيرتي</h2><p class="note" id="jr_s">جارٍ التحميل…</p><div id="jr_body"></div>', null, () => o.remove());
+  const o = overlay('<h2 class="serif">سيري</h2><p class="note" id="jr_s">جارٍ التحميل…</p><div id="jr_body"></div>', null, () => o.remove());
   o.querySelector('.modal').classList.add('jr');
   const { data, error } = await sb.rpc('muqraa_my_journey', { p_username: pf.username });
   if (!o.isConnected) return;
@@ -563,7 +588,7 @@ function student() {
   try { const d = JSON.parse(ls('draft') || '{}'); if (d.day === day) draft = d.v; } catch (e) {}
   if (!draft) { try { const t = JSON.parse(ls('srv') || '{}'); if (t.day === day && t.v) draft = t.v; } catch (e) {} }
   const full = pf.first + ' ' + pf.family, vals = { ...(draft || {}), name: full };
-  app.innerHTML = hero(`${esc(full)} <small class="wd">مقرأة ${esc(pf.muqraa)} · ${esc(pf.halaqa)}</small>`, '<span class="mb"><button class="chip" id="jrb">مسيرتي</button><button class="chip" id="pfb">بطاقتي</button><button class="chip" id="lgo">خروج</button></span>') + clockBar() + hadithCard() + pendNote(pf, day) + `
+  app.innerHTML = hero(`${esc(full)} <small class="wd">مقرأة ${esc(pf.muqraa)} · ${esc(pf.halaqa)}</small>`, '<span class="mb"><button class="chip" id="jrb">سيري</button><button class="chip" id="pfb">بطاقتي</button><button class="chip" id="lgo">خروج</button></span>') + clockBar() + hadithCard() + pendNote(pf, day) + `
   <div class="card"><h2 class="pill">مهام اليوم: <span class="dd">${dateLine(day)}</span></h2>${winNote(day)}<div class="prog"><span></span><span id="pc"></span></div><div class="bar"><i id="pb"></i></div>
   <div class="fgrid">${FIELDS.map(fieldHTML).join('')}</div>
   <button class="btn" id="go">إرسال</button><p class="note" id="st"></p></div>
@@ -780,8 +805,8 @@ function draw() {
   if (S.mode === 'day') {
     const sent = S.rows.filter(f).sort(cmpN), seen = new Set(S.rows.map(key3));
     const miss = S.known.filter(k => !seen.has(key3(k)) && f(k)).sort(cmpN), n = sent.filter(done).length;
-    $('#stats').innerHTML = `<div class="stat"><b>${n}</b>أتمّوا</div><div class="stat"><b>${sent.length - n}</b>ناقصة</div><div class="stat"><b>${miss.length}</b>لم يرسلوا</div>${n ? `<p class="note" style="grid-column:1/-1;margin:0;text-align:center">من أتمّوا: ${sent.filter(r => tmOf(r) === 'ok').length} في الوقت · ${sent.filter(r => tmOf(r) === 'late').length} تأخير</p>` : ''}`;
-    $('#th').innerHTML = `<tr><th>الاسم</th><th>المقرأة</th>${A ? '<th>الحلقة</th>' : ''}<th>المحفوظ</th><th>التكرار</th><th>السماع</th><th>المراجعة</th><th>الربط</th><th>الحالة</th>${A ? '<th></th>' : ''}</tr>`;
+    $('#stats').innerHTML = `<div class="stat"><b>${n}</b>أتمّوا</div><div class="stat"><b>${sent.length - n}</b>ناقصة</div><div class="stat"><b>${miss.length}</b>لم يرسلوا</div>${n ? `<p class="note" style="grid-column:1/-1;margin:0;text-align:center">من أتمّوا: ${sent.filter(r => tmOf(r) === 'ok').length} ضمن الموعد · ${sent.filter(r => tmOf(r) === 'late').length} تأخير</p>` : ''}`;
+    $('#th').innerHTML = `<tr><th>الاسم</th><th>المقرأة</th>${A ? '<th>الحلقة</th>' : ''}<th>نصاب اليوم</th><th>التكرار</th><th>السماع</th><th>المراجعة</th><th>الربط</th><th>الحالة</th>${A ? '<th></th>' : ''}</tr>`;
     $('#tb').innerHTML = sent.map(r => `<tr><td>${esc(r.name)}</td><td>${esc(r.muqraa)}</td>${A ? `<td>${esc(r.halaqa) || '—'}</td>` : ''}<td class="w">${esc(r.num) || '—'}</td><td>${cnum(r.rep) || '—'}</td><td>${cnum(r.listening) || '—'}</td><td>${esc(r.reviewing) || '—'}</td><td>${esc(r.linking) || '—'}</td>
       <td>${done(r) ? '<span class="badge b-ok">مكتمل</span>' + tmBadge(r) : `<span class="badge b-wn">${filled(r)}/${FIELDS.length}</span>`}</td>${A ? `<td><button class="x" data-id="${r.id}" title="حذف" aria-label="حذف">×</button></td>` : ''}</tr>`).join('')
       + miss.map(r => `<tr><td>${esc(r.name)}</td><td>${esc(r.muqraa)}</td>${A ? `<td>${esc(r.halaqa) || '—'}</td>` : ''}<td colspan="5">—</td><td><span class="badge b-mu">لم يرسل</span></td>${A ? '<td></td>' : ''}</tr>`).join('')
@@ -798,7 +823,7 @@ function draw() {
     const act = Math.max(0, ...Object.values(S.rows.reduce((a, r) => { const g = r.muqraa + '|' + (r.halaqa || ''); (a[g] = a[g] || new Set()).add(r.day); return a; }, {})).map(s => s.size));
     const avg = sm.length ? Math.round(sm.reduce((s, o) => s + o.pct, 0) / sm.length) : 0;
     $('#stats').innerHTML = `<div class="stat"><b>${sm.length}</b>طالب</div><div class="stat"><b>${avg}%</b>متوسط الالتزام</div><div class="stat"><b>${act}</b>أيام الدراسة</div>`;
-    $('#th').innerHTML = `<tr><th></th><th>الاسم</th><th>المقرأة</th>${A ? '<th>الحلقة</th>' : ''}<th>أيام الإرسال</th><th>أيام الإتمام</th><th>في الوقت</th><th>تأخير</th><th>تفريط</th><th>نسبة الالتزام</th><th>آخر إرسال</th>${A ? '<th></th>' : ''}</tr>`;
+    $('#th').innerHTML = `<tr><th></th><th>الاسم</th><th>المقرأة</th>${A ? '<th>الحلقة</th>' : ''}<th>أيام الإرسال</th><th>أيام الإتمام</th><th>ضمن الموعد</th><th>تأخير</th><th>تفريط</th><th>نسبة الالتزام</th><th>آخر إرسال</th>${A ? '<th></th>' : ''}</tr>`;
     $('#tb').innerHTML = sm.map((o, i) => `<tr><td>${i < 3 && o.pct > 0 ? '<span class="rk">' + (i + 1) + '</span>' : ''}</td><td>${esc(o.name)}</td><td>${esc(o.muqraa)}</td>${A ? `<td>${esc(o.halaqa) || '—'}</td>` : ''}<td>${o.sent}</td><td>${o.done}</td><td>${o.ot}</td><td>${o.lt}</td><td>${o.fr}</td>
       <td>${o.pct}%<span class="mini"><i style="width:${o.pct}%"></i></span></td><td>${o.last}</td>${A ? `<td><button class="x" data-i="${i}" title="حذف إرساليات هذا الطالب في الفترة" aria-label="حذف">×</button></td>` : ''}</tr>`).join('') || `<tr><td colspan="${A ? 12 : 10}" class="note">لا توجد بيانات في هذه الفترة.</td></tr>`;
     $('#tb').onclick = !A ? null : e => { const o = sm[+e.target.dataset.i]; if (e.target.dataset.i !== undefined && o) delIds(o.ids, 'سيُنقل ' + AR(o.ids.length) + ' إرسال للطالب «' + o.name + '» في هذه الفترة إلى «السلة» ويمكن استعادتها. متابعة؟'); }; $('#rem').hidden = true; $('#rem').innerHTML = '';
@@ -1004,7 +1029,7 @@ function wkTable(list) {
     return `<tr><td>${i + 1}${w === d.cur ? ' <small class="wd">(الجاري)</small>' : ''}</td><td class="wd">${wRange(w)}</td><td>${upTo(list, w).length}</td><td>${a.sent}</td>${tdp(a.att)}<td>${a.done}</td><td>${a.on}</td><td>${a.lt}</td><td>${a.fr}</td><td>${a.mk}</td>${tdp(a.pct)}<td>${a.pg}</td><td>${a.pd}</td><td>${a.faces}</td></tr>`; });
   const t = agg(list, d.weeks);
   body.push(`<tr class="tot"><td colspan="2">الإجمالي</td><td>${list.length}</td><td>${t.sent}</td>${tdp(t.att)}<td>${t.done}</td><td>${t.on}</td><td>${t.lt}</td><td>${t.fr}</td><td>${t.mk}</td>${tdp(t.pct)}<td>${t.pg}</td><td>${t.pd}</td><td>${t.faces}</td></tr>`);
-  return tblR(['الأسبوع', 'الفترة', 'الطلاب', 'الحضور', 'نسبة الحضور', 'أيام الإتمام', 'في الوقت', 'تأخير', 'تفريط', 'تعويض', 'نسبة الإنجاز', 'الأوجه المقروءة', 'عرضوا', 'أوجه العرض'], body);
+  return tblR(['الأسبوع', 'الفترة', 'الطلاب', 'الحضور', 'نسبة الحضور', 'أيام الإتمام', 'ضمن الموعد', 'تأخير', 'تفريط', 'تعويض', 'نسبة الإنجاز', 'الأوجه المقروءة', 'عرضوا', 'أوجه العرض'], body);
 }
 const statsR = (a, n) => `<div class="stats s4"><div class="stat"><b>${n}</b>طالب</div><div class="stat"><b>${PC(a.pct)}</b>نسبة الإنجاز</div><div class="stat"><b>${a.pg}</b>وجهًا مقروءًا</div><div class="stat"><b>${a.faces}</b>وجه عرض</div></div>`;
 
@@ -1016,12 +1041,12 @@ function repTop() {
     const rk = L.map(o => ({ o, a: agg([o], [W]) })).filter(x => x.a.done > 0 || x.a.mk > 0).sort((x, y) => (y.a.ot - x.a.ot) || (y.a.pct - x.a.pct) || (y.a.done - x.a.done) || (y.a.pg - x.a.pg) || ((y.a.rep + y.a.lis) - (x.a.rep + x.a.lis)) || cmpN(x.o, y.o)).slice(0, 5);
     return `<div class="gh"><span>أفضل ٥ طلاب — مقرأة ${esc(m)}</span><small>متوسط المقرأة: ${PC(av.pct)}</small></div>`
       + (rk.length ? tblR(['#', 'الاسم', 'الإنجاز', 'التقدير', 'الأوجه'],
-        rk.map((x, j) => `<tr><td><span class="rk">${j + 1}</span></td><td>${esc(x.o.name)}<small>${esc(hShort(x.o.halaqa))} · أتمّ ${x.a.done} من ${actN(W, x.o)} (في الوقت ${x.a.on}${x.a.lt ? ' · تأخير ' + x.a.lt : ''})${x.a.mk ? ' + تعويض ' + x.a.mk : ''}</small></td>${tdp(x.a.pct)}<td>${GR(x.a.pct)}</td><td>${x.a.pg}</td></tr>`), 'rt tp') : '<p class="note">لا أحد أتمّ مهامه في هذا الأسبوع.</p>'); }).join('')
-    + '<p class="note">الترتيب أولًا بعدد أيام الإتمام في الوقت (قبل ١١:٠٠ مساءً)، فمن أتمّ في وقته يتقدّم على من تأخّر أو فرّط واستدرك الجمعة أو السبت، ثم بنسبة الإنجاز مع التعويض، ثم الأوجه المقروءة ثم التكرار والسماع. يدخل من أتمّ مهامه يومًا واحدًا على الأقل في الأسبوع.</p>';
+        rk.map((x, j) => `<tr><td><span class="rk">${j + 1}</span></td><td>${esc(x.o.name)}<small>${esc(hShort(x.o.halaqa))} · أتمّ ${x.a.done} من ${actN(W, x.o)} (ضمن الموعد ${x.a.on}${x.a.lt ? ' · تأخير ' + x.a.lt : ''})${x.a.mk ? ' + تعويض ' + x.a.mk : ''}</small></td>${tdp(x.a.pct)}<td>${GR(x.a.pct)}</td><td>${x.a.pg}</td></tr>`), 'rt tp') : '<p class="note">لا أحد أتمّ مهامه في هذا الأسبوع.</p>'); }).join('')
+    + '<p class="note">الترتيب أولًا بعدد أيام الإتمام ضمن الموعد (قبل ١١:٠٠ مساءً)، فمن أتمّ ضمن الموعد يتقدّم على من تأخّر أو فرّط واستدرك الجمعة أو السبت، ثم بنسبة الإنجاز مع التعويض، ثم الأوجه المقروءة ثم التكرار والسماع. يدخل من أتمّ مهامه يومًا واحدًا على الأقل في الأسبوع.</p>';
 }
 function repMq() {
   const d = R.d, m = R.mq, L = d.stu.filter(o => o.muqraa === m).sort(cmpN), all = agg(L, d.weeks);
-  const head = ['الاسم', 'الحلقة', ...d.weeks.map((w, i) => `<span title="${wRange(w)}">${i + 1}</span>`), 'متوسط الإنجاز', 'التقدير', 'الحضور', 'أيام الإتمام', 'في الوقت', 'تأخير', 'تفريط', 'الأوجه المقروءة'];
+  const head = ['الاسم', 'الحلقة', ...d.weeks.map((w, i) => `<span title="${wRange(w)}">${i + 1}</span>`), 'متوسط الإنجاز', 'التقدير', 'الحضور', 'أيام الإتمام', 'ضمن الموعد', 'تأخير', 'تفريط', 'الأوجه المقروءة'];
   const body = L.map(o => { const a = agg([o], d.weeks);
     return `<tr><td>${esc(o.name)}</td><td>${esc(hShort(o.halaqa))}</td>${d.weeks.map(w => { if (w < o.start || !actN(w, o)) return '<td></td>'; const c = o.w[w];
       return c && (c.s.size || c.x.size) ? tdp(agg([o], [w]).pct) : '<td class="mu">غ</td>'; }).join('')}${tdp(a.pct)}<td>${grd(a.pct)}</td><td>${a.sent}</td><td>${a.done}</td><td>${a.on}</td><td>${a.lt}</td><td>${a.fr}</td><td>${a.pg}</td></tr>`; });
@@ -1044,23 +1069,23 @@ function repHq() {
   const L = byH(h), a = agg(L, d.weeks);
   const rank = L.map(o => ({ o, a: agg([o], d.weeks) })).sort((x, y) => ((y.a.ot == null ? -1 : y.a.ot) - (x.a.ot == null ? -1 : x.a.ot)) || ((y.a.pct == null ? -1 : y.a.pct) - (x.a.pct == null ? -1 : x.a.pct)) || (y.a.done - x.a.done) || (y.a.pg - x.a.pg) || cmpN(x.o, y.o));
   return `<div class="gh"><span>تقرير الحلقات</span><small>مقارنة تراكمية</small></div>`
-    + tblR(['الحلقة', 'طلاب ' + MQ[0], 'طلاب ' + MQ[1], 'المجموع', 'الحضور', 'أيام الإتمام', 'في الوقت', 'تأخير', 'تفريط', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'أوجه العرض'], rows)
+    + tblR(['الحلقة', 'طلاب ' + MQ[0], 'طلاب ' + MQ[1], 'المجموع', 'الحضور', 'أيام الإتمام', 'ضمن الموعد', 'تأخير', 'تفريط', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'أوجه العرض'], rows)
     + (rest.length ? `<p class="note">${rest.length} طالب بلا حلقة معروفة، يدخلون في «البرنامج» فقط.</p>` : '')
     + `<div class="gh"><span>نسبة الإنجاز أسبوعيًا</span><small>التراكمي في آخر عمود</small></div>`
     + tblR(['الحلقة', ...d.weeks.map((w, i) => `<span title="${wRange(w)}">${i + 1}</span>`), 'التراكمي'], grid, 'rt rg')
     + `<div class="gh"><span>لوحة حلقة</span></div><div class="seg sx" id="rph">${HQ.map(x => `<button type="button" data-hq="${esc(x)}"${x === h ? ' class="on"' : ''}>${esc(hShort(x))}</button>`).join('')}</div>`
     + `<p class="note" style="text-align:center"><b>${esc(h)}</b></p>` + statsR(a, L.length)
     + `<h3 class="sub">التقرير الأسبوعي</h3>` + wkTable(L)
-    + `<h3 class="sub">طلاب الحلقة</h3>` + (L.length ? tblR(['الترتيب', 'الاسم', 'المقرأة', 'الحضور', 'أيام الإتمام', 'في الوقت', 'تأخير', 'تفريط', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة'],
+    + `<h3 class="sub">طلاب الحلقة</h3>` + (L.length ? tblR(['الترتيب', 'الاسم', 'المقرأة', 'الحضور', 'أيام الإتمام', 'ضمن الموعد', 'تأخير', 'تفريط', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة'],
       rank.map((x, j) => `<tr><td>${x.a.pct == null ? '' : j + 1}</td><td>${esc(x.o.name)}</td><td>${esc(x.o.muqraa)}</td><td>${x.a.sent}</td><td>${x.a.done}</td><td>${x.a.on}</td><td>${x.a.lt}</td><td>${x.a.fr}</td>${tdp(x.a.pct)}<td>${grd(x.a.pct)}</td><td>${x.a.pg}</td></tr>`)) : '<p class="note">لا يوجد طلاب في هذه الحلقة بعد.</p>');
 }
 function repPg() {
   const d = R.d, a = agg(d.stu, d.weeks);
   return statsR(a, d.stu.length)
     + `<div class="stats s4"><div class="stat"><b>${a.sent}</b>الحضور</div><div class="stat"><b>${PC(a.att)}</b>نسبة الحضور</div><div class="stat"><b>${a.done}</b>أيام الإتمام</div><div class="stat"><b>${a.pd}</b>مرات العرض</div></div>`
-    + `<div class="stats"><div class="stat"><b>${a.on}</b>أيام في الوقت</div><div class="stat"><b>${a.lt}</b>أيام تأخير</div><div class="stat"><b>${a.fr}</b>أيام تفريط</div></div>`
+    + `<div class="stats"><div class="stat"><b>${a.on}</b>أيام ضمن الموعد</div><div class="stat"><b>${a.lt}</b>أيام تأخير</div><div class="stat"><b>${a.fr}</b>أيام تفريط</div></div>`
     + `<p class="note" style="text-align:center">التقدير العام: <b>${grd(a.pct)}</b></p><h3 class="sub">التقرير الأسبوعي</h3>` + wkTable(d.stu)
-    + `<h3 class="sub">حسب المقرأة (تراكمي)</h3>` + tblR(['المقرأة', 'الطلاب', 'الحضور', 'نسبة الحضور', 'أيام الإتمام', 'في الوقت', 'تأخير', 'تفريط', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'أوجه العرض'],
+    + `<h3 class="sub">حسب المقرأة (تراكمي)</h3>` + tblR(['المقرأة', 'الطلاب', 'الحضور', 'نسبة الحضور', 'أيام الإتمام', 'ضمن الموعد', 'تأخير', 'تفريط', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'أوجه العرض'],
       MQ.map(m => { const L = d.stu.filter(o => o.muqraa === m), v = agg(L, d.weeks); return `<tr><td>${esc(m)}</td><td>${L.length}</td><td>${v.sent}</td>${tdp(v.att)}<td>${v.done}</td><td>${v.on}</td><td>${v.lt}</td><td>${v.fr}</td>${tdp(v.pct)}<td>${grd(v.pct)}</td><td>${v.pg}</td><td>${v.faces}</td></tr>`; }));
 }
 function drawRep() {
@@ -1068,7 +1093,7 @@ function drawRep() {
   const d = R.d; if (!R.wk || !d.weeks.includes(R.wk)) R.wk = d.weeks.length > 1 ? d.weeks[d.weeks.length - 2] : d.weeks[0];
   document.querySelectorAll('#rpt button').forEach(x => x.classList.toggle('on', x.dataset.rt === R.tab));
   b.innerHTML = (d.stu.length ? { top:repTop, mq:repMq, hq:repHq, pg:repPg }[R.tab]() : '<p class="note">لا توجد بيانات بعد.</p>')
-    + '<p class="note">الحضور = مرات إرسال المهام اليومية. نسبة الإنجاز = أيام إتمام جميع المهام في يومها ÷ أيام الدراسة (الأحد–الخميس، والأربعاء يوم العرض). الجمعة والسبت تعويض: كل يوم يُتمّ فيه الطالب مهامه يعوّض يومًا فاته بنصف درجة. الأسبوع من الأحد إلى السبت. الأوجه المقروءة = صفحات المراجعة والربط. اليوم يبدأ ٤:٠٠ فجرًا: في الوقت حتى ١٠:٥٩ مساءً، تأخير من ١١:٠٠ مساءً حتى ٣:٥٩ فجرًا، وما لم يُتمّ قبل ٤:٠٠ فجرًا فهو تفريط (ويبقى الاستدراك تعويضًا بنصف درجة).</p>';
+    + '<p class="note">الحضور = مرات إرسال المهام اليومية. نسبة الإنجاز = أيام إتمام جميع المهام في يومها ÷ أيام الدراسة (الأحد–الخميس، والأربعاء يوم العرض). الجمعة والسبت تعويض: كل يوم يُتمّ فيه الطالب مهامه يعوّض يومًا فاته بنصف درجة. الأسبوع من الأحد إلى السبت. الأوجه المقروءة = صفحات المراجعة والربط. اليوم يبدأ ٤:٠٠ فجرًا: ضمن الموعد حتى ١٠:٥٩ مساءً، تأخير من ١١:٠٠ مساءً حتى ٣:٥٩ فجرًا، وما لم يُتمّ قبل ٤:٠٠ فجرًا فهو تفريط (ويبقى الاستدراك تعويضًا بنصف درجة).</p>';
   reveal();
 }
 async function loadRep() {
@@ -1090,7 +1115,7 @@ function repClick(e) {
 
 /* ---------------- التصدير ---------------- */
 const saveBlob = (blob, name) => { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); };
-const HEAD = ['التاريخ','اليوم','الحلقة','الاسم','رقم المحفوظ','عدد التكرار','السماع','المراجعة','الربط','الحالة','التوقيت','وقت الإتمام'];
+const HEAD = ['التاريخ','اليوم','الحلقة','الاسم','نصاب اليوم','عدد التكرار','السماع','المراجعة','الربط','الحالة','التوقيت','وقت الإتمام'];
 const rowArr = r => [r.day, wd(r.day), r.halaqa || '', r.name, r.num, cnum(r.rep), cnum(r.listening), r.reviewing, r.linking, done(r) ? 'مكتمل' : 'ناقص', tmOf(r) ? TMN[tmOf(r)] : '', tmOf(r) ? clockOf(r) : ''];
 const pick = onlyDone => S.rows.filter(r => !onlyDone || done(r)).sort((a, b) => a.day.localeCompare(b.day) || cmpN(a, b));
 const PHEAD = ['الأربعاء','الجلسة','المقرأة','الحلقة','الاسم','المقرر','الأرباع','الأوجه','الحالة','الأوجه المحسوبة'];
@@ -1156,7 +1181,7 @@ const xlOrder = () => R.d.stu.slice().sort((a, b) => (MQ.indexOf(a.muqraa) - MQ.
 function xlEntry(wb) {
   const d = R.d, ws = xSheet(wb, 'الإدخال', { freeze:[0, 4] }), L = xlOrder(), no = new Map(L.map((o, i) => [o, i + 1]));
   xTitle(ws, 'الإدخال الأسبوعي', 'يُجمَّع تلقائيًا من إدخال الطلبة اليومي · رقم الطالب كما في ورقة «الطلاب» · الحضور = أيام الإرسال (الأحد–الخميس) · التعويض = الجمعة والسبت');
-  const head = ['الأسبوع', 'المقرأة', 'الحلقة', 'رقم الطالب', 'اسم الطالب', 'الحضور (أيام الإرسال)', 'أيام الإتمام', 'تعويض', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'مجموع التكرار', 'مجموع السماع', 'حالة العرض', 'أوجه العرض', 'في الوقت', 'تأخير', 'تفريط'];
+  const head = ['الأسبوع', 'المقرأة', 'الحلقة', 'رقم الطالب', 'اسم الطالب', 'الحضور (أيام الإرسال)', 'أيام الإتمام', 'تعويض', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'مجموع التكرار', 'مجموع السماع', 'حالة العرض', 'أوجه العرض', 'ضمن الموعد', 'تأخير', 'تفريط'];
   xHead(ws, 4, 1, head, { nf:head.map((h, j) => j === 0 ? XWK : undefined), h:36 }); const ST = { done:'عرض', missed:'لم يعرض', postponed:'تأجل' }, rows = [];
   d.weeks.forEach((w, i) => L.forEach(o => { if (w < o.start) return; const a = agg([o], [w]), c = o.w[w], p = o.p[w];
     rows.push([{ v:i + 1, nf:XWK, b:true }, o.muqraa, hShort(o.halaqa), no.get(o), { v:o.name, al:'right', b:true }, a.sent, a.done, a.mk, actN(w, o) ? xp(a.pct) : { v:'' }, actN(w, o) ? xg(a.pct) : { v:'' }, a.pg, a.rep, a.lis, p ? ST[p.st] : '—', a.faces, a.on, a.lt, a.fr]); }));
@@ -1215,7 +1240,7 @@ function xlHalaqat(wb) {
   xWidths(ws, [3, 26, ...Array(Math.max(nW + 1, 11)).fill(10.5)]); }
 
 const xWeekRows = L => { const d = R.d; return d.weeks.map((w, i) => { const a = agg(L, [w]); return [{ v:i + 1, nf:XWK, b:true }, xRng(w) + (w === d.cur ? ' (الجاري)' : ''), upTo(L, w).length, a.sent, xp(a.att), a.done, a.mk, xp(a.pct), a.pg, a.pd, a.faces, a.on, a.lt, a.fr]; }); };
-const xWeekHead = ['الأسبوع', 'الفترة', 'الطلاب', 'الحضور', 'نسبة الحضور', 'أيام الإتمام', 'تعويض', 'نسبة الإنجاز', 'الأوجه المقروءة', 'عرضوا', 'أوجه العرض', 'في الوقت', 'تأخير', 'تفريط'];
+const xWeekHead = ['الأسبوع', 'الفترة', 'الطلاب', 'الحضور', 'نسبة الحضور', 'أيام الإتمام', 'تعويض', 'نسبة الإنجاز', 'الأوجه المقروءة', 'عرضوا', 'أوجه العرض', 'ضمن الموعد', 'تأخير', 'تفريط'];
 function xWeekTable(ws, r, L) {
   const d = R.d, t = agg(L, d.weeks); r = xHead(ws, r, 2, xWeekHead);
   const rows = xWeekRows(L); rows.push(['الإجمالي', '', L.length, t.sent, xp(t.att), t.done, t.mk, xp(t.pct), t.pg, t.pd, t.faces, t.on, t.lt, t.fr]);
@@ -1278,13 +1303,13 @@ async function doExport0() {
       const wb = new XJ.Workbook(); wb.creator = 'تعاهد'; const per = what === 'all' ? 'كامل البرنامج' : 'الفترة: ' + String(lb).replace(/_/g, ' ');
       if (wantR) xlReports(wb);
       if (wantT) { MQ.forEach(m => xlData(wb, 'مهام مقرأة ' + m, per, HEAD, rows.filter(r => r.muqraa === m).map(rowArr), [12, 10, 22, 24, 28, 14, 12, 18, 18, 10, 11, 12], [2, 3]));
-        if (S.mode !== 'day') xlData(wb, 'ملخص المهام', per, ['المقرأة', 'الحلقة', 'الاسم', 'أيام الإرسال', 'أيام الإتمام', 'أيام الدراسة', 'نسبة الالتزام %', 'في الوقت', 'تأخير', 'تفريط'], sm.map(o => [o.muqraa, o.halaqa, o.name, o.sent, o.done, o.active, o.pct, o.ot, o.lt, o.fr]), [12, 22, 24, 14, 14, 14, 16, 11, 11, 11], [1, 2]); }
+        if (S.mode !== 'day') xlData(wb, 'ملخص المهام', per, ['المقرأة', 'الحلقة', 'الاسم', 'أيام الإرسال', 'أيام الإتمام', 'أيام الدراسة', 'نسبة الالتزام %', 'ضمن الموعد', 'تأخير', 'تفريط'], sm.map(o => [o.muqraa, o.halaqa, o.name, o.sent, o.done, o.active, o.pct, o.ot, o.lt, o.fr]), [12, 22, 24, 14, 14, 14, 16, 11, 11, 11], [1, 2]); }
       if (wantP) { const ps = presSum(pr); xlData(wb, 'العرض الأسبوعي', per, PHEAD, pr, [12, 8, 10, 22, 24, 52, 9, 9, 12, 14], [3, 4, 5]); xlData(wb, 'أوجه العرض', per, ps[0], ps.slice(1), [14, 20, 20, 20, 22, 14], []); }
       const buf = await wb.xlsx.writeBuffer(); saveBlob(new Blob([buf], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), name + '.xlsx'); toast('تم التصدير'); return;
     } catch (e) { console.error(e); toast('تعذّر إنشاء الملف المنسّق'); if (what === 'rep') return; } }
     const wb = XLSX.utils.book_new(), add = (title, aoa, cols) => { const ws = XLSX.utils.aoa_to_sheet(aoa); ws['!cols'] = cols.map(w => ({ wch:w })); XLSX.utils.book_append_sheet(wb, ws, title); };
     if (wantT) { MQ.forEach(m => add('مقرأة ' + m, [HEAD, ...rows.filter(r => r.muqraa === m).map(rowArr)], [12,10,22,24,28,14,12,18,18,10,11,12]));
-      if (S.mode !== 'day') add('ملخص', [['المقرأة','الحلقة','الاسم','أيام الإرسال','أيام الإتمام','أيام الدراسة','نسبة الالتزام %','في الوقت','تأخير','تفريط'], ...sm.map(o => [o.muqraa, o.halaqa, o.name, o.sent, o.done, o.active, o.pct, o.ot, o.lt, o.fr])], [12,22,24,14,14,14,16,11,11,11]); }
+      if (S.mode !== 'day') add('ملخص', [['المقرأة','الحلقة','الاسم','أيام الإرسال','أيام الإتمام','أيام الدراسة','نسبة الالتزام %','ضمن الموعد','تأخير','تفريط'], ...sm.map(o => [o.muqraa, o.halaqa, o.name, o.sent, o.done, o.active, o.pct, o.ot, o.lt, o.fr])], [12,22,24,14,14,14,16,11,11,11]); }
     if (wantP) { add('العرض الأسبوعي', [PHEAD, ...pr], [12,8,10,22,24,52,9,9,12,14]); add('أوجه العرض', presSum(pr), [14, 20, 20, 20, 22, 14]); }
     wb.Workbook = { Views:[{ RTL:true }] }; XLSX.writeFile(wb, name + '.xlsx');
   } else if (fmt === 'csv') {
