@@ -405,7 +405,8 @@ async function journey() {
 
 /* ---- إضافة التطبيق للشاشة الرئيسية ---- */
 let deferredInstall = null;
-window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; const t = $('#pwa_tip'); if (t) pwaTip(); });
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; const t = $('#pwa_tip'); if (t) pwaTip(); if ($('#pwa_panel')) pwaPanel(); });
+window.addEventListener('appinstalled', () => { deferredInstall = null; if ($('#pwa_panel')) pwaPanel(); });
 const isStandalone = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
 function pwaTip() {
   const box = $('#pwa_tip'); if (!box || isStandalone() || ls('pwa_x')) return;
@@ -417,6 +418,19 @@ function pwaTip() {
     : '<p class="note" style="margin-top:0">لتفتحه كالتطبيق: من قائمة المتصفح (⋮) اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».</p>') + '</div>';
   box.querySelector('.x').onclick = () => { ls('pwa_x', '1'); box.innerHTML = ''; };
   const g = box.querySelector('#pwa_go'); if (g) g.onclick = async () => { deferredInstall.prompt(); await deferredInstall.userChoice.catch(() => {}); deferredInstall = null; ls('pwa_x', '1'); box.innerHTML = ''; };
+}
+/* بطاقة التثبيت في لوحة الإدارة والمعلمين (تبويب الإعدادات): ثابتة دائمًا بلا إخفاء */
+function pwaPanel() {
+  const box = $('#pwa_panel'); if (!box) return;
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent), android = /android/i.test(navigator.userAgent);
+  const p = t => `<p class="note" style="margin-top:0">${t}</p>`;
+  box.innerHTML = `<div class="card pwa-tip"><h2 class="pill">تعاهد على شاشتك</h2>` + (isStandalone()
+    ? p('تعاهد مثبّت على هذا الجهاز ويفتح كالتطبيق.')
+    : deferredInstall ? p('ثبّت تعاهد ليفتح كالتطبيق من شاشة جهازك.') + '<button class="btn sm" id="pwa_go" style="margin-top:12px">تثبيت</button>'
+    : ios ? p('لتفتحه كالتطبيق: من Safari اضغط زر المشاركة، ثم «إضافة إلى الشاشة الرئيسية».')
+    : android ? p('لتفتحه كالتطبيق: من قائمة المتصفح (⋮) اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».')
+    : p('لتفتحه كالتطبيق: من شريط عنوان المتصفح اضغط أيقونة التثبيت، أو من القائمة اختر «تثبيت تعاهد».')) + '</div>';
+  const g = box.querySelector('#pwa_go'); if (g) g.onclick = async () => { deferredInstall.prompt(); await deferredInstall.userChoice.catch(() => {}); deferredInstall = null; pwaPanel(); };
 }
 if ('serviceWorker' in navigator && location.protocol === 'https:') window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 
@@ -625,6 +639,7 @@ async function teacher() {
   <button class="btn" id="ex">تصدير</button></div>
   </section>
   <section class="pane" data-p="set" hidden>
+  <div id="pwa_panel"></div>
   <div class="card" id="tc" hidden><h2 class="pill">رموز المعلمين</h2><p class="note" style="margin-top:0">لكل معلم رمز خاص يفتح له حلقته فقط. «إعادة تعيين» تنشئ رمزًا جديدًا وتوقف القديم.</p>
   ${HQ.map(h => `<div class="trow"><span>${h}</span><button class="btn sec sm" data-h="${h}">إعادة تعيين</button></div>`).join('')}</div>
   <div class="card"><h2 class="pill">الرمز السري</h2><p class="note" style="margin-top:0">غيّر رمزك السري الخاص بحسابك هذا.</p><button class="btn sec sm" id="sec" style="margin-top:12px">تغيير رمزي السري</button></div>
@@ -697,6 +712,7 @@ async function load() {
   $('#pn1').textContent = isAdmin() ? 'تعاهد' : 'لوحة المعلم'; $('#pn').textContent = isAdmin() ? 'لوحة الإدارة' : S.halaqa;
   document.title = 'تعاهد · ' + (isAdmin() ? 'لوحة الإدارة' : S.halaqa);
   if (!S._wl) { S._wl = 1; loadWed(); }
+  pwaPanel();
   $('#tc').hidden = !isAdmin(); $('#sc').hidden = !isAdmin(); $('#trc').hidden = !isAdmin(); if (isAdmin() && !S._sl) { S._sl = 1; loadStu(); loadTrash(); } $('#cy').hidden = !isAdmin(); $('#xcard').hidden = !isAdmin(); $('#rpc').hidden = !isAdmin();
   if (isAdmin()) { $('#cy_d').value = CYC.start; window.__cyPreview(); }
   document.querySelectorAll('#nav [data-a]').forEach(b => b.hidden = !isAdmin());
