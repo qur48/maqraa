@@ -237,6 +237,12 @@ details.jr-d dt{color:var(--mu)}details.jr-d dd{margin:0;font-weight:500}
 .pwa-tip{position:relative}
 .pwa-tip p{margin:0}
 .pwa-tip .x{position:absolute;top:10px;inset-inline-end:14px;background:none;border:0;font-size:22px;line-height:1;color:var(--mu);cursor:pointer;font-family:inherit}
+.pwa-tip .stp{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:10px}
+.pwa-tip .stp li{display:flex;align-items:center;gap:10px;font-size:14px;line-height:1.7}
+.pwa-tip .stp b{flex:none;width:24px;height:24px;border-radius:50%;background:var(--g,#1f412f);color:#fff;font-size:13px;display:inline-flex;align-items:center;justify-content:center;font-weight:600}
+.pwa-tip .shr{display:inline-flex;vertical-align:middle;width:30px;height:30px;border:1px solid #d9d3c7;border-radius:8px;background:#fff;align-items:center;justify-content:center;margin:0 3px}
+.pwa-tip .shr svg{width:18px;height:18px;stroke:#0a84ff;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.pwa-tip .plus{display:inline-flex;vertical-align:middle;width:22px;height:22px;border:1.6px solid #333;border-radius:6px;align-items:center;justify-content:center;font-size:17px;line-height:1;margin:0 3px;font-weight:500}
 </style>
 </head>
 <body>
@@ -436,14 +442,17 @@ async function journey() {
 let deferredInstall = null;
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; const t = $('#pwa_tip'); if (t) pwaTip(); if ($('#pwa_panel')) pwaPanel(); });
 window.addEventListener('appinstalled', () => { deferredInstall = null; if ($('#pwa_panel')) pwaPanel(); });
+const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (/macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+const SHARE_ICO = '<span class="shr" aria-label="زر المشاركة"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M8 7l4-4 4 4M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/></svg></span>';
+const iosSteps = () => `<p class="note" style="margin-top:0">لتفتحه كالتطبيق (من متصفح Safari):</p><ol class="stp"><li><b>١</b><span>اضغط زر المشاركة ${SHARE_ICO} أسفل الشاشة (أعلاها في الآيباد)</span></li><li><b>٢</b><span>مرّر للأسفل واختر «إضافة إلى الشاشة الرئيسية» <span class="plus" aria-hidden="true">+</span></span></li><li><b>٣</b><span>اضغط «إضافة» أعلى الشاشة</span></li></ol>`;
 const isStandalone = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
 function pwaTip() {
   const box = $('#pwa_tip'); if (!box || isStandalone() || ls('pwa_x')) return;
-  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent), android = /android/i.test(navigator.userAgent);
+  const ios = isIOS(), android = /android/i.test(navigator.userAgent);
   if (!ios && !android && !deferredInstall) return;
   box.innerHTML = `<div class="card pwa-tip"><button class="x" aria-label="إخفاء" type="button">×</button><h2 class="pill">تعاهد على شاشتك</h2>` + (deferredInstall
     ? '<p class="note" style="margin-top:0">ثبّت تعاهد ليفتح كالتطبيق من شاشة جوالك.</p><button class="btn sm" id="pwa_go" style="margin-top:12px">تثبيت</button>'
-    : ios ? '<p class="note" style="margin-top:0">لتفتحه كالتطبيق: من Safari اضغط زر المشاركة، ثم «إضافة إلى الشاشة الرئيسية».</p>'
+    : ios ? iosSteps()
     : '<p class="note" style="margin-top:0">لتفتحه كالتطبيق: من قائمة المتصفح (⋮) اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».</p>') + '</div>';
   box.querySelector('.x').onclick = () => { ls('pwa_x', '1'); box.innerHTML = ''; };
   const g = box.querySelector('#pwa_go'); if (g) g.onclick = async () => { deferredInstall.prompt(); await deferredInstall.userChoice.catch(() => {}); deferredInstall = null; ls('pwa_x', '1'); box.innerHTML = ''; };
@@ -451,12 +460,12 @@ function pwaTip() {
 /* بطاقة التثبيت في لوحة الإدارة والمعلمين (تبويب الإعدادات): ثابتة دائمًا بلا إخفاء */
 function pwaPanel() {
   const box = $('#pwa_panel'); if (!box) return;
-  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent), android = /android/i.test(navigator.userAgent);
+  const ios = isIOS(), android = /android/i.test(navigator.userAgent);
   const p = t => `<p class="note" style="margin-top:0">${t}</p>`;
   box.innerHTML = `<div class="card pwa-tip"><h2 class="pill">تعاهد على شاشتك</h2>` + (isStandalone()
     ? p('تعاهد مثبّت على هذا الجهاز ويفتح كالتطبيق.')
     : deferredInstall ? p('ثبّت تعاهد ليفتح كالتطبيق من شاشة جهازك.') + '<button class="btn sm" id="pwa_go" style="margin-top:12px">تثبيت</button>'
-    : ios ? p('لتفتحه كالتطبيق: من Safari اضغط زر المشاركة، ثم «إضافة إلى الشاشة الرئيسية».')
+    : ios ? iosSteps()
     : android ? p('لتفتحه كالتطبيق: من قائمة المتصفح (⋮) اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».')
     : p('لتفتحه كالتطبيق: من شريط عنوان المتصفح اضغط أيقونة التثبيت، أو من القائمة اختر «تثبيت تعاهد».')) + '</div>';
   const g = box.querySelector('#pwa_go'); if (g) g.onclick = async () => { deferredInstall.prompt(); await deferredInstall.userChoice.catch(() => {}); deferredInstall = null; pwaPanel(); };
