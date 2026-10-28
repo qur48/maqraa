@@ -148,7 +148,7 @@ textarea{resize:none;overflow:hidden}
 .fbme{position:relative;display:inline-block;margin:4px 0 8px;padding:5px 16px;border-radius:99px;background:var(--goldb);color:var(--g);font-size:14px;font-weight:700;box-shadow:inset 0 0 0 1px rgba(149,127,80,.5)}.fbme[hidden]{display:none}
 @media (max-width:359px){.fb li .tm{display:none}}
 @media (prefers-reduced-motion:reduce){.fb li.st,.fb li.pop,.fbme.pop{animation:none}.bs{display:none}}
-.hd.hdr{margin:0 4px 18px;padding:12px 16px;border-radius:12px}.hd.hdr::before,.hd.hdr::after{display:none}.hd.hdr .l1{margin:0;font-size:16.5px;line-height:1.95;font-weight:400;color:var(--cream)}.hd.hdr .l1 span{color:var(--gold2)}
+.hd.hdr{margin:22px 4px 16px;padding:14px 14px 10px;border-radius:14px}.hd.hdr .lbl{margin:0;font-size:16px;line-height:1.5}.hd.hdr .ln{width:56px;margin:4px auto 4px}.hd.hdr .l1{line-height:1.4}.hd.hdr .l2{margin:0;line-height:1.65}
 .lh{font-size:12.5px;font-weight:400;color:var(--mu)}
 .b-mu{background:var(--card2);color:var(--mu);border:1px solid var(--bd)}
 .done-card{text-align:center}
@@ -513,7 +513,7 @@ const hero = (sub, extra, inner) => banner('', inner) + `<div class="meta"><span
 const hadithCard = () => `<section class="hd serif" aria-label="حديث"><p class="lbl">قال ﷺ</p><div class="ln"></div>
   <p class="l1">«تَعاهَدوا هذا القُرآنَ،</p><p class="l2">فوالذي نَفسُ مُحَمَّدٍ بيَدِه لَهو أشَدُّ تَفَلُّتًا مِنَ الإبِلِ في عُقُلِها»</p></section>`;
 
-const hadithBar = () => `<section class="hd hdr serif" aria-label="حديث"><p class="l1">قال ﷺ: «تَعاهَدوا هذا القُرآنَ، <span>فوالذي نَفسُ مُحَمَّدٍ بيَدِه لَهو أشَدُّ تَفَلُّتًا مِنَ الإبِلِ في عُقُلِها»</span></p></section>`;
+const hadithBar = () => `<section class="hd hdr serif" aria-label="حديث"><p class="lbl">قال ﷺ</p><div class="ln"></div><p class="l1">«تَعاهَدوا هذا القُرآنَ،</p><p class="l2">فوالذي نَفسُ مُحَمَّدٍ بيَدِه لَهو أشَدُّ تَفَلُّتًا مِنَ الإبِلِ في عُقُلِها»</p></section>`;
 
 function route() {
   document.querySelectorAll('.ov').forEach(o => o.remove());
