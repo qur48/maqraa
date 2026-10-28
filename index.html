@@ -605,7 +605,7 @@ async function teacher() {
   <section class="pane" data-p="rep" hidden>
   <div class="card" id="rpc" hidden><h2 class="pill">التقارير</h2>
   <div class="seg sx" id="rpt">${[['top','أفضل ٥'],['mq','المقرأتان'],['hq','الحلقات'],['pg','البرنامج']].map(([k, t]) => `<button type="button" data-rt="${k}">${t}</button>`).join('')}</div>
-  <p class="note" id="rpm"></p><div id="rpb"></div></div>
+  <button class="btn sm" id="rpx" type="button" style="margin:2px 0 8px">تصدير التقارير إلى Excel</button><p class="note" id="rpm"></p><div id="rpb"></div></div>
   </section>
   <section class="pane" data-p="stu" hidden>
   <div class="card" id="sc" hidden><h2 class="pill">الطلاب المسجلون</h2><p class="note" style="margin-top:0">ابحث بالاسم أو اسم المستخدم. حذف الطالب ينقل حسابه وإرسالاته وسجل عرضه إلى «السلة» ٣٠ يومًا، ويمكن استعادته منها.</p>
@@ -618,7 +618,7 @@ async function teacher() {
   </section>
   <section class="pane" data-p="exp" hidden>
   <div class="card" id="xcard" hidden><h2 class="pill">تصدير</h2><p class="note" id="xn" style="margin-top:0"></p><button type="button" class="lnk" id="xp" style="margin:0 0 4px">تغيير الفترة</button>
-  <label>ما الذي يُصدَّر؟</label><div class="seg" id="xw">${[['tasks','المهام'],['pres','العرض الأسبوعي'],['both','الاثنان']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
+  <label>ما الذي يُصدَّر؟</label><div class="seg" id="xw">${[['tasks','المهام'],['pres','العرض الأسبوعي'],['both','المهام والعرض'],['rep','التقارير'],['all','الكل']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
   <label>الصيغة</label><div class="seg" id="xf">${[['xlsx','Excel'],['csv','CSV'],['json','JSON'],['print','طباعة / PDF']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
   <label>المحتوى</label><div class="seg" id="xs">${[['done',''],['all','']].map(([k, t]) => `<button data-k="${k}">${t}</button>`).join('')}</div>
   <button class="btn" id="ex">تصدير</button></div>
@@ -640,9 +640,10 @@ async function teacher() {
     document.querySelectorAll('#xf button').forEach(b => b.classList.toggle('on', b.dataset.k === S.fmt));
     document.querySelectorAll('#xs button').forEach(b => b.classList.toggle('on', b.dataset.k === S.scope));
     document.querySelectorAll('#xw button').forEach(b => b.classList.toggle('on', b.dataset.k === S.what));
-    const L = { tasks: ['من أتمّ جميع المهام', 'جميع الإرسالات'], pres: ['من عرض فقط', 'جميع الطلاب'], both: ['من أتمّ / من عرض فقط', 'الجميع'] }[S.what];
+    const L = { tasks: ['من أتمّ جميع المهام', 'جميع الإرسالات'], pres: ['من عرض فقط', 'جميع الطلاب'], both: ['من أتمّ / من عرض فقط', 'الجميع'], rep: ['', ''], all: ['من أتمّ / من عرض فقط', 'الجميع'] }[S.what];
     document.querySelectorAll('#xs button').forEach(b => { b.textContent = L[b.dataset.k === 'done' ? 0 : 1]; });
-    const xl = document.querySelector('#xs').previousElementSibling; if (xl) xl.textContent = S.what === 'pres' ? 'المحتوى (حالة العرض)' : 'المحتوى'; };
+    const xl = document.querySelector('#xs').previousElementSibling; if (xl) xl.textContent = S.what === 'pres' ? 'المحتوى (حالة العرض)' : 'المحتوى';
+    const hid = S.what === 'rep'; $('#xs').style.display = hid ? 'none' : ''; if (xl) xl.style.display = hid ? 'none' : ''; };
   $('#md').onclick = e => { if (e.target.dataset.k) { S.mode = e.target.dataset.k; tabs(); pickers(); load(); } };
   $('#xf').onclick = e => { if (e.target.dataset.k) { S.fmt = e.target.dataset.k; tabs(); } };
   $('#xs').onclick = e => { if (e.target.dataset.k) { S.scope = e.target.dataset.k; tabs(); } };
@@ -700,7 +701,7 @@ async function load() {
   document.querySelectorAll('#nav [data-a]').forEach(b => b.hidden = !isAdmin());
   if (!isAdmin() && (S.tab === 'stu' || S.tab === 'exp' || S.tab === 'trs' || S.tab === 'rep')) S.tab = 'home';
   setTab(S.tab);
-  $('#xn').textContent = 'يشمل التصدير كل الحلقات والمقرأتين في الفترة: ' + label().replace(/_/g, ' ') + '. تُحدَّد الفترة من قسم «المتابعة». المهام تُصدَّر من الإرسالات اليومية، والعرض من جدول الأربعاوات الواقعة في الفترة.';
+  $('#xn').textContent = 'يشمل التصدير كل الحلقات والمقرأتين في الفترة: ' + label().replace(/_/g, ' ') + '. تُحدَّد الفترة من قسم «المتابعة». المهام تُصدَّر من الإرسالات اليومية، والعرض من جدول الأربعاوات الواقعة في الفترة. التقارير تُصدَّر بصيغة Excel منسّقة لكل الأسابيع بغضّ النظر عن الفترة.';
   draw();
 }
 
@@ -1008,10 +1009,11 @@ async function loadRep() {
   if (!$('#rpm')) return;
   const er = a.error || b.error || c.error;
   if (er) { if (/forbidden/.test(er.message)) { ls('tk', ''); return login('الرمز السري غير صحيح.'); } return m.textContent = 'تعذّر تحميل التقارير، اضغط «تحديث».'; }
-  R.d = repCalc(a.data.rows, b.data, c.data); R.at = Date.now(); m.textContent = ''; drawRep();
+  R.d = repCalc(a.data.rows, b.data, c.data); R.at = Date.now(); m.textContent = ''; drawRep(); return true;
 }
 function repClick(e) {
   const b = e.target.closest('button'); if (!b || b.disabled) return;
+  if (b.id === 'rpx') return rpExport(b);
   if (b.dataset.rt) R.tab = b.dataset.rt; else if (b.dataset.mq) R.mq = b.dataset.mq; else if (b.dataset.hq) R.hq = b.dataset.hq;
   else if (b.dataset.wk) { const i = R.d.weeks.indexOf(R.wk) + +b.dataset.wk; if (i >= 0 && i < R.d.weeks.length) R.wk = R.d.weeks[i]; } else return;
   drawRep();
@@ -1039,17 +1041,157 @@ function presSum(pr) {
   const weds = [...new Set(pr.map(r => r[0]))], tot = HQ.map(() => 0), body = weds.map(W => { const v = HQ.map((h, i) => pr.filter(r => r[0] === W && r[3] === h).reduce((a, r) => a + r[9], 0)); v.forEach((n, i) => { tot[i] += n; }); return [W, ...v, v.reduce((a, b) => a + b, 0)]; });
   return [['الأربعاء', ...HQ, 'جميع الحلقات'], ...body, ['المجموع', ...tot, tot.reduce((a, b) => a + b, 0)]];
 }
+/* ---------------- التصدير المنسّق إلى Excel (على نمط ملف «برنامج تعاهد») ----------------
+   مكتبة ExcelJS تُحمَّل عند أول تصدير فقط. الألوان والخطوط مأخوذة من الملف: Tahoma، أخضر #1E402F، رمادي كريمي #F4F1EC، إجمالي #E3E9DF، تمييز #EEDFC0. */
+const XL = { G:'FF1E402F', BAND:'FFF4F1EC', TOT:'FFE3E9DF', HI:'FFEEDFC0', BD:'FFD9D3C7', TX:'FF12261B', MUTE:'FF576454', TAB:'FF0D5A54', RED:'FFAE3329', REDB:'FFF7DBD8', GRN:'FF1A5144' };
+const XB = { style:'thin', color:{ argb:XL.BD } }, XBD = { top:XB, left:XB, bottom:XB, right:XB };
+const XWK = '"أسبوع "0', XNF = { pct:'0%', int:'#,##0' };
+const xlLib = () => new Promise((ok, no) => {
+  if (window.ExcelJS) return ok(window.ExcelJS);
+  const urls = ['https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js'];
+  const next = i => { if (i >= urls.length) return no(new Error('exceljs')); const e = document.createElement('script'); e.src = urls[i];
+    e.onload = () => window.ExcelJS ? ok(window.ExcelJS) : next(i + 1); e.onerror = () => { e.remove(); next(i + 1); }; document.head.appendChild(e); };
+  next(0); });
+function xSheet(wb, name, o = {}) {
+  const v = { rightToLeft:true, showGridLines:false }; if (o.freeze) Object.assign(v, { state:'frozen', xSplit:o.freeze[0], ySplit:o.freeze[1] });
+  const ws = wb.addWorksheet(String(name).replace(/[\\\/?*\[\]:]/g, ' ').trim().slice(0, 31), { views:[v], properties:o.tab ? { tabColor:{ argb:o.tab } } : {} });
+  ws.pageSetup = { orientation:'landscape', fitToPage:true, fitToWidth:1, fitToHeight:0, paperSize:9 }; ws.getColumn(1).width = 3; return ws; }
+function xc(ws, r, c, v, o = {}) {
+  const x = ws.getCell(r, c); x.value = v == null || (typeof v === 'number' && !isFinite(v)) ? null : v;
+  x.font = { name:'Tahoma', size:o.sz || 10, bold:!!o.b, color:{ argb:o.col || XL.TX } };
+  if (o.fill) x.fill = { type:'pattern', pattern:'solid', fgColor:{ argb:o.fill } };
+  x.alignment = { horizontal:o.al || 'center', vertical:'middle', wrapText:o.wrap !== false, readingOrder:'rtl' };
+  if (o.nf) x.numFmt = o.nf; if (o.bd !== false) x.border = XBD; return x; }
+function xTitle(ws, text, sub) {
+  xc(ws, 1, 1, text, { sz:18, b:true, col:XL.G, al:'right', bd:false, wrap:false }); ws.getRow(1).height = 30;
+  if (sub) xc(ws, 2, 1, sub, { sz:9, col:XL.MUTE, al:'right', bd:false, wrap:false }); }
+const xLabel = (ws, r, c, t, sz) => xc(ws, r, c, t, { sz:sz || 11, b:true, col:XL.G, al:'right', bd:false, wrap:false });
+function xHead(ws, r, c0, labels, o = {}) { labels.forEach((t, j) => xc(ws, r, c0 + j, t, { b:true, col:'FFFFFFFF', fill:XL.G, nf:o.nf && o.nf[j] })); ws.getRow(r).height = o.h || 30; return r + 1; }
+function xBody(ws, r0, c0, rows, o = {}) {
+  rows.forEach((row, i) => { const tot = o.tot && o.tot.includes(i), band = !tot && i % 2 === 0;
+    row.forEach((v, j) => { const k = v && typeof v === 'object' && 'v' in v ? v : { v };
+      xc(ws, r0 + i, c0 + j, k.v, { b:tot || k.b, col:k.col, sz:k.sz, fill:k.fill || (tot ? XL.TOT : band ? XL.BAND : undefined), nf:k.nf || (o.nf && o.nf[j]), al:k.al || (o.al && o.al[j]) }); });
+    ws.getRow(r0 + i).height = o.h || 20; });
+  return r0 + rows.length; }
+const xScale = (ws, ref) => ws.addConditionalFormatting({ ref, rules:[{ type:'colorScale', cfvo:[{ type:'num', value:.5 }, { type:'num', value:.75 }, { type:'num', value:1 }], color:[{ argb:'FFF7DBD8' }, { argb:'FFF9EACB' }, { argb:'FFCFE0D2' }] }] });
+const xWidths = (ws, arr) => arr.forEach((w, i) => { if (w) ws.getColumn(i + 1).width = w; });
+const xf = p => p == null ? null : p / 100;
+const xp = p => ({ v:xf(p), nf:'0%' });
+const xg = p => p == null ? { v:'' } : { v:GR(p), col:p < 60 ? XL.RED : p >= 90 ? XL.GRN : undefined, b:p < 60 || p >= 90 };
+const xRng = w => shDate(addDays(w, -3)) + ' إلى ' + shDate(addDays(w, 3));
+const xlCol = n => { let s = ''; for (n++; n > 0; n = Math.floor((n - 1) / 26)) s = String.fromCharCode(65 + (n - 1) % 26) + s; return s; }; /* فهرس من صفر → حرف العمود */
+const xRef = (r1, c1, r2, c2) => xlCol(c1 - 1) + r1 + ':' + xlCol(c2 - 1) + r2;
+
+function xlStudents(wb) {
+  const d = R.d, ws = xSheet(wb, 'الطلاب'); xTitle(ws, 'الطلاب وتوزيعهم', 'عدد الطلاب المسجلين: ' + d.stu.length);
+  xHead(ws, 4, 1, ['م', 'اسم الطالب', 'المقرأة', 'الحلقة']);
+  const L = d.stu.slice().sort((a, b) => (MQ.indexOf(a.muqraa) - MQ.indexOf(b.muqraa)) || (HQ.indexOf(a.halaqa) - HQ.indexOf(b.halaqa)) || cmpN(a, b));
+  xBody(ws, 5, 1, L.map((o, i) => [i + 1, { v:o.name, al:'right', b:true }, o.muqraa, o.halaqa]));
+  xHead(ws, 4, 6, ['الحلقة', ...MQ.map(m => 'مقرأة ' + m), 'المجموع']);
+  const c = (h, m) => d.stu.filter(o => o.halaqa === h && o.muqraa === m).length, rows = HQ.map(h => [{ v:h, al:'right' }, c(h, MQ[0]), c(h, MQ[1]), c(h, MQ[0]) + c(h, MQ[1])]);
+  rows.push([{ v:'المجموع', al:'right' }, d.stu.filter(o => o.muqraa === MQ[0]).length, d.stu.filter(o => o.muqraa === MQ[1]).length, d.stu.length]);
+  xBody(ws, 5, 6, rows, { tot:[HQ.length] }); xWidths(ws, [6, 30, 12, 26, 3, 26, 14, 14, 12]); ws.getColumn(1).width = 6; }
+
+function xlMq(wb, m) {
+  const d = R.d, n = d.weeks.length, L = d.stu.filter(o => o.muqraa === m).sort(cmpN), all = agg(L, d.weeks), ws = xSheet(wb, 'تقرير مقرأة ' + m, { freeze:[3, 5] });
+  xTitle(ws, 'تقرير مقرأة ' + m + ' — نسبة إنجاز الطلاب أسبوعيًا'); xLabel(ws, 3, 2, 'المقرأة:'); xc(ws, 3, 3, m, { sz:12, b:true, col:XL.G, bd:false, al:'right' });
+  const c0 = 4, cs = c0 + n, heads = ['م', 'اسم الطالب', 'الحلقة', ...d.weeks.map((w, i) => i + 1), 'متوسط الإنجاز', 'التقدير', 'الحضور', 'أيام الإتمام', 'تعويض', 'الأوجه المقروءة'];
+  xHead(ws, 5, 1, heads, { nf:heads.map((h, j) => j >= 3 && j < 3 + n ? XWK : undefined), h:36 });
+  const rows = L.map((o, i) => { const a = agg([o], d.weeks);
+    return [i + 1, { v:o.name, al:'right', b:true, sz:9 }, hShort(o.halaqa), ...d.weeks.map(w => { if (w < o.start || !actN(w, o)) return { v:'' }; const c = o.w[w];
+      return c && (c.s.size || c.x.size) ? xp(agg([o], [w]).pct) : { v:'غ', col:XL.RED, fill:XL.REDB, b:true }; }), { ...xp(a.pct), b:true }, xg(a.pct), a.sent, a.done, a.mk, a.pg]; });
+  const end = xBody(ws, 6, 1, rows), f = (lb, fn, tail) => [{ v:lb, b:true, al:'right' }, '', '', ...d.weeks.map(w => fn(agg(upTo(L, w), [w]))), ...tail];
+  const foot = [f('نسبة إنجاز المقرأة', a => xp(a.pct), [xp(all.pct), xg(all.pct), '', '', '', '']), f('عدد الحضور (المرسلون)', a => ({ v:a.snd }), ['', '', all.sent, '', '', '']), f('الأوجه المقروءة', a => ({ v:a.pg }), ['', '', '', '', '', all.pg])];
+  const e2 = xBody(ws, end, 1, foot, { tot:[0, 1, 2] }); for (let i = 0; i < 3; i++) ws.mergeCells(end + i, 1, end + i, 3);
+  if (L.length) xScale(ws, xRef(6, c0, 5 + L.length, cs)); xScale(ws, xRef(end, c0, end, cs));
+  xWidths(ws, [5, 24, 15, ...d.weeks.map(() => 8.4), 12, 13, 8, 10, 8, 12]); ws.getColumn(1).width = 5; return e2; }
+
+function xlTop(wb) {
+  const d = R.d, W = R.wk, i = d.weeks.indexOf(W), ws = xSheet(wb, 'أفضل 5 طلاب');
+  xTitle(ws, 'أفضل 5 طلاب في كل مقرأة', 'الترتيب بالإتمام في يومها أولًا، ثم نسبة الإنجاز مع التعويض، ثم الأوجه المقروءة · من أتمّ مهامه يومًا واحدًا على الأقل');
+  xLabel(ws, 3, 2, 'الأسبوع:', 12); xc(ws, 3, 3, i + 1, { sz:14, b:true, col:XL.G, fill:'FFF6EEDC', nf:'0' }); xc(ws, 3, 4, xRng(W) + (W === d.cur ? ' (الجاري)' : ''), { col:XL.MUTE, bd:false, al:'right', wrap:false });
+  let r = 5;
+  MQ.forEach(m => { const L = upTo(d.stu.filter(o => o.muqraa === m), W), av = agg(L, [W]);
+    const rk = L.map(o => ({ o, a:agg([o], [W]) })).filter(x => x.a.done > 0 || x.a.mk > 0).sort((x, y) => (y.a.ot - x.a.ot) || (y.a.pct - x.a.pct) || (y.a.done - x.a.done) || (y.a.pg - x.a.pg) || ((y.a.rep + y.a.lis) - (x.a.rep + x.a.lis)) || cmpN(x.o, y.o)).slice(0, 5);
+    xLabel(ws, r, 2, 'مقرأة ' + m, 14); xc(ws, r, 5, 'متوسط المقرأة هذا الأسبوع:', { col:XL.MUTE, bd:false, al:'right', wrap:false }); xc(ws, r, 7, xf(av.pct), { sz:11, b:true, col:XL.G, nf:'0%', bd:false });
+    r = xHead(ws, r + 1, 2, ['الترتيب', 'اسم الطالب', 'الحلقة', 'أيام الإتمام', 'تعويض', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة'], { h:30 });
+    const rows = [0, 1, 2, 3, 4].map(j => { const x = rk[j]; if (!x) return [{ v:j + 1, col:'FF937D50', b:true }, '', '', '', '', '', '', '']; const f = j === 0 ? XL.HI : undefined;
+      return [{ v:j + 1, col:'FF937D50', b:true, fill:f }, { v:x.o.name, al:'right', b:true, fill:f }, { v:hShort(x.o.halaqa), fill:f }, { v:x.a.done + ' من ' + actN(W, x.o), fill:f }, { v:x.a.mk, fill:f }, { ...xp(x.a.pct), fill:f, b:true }, { ...xg(x.a.pct), fill:f }, { v:x.a.pg, fill:f }]; });
+    r = xBody(ws, r, 2, rows, { h:24 }) + 2; });
+  xWidths(ws, [3, 10, 26, 16, 14, 10, 14, 12, 14]); }
+
+function xlHalaqat(wb) {
+  const d = R.d, ws = xSheet(wb, 'تقرير الحلقات'), nW = d.weeks.length, byH = h => d.stu.filter(o => o.halaqa === h), groups = [...HQ.map(h => [h, byH(h)]), ['البرنامج', d.stu]];
+  xTitle(ws, 'تقرير الحلقات — نسبة الإنجاز أسبوعيًا', 'تجمع كل حلقة طلابها من المقرأتين · من لم يرسل يُحسب صفرًا · التعويض بنصف درجة');
+  let r = 4; const hd = ['الحلقة', ...d.weeks.map((w, i) => i + 1), 'التراكمي'], nf = hd.map((h, j) => j >= 1 && j <= nW ? XWK : undefined), wk = (lb, fn, pctCols) => {
+    xc(ws, r, 2, lb, { sz:9, b:true, col:XL.G, al:'right', bd:false, wrap:false }); r = xHead(ws, r + 1, 2, hd, { nf });
+    const e = xBody(ws, r, 2, groups.map(([h, L]) => [{ v:h, al:'right', b:true, sz:9 }, ...d.weeks.map(w => fn(agg(upTo(L, w), [w]))), fn(agg(L, d.weeks))]), { tot:[HQ.length] });
+    if (pctCols) xScale(ws, xRef(r, 3, e - 1, 3 + nW)); r = e + 1; };
+  wk('نسبة الإنجاز', a => xp(a.pct), true); wk('عدد الحضور (مرات الإرسال)', a => ({ v:a.sent }), false); wk('نسبة الحضور', a => xp(a.att), true);
+  xc(ws, r, 2, 'ملخص الحلقات (تراكمي)', { sz:11, b:true, col:XL.G, al:'right', bd:false, wrap:false });
+  r = xHead(ws, r + 1, 2, ['الحلقة', 'عدد الطلاب', 'طلاب ' + MQ[0], 'طلاب ' + MQ[1], 'مرات الحضور', 'أيام الإتمام', 'تعويض', 'نسبة الحضور', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'أوجه العرض']);
+  xBody(ws, r, 2, groups.map(([h, L]) => { const a = agg(L, d.weeks); return [{ v:h, al:'right', b:true, sz:9 }, L.length, L.filter(o => o.muqraa === MQ[0]).length, L.filter(o => o.muqraa === MQ[1]).length, a.sent, a.done, a.mk, xp(a.att), xp(a.pct), xg(a.pct), a.pg, a.faces]; }), { tot:[HQ.length] });
+  xWidths(ws, [3, 26, ...Array(Math.max(nW + 1, 11)).fill(10.5)]); }
+
+const xWeekRows = L => { const d = R.d; return d.weeks.map((w, i) => { const a = agg(L, [w]); return [{ v:i + 1, nf:XWK, b:true }, xRng(w) + (w === d.cur ? ' (الجاري)' : ''), upTo(L, w).length, a.sent, xp(a.att), a.done, a.mk, xp(a.pct), a.pg, a.pd, a.faces]; }); };
+const xWeekHead = ['الأسبوع', 'الفترة', 'الطلاب', 'الحضور', 'نسبة الحضور', 'أيام الإتمام', 'تعويض', 'نسبة الإنجاز', 'الأوجه المقروءة', 'عرضوا', 'أوجه العرض'];
+function xWeekTable(ws, r, L) {
+  const d = R.d, t = agg(L, d.weeks); r = xHead(ws, r, 2, xWeekHead);
+  const rows = xWeekRows(L); rows.push(['الإجمالي', '', L.length, t.sent, xp(t.att), t.done, t.mk, xp(t.pct), t.pg, t.pd, t.faces]);
+  const e = xBody(ws, r, 2, rows, { tot:[rows.length - 1] }); xScale(ws, xRef(r, 6, e - 1, 6)); xScale(ws, xRef(r, 9, e - 1, 9)); return e + 1; }
+const xKpi = (ws, r, heads, vals) => { xHead(ws, r, 2, heads, { h:32 }); vals.forEach((v, j) => xc(ws, r + 1, 2 + j, v && typeof v === 'object' ? v.v : v, { sz:15, b:true, col:XL.G, fill:XL.TOT, nf:v && v.nf })); ws.getRow(r + 1).height = 30; return r + 3; };
+
+function xlProgram(wb) {
+  const d = R.d, ws = xSheet(wb, 'تقرير البرنامج'), a = agg(d.stu, d.weeks);
+  xTitle(ws, 'تقرير البرنامج الكامل', 'يُحدَّث من إدخال الطلبة · الحضور = مرات إرسال المهام · الجمعة والسبت تعويض بنصف درجة');
+  let r = xKpi(ws, 4, ['عدد الطلاب', 'إجمالي الحضور', 'نسبة الحضور', 'أيام الإتمام', 'تعويض', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'أوجه العرض'], [d.stu.length, a.sent, xp(a.att), a.done, a.mk, xp(a.pct), a.pct == null ? '' : GR(a.pct), a.pg, a.faces]);
+  xLabel(ws, r, 2, 'التقرير الأسبوعي'); r = xWeekTable(ws, r + 1, d.stu) + 1;
+  xLabel(ws, r, 2, 'حسب المقرأة (تراكمي)'); r = xHead(ws, r + 1, 2, ['المقرأة', 'عدد الطلاب', 'مرات الحضور', 'نسبة الحضور', 'أيام الإتمام', 'تعويض', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'أوجه العرض']);
+  xBody(ws, r, 2, MQ.map(m => { const L = d.stu.filter(o => o.muqraa === m), v = agg(L, d.weeks); return [{ v:'مقرأة ' + m, b:true }, L.length, v.sent, xp(v.att), v.done, v.mk, xp(v.pct), xg(v.pct), v.pg, v.faces]; }));
+  xWidths(ws, [3, 12, 30, 12, 12, 13, 12, 10, 13, 15, 12, 13]); }
+
+function xlHalaqa(wb, h) {
+  const d = R.d, ws = xSheet(wb, h, { tab:XL.TAB }), L = d.stu.filter(o => o.halaqa === h), a = agg(L, d.weeks);
+  xTitle(ws, 'لوحة معلومات ' + h, 'تُحدَّث من إدخال الطلبة · الحضور = مرات إرسال المهام · الجمعة والسبت تعويض بنصف درجة');
+  xLabel(ws, 3, 2, 'الحلقة:', 10); xc(ws, 3, 3, h, { sz:12, b:true, col:'FF008000', fill:XL.TOT, bd:false }); ws.mergeCells(3, 3, 3, 5);
+  let r = xKpi(ws, 5, ['عدد الطلاب', 'إجمالي الحضور', 'نسبة الحضور', 'أيام الإتمام', 'تعويض', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة', 'أوجه العرض'], [L.length, a.sent, xp(a.att), a.done, a.mk, xp(a.pct), a.pct == null ? '' : GR(a.pct), a.pg, a.faces]);
+  xLabel(ws, r, 2, 'التقرير الأسبوعي', 12); r = xWeekTable(ws, r + 1, L) + 1;
+  xLabel(ws, r, 2, 'طلاب الحلقة'); r = xHead(ws, r + 1, 2, ['الترتيب', 'اسم الطالب', 'المقرأة', 'الحضور', 'أيام الإتمام', 'تعويض', 'نسبة الإنجاز', 'التقدير', 'الأوجه المقروءة']);
+  const rank = L.map(o => ({ o, a:agg([o], d.weeks) })).sort((x, y) => ((y.a.ot == null ? -1 : y.a.ot) - (x.a.ot == null ? -1 : x.a.ot)) || ((y.a.pct == null ? -1 : y.a.pct) - (x.a.pct == null ? -1 : x.a.pct)) || (y.a.done - x.a.done) || (y.a.pg - x.a.pg) || cmpN(x.o, y.o));
+  xBody(ws, r, 2, rank.map((x, j) => [x.a.pct == null ? '' : j + 1, { v:x.o.name, al:'right', b:true }, x.o.muqraa, x.a.sent, x.a.done, x.a.mk, xp(x.a.pct), xg(x.a.pct), x.a.pg]));
+  xWidths(ws, [3, 12, 30, 15, 12, 13, 12, 12, 13, 12, 12]); }
+
+function xlReports(wb) { xlStudents(wb); MQ.forEach(m => xlMq(wb, m)); xlTop(wb); xlHalaqat(wb); xlProgram(wb); HQ.forEach(h => xlHalaqa(wb, h)); }
+
+/* جداول المهام والعرض بنفس التنسيق */
+function xlData(wb, title, sub, head, rows, widths, nameCols) {
+  const ws = xSheet(wb, title, { freeze:[0, 4] }); xTitle(ws, title, sub); xHead(ws, 4, 1, head);
+  xBody(ws, 5, 1, rows.map(r => r.map((v, j) => nameCols && nameCols.includes(j) ? { v, al:'right' } : v)));
+  widths.forEach((w, i) => { ws.getColumn(i + 1).width = w; }); if (rows.length) ws.autoFilter = { from:{ row:4, column:1 }, to:{ row:4 + rows.length, column:head.length } }; return ws; }
+
+async function rpExport(b) { const w = S.what, f = S.fmt; S.what = 'rep'; S.fmt = 'xlsx'; b.disabled = true; try { await doExport(); } finally { S.what = w; S.fmt = f; b.disabled = false; } }
 async function doExport() {
-  const fmt = S.fmt, what = S.what, onlyDone = S.scope === 'done', lb = label(), wantT = what !== 'pres', wantP = what !== 'tasks';
-  const name = 'تعاهد-' + (what === 'pres' ? 'العرض-' : '') + lb;
+  let fmt = S.fmt; const what = S.what, onlyDone = S.scope === 'done', wantR = what === 'rep' || what === 'all', wantT = ['tasks', 'both', 'all'].includes(what), wantP = ['pres', 'both', 'all'].includes(what), lb = wantR && !wantT && !wantP ? riyadh() : label();
+  const name = 'تعاهد-' + (what === 'pres' ? 'العرض-' : what === 'rep' ? 'التقارير-' : '') + lb;
   let pr = [];
   if (wantP) { const [f, t] = range(), btn = $('#ex'); btn.disabled = true;
     const { data, error } = await sb.rpc('muqraa_panel_pres_range', { p_secret: ls('tk'), p_from: f, p_to: t }); btn.disabled = false;
     if (error) return alert(/forbidden/.test(error.message) ? 'الرمز السري غير صحيح.' : /bad range/.test(error.message) ? 'الفترة طويلة، الحد الأقصى ٤٠٠ يوم.' : 'تعذّر تحميل بيانات العرض.');
     pr = presRows(data, onlyDone, f, t);
     if (!wedsIn(f, t).length) { if (!wantT) return toast('لا يوجد يوم أربعاء ضمن الفترة المختارة'); toast('لا يوجد أربعاء في الفترة، سيُصدَّر قسم المهام فقط'); } }
+  if (wantR) { toast('جارٍ تحضير التقارير…'); if (!(await loadRep())) return toast('تعذّر تحميل التقارير، حاول مرة أخرى');
+    if (fmt !== 'xlsx') { if (what === 'rep') { fmt = 'xlsx'; S.fmt = 'xlsx'; document.querySelectorAll('#xf button').forEach(b => b.classList.toggle('on', b.dataset.k === 'xlsx')); } else toast('التقارير تُصدَّر بصيغة Excel فقط، وسيُصدَّر الباقي بالصيغة المختارة'); } }
   const rows = wantT ? pick(onlyDone) : [], sm = wantT ? summarize() : [];
   if (fmt === 'xlsx') {
+    let XJ = null; try { XJ = await xlLib(); } catch (e) { toast(wantR ? 'تعذّر تحميل مكتبة التنسيق، تأكد من الاتصال بالإنترنت' : 'تعذّر تحميل مكتبة التنسيق، سيُصدَّر ملف بسيط'); if (what === 'rep') return; }
+    if (XJ) { try {
+      const wb = new XJ.Workbook(); wb.creator = 'تعاهد'; const per = 'الفترة: ' + String(lb).replace(/_/g, ' ');
+      if (wantR) xlReports(wb);
+      if (wantT) { MQ.forEach(m => xlData(wb, 'مهام مقرأة ' + m, per, HEAD, rows.filter(r => r.muqraa === m).map(rowArr), [12, 10, 22, 24, 28, 14, 12, 18, 18, 10], [2, 3]));
+        if (S.mode !== 'day') xlData(wb, 'ملخص المهام', per, ['المقرأة', 'الحلقة', 'الاسم', 'أيام الإرسال', 'أيام الإتمام', 'أيام الدراسة', 'نسبة الالتزام %'], sm.map(o => [o.muqraa, o.halaqa, o.name, o.sent, o.done, o.active, o.pct]), [12, 22, 24, 14, 14, 14, 16], [1, 2]); }
+      if (wantP) { const ps = presSum(pr); xlData(wb, 'العرض الأسبوعي', per, PHEAD, pr, [12, 8, 10, 22, 24, 52, 9, 9, 12, 14], [3, 4, 5]); xlData(wb, 'أوجه العرض', per, ps[0], ps.slice(1), [14, 20, 20, 20, 22, 14], []); }
+      const buf = await wb.xlsx.writeBuffer(); saveBlob(new Blob([buf], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), name + '.xlsx'); toast('تم التصدير'); return;
+    } catch (e) { console.error(e); toast('تعذّر إنشاء الملف المنسّق'); if (what === 'rep') return; } }
     const wb = XLSX.utils.book_new(), add = (title, aoa, cols) => { const ws = XLSX.utils.aoa_to_sheet(aoa); ws['!cols'] = cols.map(w => ({ wch:w })); XLSX.utils.book_append_sheet(wb, ws, title); };
     if (wantT) { MQ.forEach(m => add('مقرأة ' + m, [HEAD, ...rows.filter(r => r.muqraa === m).map(rowArr)], [12,10,22,24,28,14,12,18,18,10]));
       if (S.mode !== 'day') add('ملخص', [['المقرأة','الحلقة','الاسم','أيام الإرسال','أيام الإتمام','أيام الدراسة','نسبة الالتزام %'], ...sm.map(o => [o.muqraa, o.halaqa, o.name, o.sent, o.done, o.active, o.pct])], [12,22,24,14,14,14,16]); }
