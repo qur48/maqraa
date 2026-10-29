@@ -1142,8 +1142,8 @@ function drawWed() {
   wb.innerHTML = `<div class="wnav"><button type="button" class="btn sec sm" data-w="-7">السابق</button><b>الجلسة ${AR(s)} من ٤</b><button type="button" class="btn sec sm" data-w="7">التالي</button></div>
     <p class="note" style="text-align:center">${dateLine(W)}</p>
     ${W !== nw ? `<div style="text-align:center"><button type="button" class="btn sm" data-w="0" style="margin:0 auto 6px">العودة إلى ${today === nw ? 'أربعاء اليوم' : 'الأربعاء القادم'} (${shDate(nw)})</button></div>` : ''}
-    <div class="fsum"><span>${A ? 'أوجه العرض — جميع الحلقات' : 'أوجه العرض — حلقتك'}</span><b>${AR(total)}</b><small>وجهًا</small>
-    <p>تُحسب تلقائيًا عند الضغط على «عرض» أمام الطالب: كل ربع = ${AR(FP)} أوجه (الجزء ${AR(FP * 4)} وجهًا)، ويدخل فيها ما تأجل وعُرض مع هذا الأربعاء. هذا مجموع كل الطلاب في هذا الأربعاء، سواء اخترتَ حلقة أم لا.</p></div>
+    <div class="fsum"><span>${A ? 'أوجه العرض — جميع الحلقات' : 'أوجه العرض — ' + esc(d.halaqa || 'حلقتك')}</span><b>${AR(total)}</b><small>وجهًا</small>
+    ${!A ? '' : `<p>تُحسب تلقائيًا عند الضغط على «عرض» أمام الطالب: كل ربع = ${AR(FP)} أوجه (الجزء ${AR(FP * 4)} وجهًا)، ويدخل فيها ما تأجل وعُرض مع هذا الأربعاء. هذا مجموع كل الطلاب في هذا الأربعاء، سواء اخترتَ حلقة أم لا.</p>`}</div>
     ${hqBar}${sel}
     <div class="stats s4"><div class="stat"><b>${c('done')}</b>عرضوا</div><div class="stat"><b>${c('missed')}</b>لم يعرضوا</div><div class="stat"><b>${c('postponed')}</b>تأجلوا</div><div class="stat"><b>${none}</b>لم يُسجَّل</div></div>
     ${list || `<p class="note">${all.length ? 'لا يوجد طلاب مطابقون للتصفية.' : 'لا يوجد طلاب مسجلون بعد.'}</p>`}
