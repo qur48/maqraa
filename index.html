@@ -882,7 +882,7 @@ function summarize() {
 }
 
 async function teacher() {
-  app.innerHTML = hero('', '<span class="mb"><button class="chip" id="rf">تحديث</button><button class="chip" id="out">خروج</button></span>') + '<div class="top">' + clockWidget() + hadithCard() + '</div>' + clockPanel() + `
+  app.innerHTML = hero('', '<span class="mb"><button class="chip" id="rf">تحديث</button><button class="chip" id="out">خروج</button></span>') + '<div class="top">' + clockWidget() + firstBoard() + '</div>' + clockPanel() + hadithBar() + `
   <div class="ptl"><small id="pn1"></small><h2 class="serif" id="pn"></h2></div>
   <div class="card" id="flt"><h2 class="pill">التصفية</h2>
   <div class="grid3"><div><label for="fm">المقرأة</label><select id="fm"><option>الكل</option>${MQ.map(m => `<option>${m}</option>`).join('')}</select></div>
@@ -956,8 +956,8 @@ async function teacher() {
   $('#sadd').onclick = () => profileForm(false, true); $('#tl').onclick = trashClick;
   $('#fm').onchange = e => { S.mq = e.target.value; draw(); }; $('#fh').onchange = e => { S.hq = e.target.value; draw(); };
   $('#fq').oninput = e => { S.q = e.target.value.trim(); draw(); };
-  clockStart(); $('#svclk').onclick = () => { const p = $('#svpanel'), o = p.hidden; p.hidden = !o; $('#svclk').setAttribute('aria-expanded', String(o)); };
-  $('#rf').onclick = () => { load(); loadWed(); if (isAdmin()) { loadStu(); loadTrash(); if (S.tab === 'rep') loadRep(); } }; $('#wc').onclick = wedClick; $('#rpc').onclick = repClick; $('#sl').onclick = stuClick; $('#sq').oninput = drawStu; $('#out').onclick = () => { ls('tk', ''); location.hash = ''; route(); };
+  clockStart(); fbStart(''); $('#svclk').onclick = () => { const p = $('#svpanel'), o = p.hidden; p.hidden = !o; $('#svclk').setAttribute('aria-expanded', String(o)); };
+  $('#rf').onclick = () => { fbLoad(''); load(); loadWed(); if (isAdmin()) { loadStu(); loadTrash(); if (S.tab === 'rep') loadRep(); } }; $('#wc').onclick = wedClick; $('#rpc').onclick = repClick; $('#sl').onclick = stuClick; $('#sq').oninput = drawStu; $('#out').onclick = () => { ls('tk', ''); location.hash = ''; route(); };
   $('#ex').onclick = doExport; $('#xp').onclick = () => setTab('home');
   { const bk = $('#bkp'), bn = $('#bk_n'), note = () => { const d = ls('bk'); bn.textContent = d ? 'آخر نسخة: ' + dateLine(d) + '. يُنصح بنسخة أسبوعيًا.' : 'لم تُنزَّل نسخة بعد، يُنصح بنسخة أسبوعيًا.'; };
     note(); bk.onclick = async () => { bk.disabled = true; const { data, error } = await sb.rpc('muqraa_admin_backup', { p_secret: ls('tk') }); bk.disabled = false;
