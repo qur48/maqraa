@@ -301,6 +301,7 @@ details.jr-d dt{color:var(--mu)}details.jr-d dd{margin:0;font-weight:500}
 .pwa-tip{position:relative}
 .pwa-tip p{margin:0}
 .pwa-tip .x{position:absolute;top:10px;inset-inline-end:14px;background:none;border:0;font-size:22px;line-height:1;color:var(--mu);cursor:pointer;font-family:inherit}
+.push-card .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}.push-card .btn.sec{background:transparent;color:var(--g);box-shadow:none;border:1.5px solid var(--g)}.pn-sw{display:flex;align-items:center;gap:8px;margin-top:12px}.pn-sw input{width:auto;margin:0;padding:0;border:0;background:none;box-shadow:none;accent-color:var(--g)}
 .pwa-tip .stp{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:10px}
 .pwa-tip .stp li{display:flex;align-items:center;gap:10px;font-size:14px;line-height:1.7}
 .pwa-tip .stp b{flex:none;width:24px;height:24px;border-radius:50%;background:var(--g,#1f412f);color:#fff;font-size:13px;display:inline-flex;align-items:center;justify-content:center;font-weight:600}
@@ -711,6 +712,102 @@ function pwaPanel() {
 }
 if ('serviceWorker' in navigator && location.protocol === 'https:') window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 
+/* ---- تذكيرات الإشعارات (OneSignal) ---- */
+const OS_APP = 'a68f48f3-2e22-45cd-845f-a295b81948d6';
+const iosVer = () => { const m = /OS (\d+)[_.](\d+)/.exec(navigator.userAgent); return m ? +m[1] + (+m[2]) / 100 : 0; };
+const pushSupport = () => {
+  if (isIOS() && iosVer() && iosVer() < 16.04) return 'old';
+  if (isIOS() && !isStandalone()) return 'install';
+  if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) return 'none';
+  return Notification.permission === 'denied' ? 'denied' : 'ok';
+};
+let osLoad = null;
+function osGet() {
+  if (osLoad) return osLoad;
+  osLoad = new Promise((res, rej) => {
+    const base = location.pathname.replace(/[^/]*$/, '');
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    window.OneSignalDeferred.push(async OS => { try { await OS.init({ appId: OS_APP, serviceWorkerPath: base.slice(1) + 'push/OneSignalSDKWorker.js', serviceWorkerParam: { scope: base + 'push/' } }); res(OS); } catch (e) { rej(e); } });
+    const sc = document.createElement('script'); sc.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js'; sc.defer = true; sc.onerror = () => rej(new Error('load')); document.head.appendChild(sc);
+  });
+  osLoad.catch(() => { osLoad = null; });
+  return osLoad;
+}
+function pushRender(on, msg) {
+  const b = $('#push_box'); if (!b) return;
+  const sup = pushSupport(), p = t => `<p class="note" style="margin-top:0">${t}</p>`;
+  let h;
+  if (on) h = p('التذكيرات مفعّلة على هذا الجهاز، وستصلك تنبيهات المهام اليومية.') + '<div class="row"><button class="btn sec sm" id="pu_off" type="button">إيقاف التذكيرات</button></div>';
+  else if (sup === 'old') h = p('إشعارات الموقع تحتاج نظام iOS ١٦٫٤ أو أحدث. حدّث نظام جهازك إن أمكن.');
+  else if (sup === 'install') h = p('على الآيفون تعمل الإشعارات بعد تثبيت تعاهد على الشاشة الرئيسية، ثم افتحه من هناك واضغط «فعّل التذكيرات».') + iosSteps();
+  else if (sup === 'none') h = p('متصفحك لا يدعم الإشعارات.');
+  else if (sup === 'denied') h = p('الإشعارات محظورة لهذا الموقع. فعّلها من إعدادات المتصفح أو الجهاز ثم أعد فتح الصفحة.');
+  else h = p('فعّل التذكيرات لتصلك تنبيهات المهام اليومية على هذا الجهاز.') + '<div class="row"><button class="btn sm" id="pu_on" type="button">فعّل التذكيرات</button></div>';
+  b.innerHTML = '<div class="card pwa-tip push-card"><h2 class="pill">تذكير المهام</h2>' + h + (msg ? `<p class="note" id="pu_st">${esc(msg)}</p>` : '') + '</div>';
+  const a = b.querySelector('#pu_on'); if (a) a.onclick = pushEnable;
+  const o = b.querySelector('#pu_off'); if (o) o.onclick = pushDisable;
+}
+async function pushInit() {
+  const pf = getPf(); if (!pf || !$('#push_box')) return;
+  let ok = false; try { const { data } = await sb.rpc('muqraa_push_enabled', { p_username: pf.username }); ok = data === true; } catch (e) {}
+  if (!ok || !$('#push_box')) return;
+  const mine = ls('push_on') === pf.username && pushSupport() === 'ok' && Notification.permission === 'granted';
+  pushRender(mine);
+  if (mine) osGet().then(async OS => { const { data: sid } = await sb.rpc('muqraa_push_register', { p_username: pf.username, p_ua: navigator.userAgent }); if (sid) await OS.login(String(sid)); }).catch(() => {});
+}
+async function pushEnable() {
+  const pf = getPf(), btn = $('#pu_on'); if (!pf || !btn) return; btn.disabled = true;
+  const perm = Promise.resolve(Notification.requestPermission()).then(r => r || Notification.permission); /* تُستدعى مباشرةً من الضغطة */
+  try {
+    if ((await perm) !== 'granted') return pushRender(false, 'لم يُمنح الإذن، فلن تصلك التذكيرات.');
+    const { data: sid, error } = await sb.rpc('muqraa_push_register', { p_username: pf.username, p_ua: navigator.userAgent });
+    if (error) throw error;
+    const OS = await osGet(); await OS.login(String(sid)); await OS.User.PushSubscription.optIn();
+    ls('push_on', pf.username); pushRender(true);
+  } catch (e) { pushRender(false, 'تعذّر التفعيل، تأكد من اتصالك وحاول مرة أخرى.'); }
+}
+async function pushDisable() {
+  const pf = getPf(); ls('push_on', '');
+  try { if (pf) await sb.rpc('muqraa_push_unregister', { p_username: pf.username }); const OS = await osGet(); await OS.User.PushSubscription.optOut(); } catch (e) {}
+  pushRender(false, 'أُوقفت التذكيرات على هذا الجهاز.');
+}
+function pushLogout() {
+  const pf = getPf(); if (!pf || ls('push_on') !== pf.username) return; ls('push_on', '');
+  try { sb.rpc('muqraa_push_unregister', { p_username: pf.username }).then(() => {}, () => {}); if (window.OneSignal && OneSignal.logout) OneSignal.logout(); } catch (e) {}
+}
+/* إدارة التذكيرات (للإدارة فقط) */
+const PN = { a: 'pending', init: 0 };
+async function pushInfo() {
+  const { data, error } = await sb.rpc('muqraa_admin_push_info', { p_secret: ls('tk') }); if (error || !data || !$('#pn_i')) return;
+  $('#pn_open').checked = !!data.open; $('#pn_users').value = data.users || '';
+  const bh = Object.entries(data.by_halaqa || {}).map(([h, c]) => h + ': ' + AR(c)).join(' · ');
+  $('#pn_i').textContent = 'المشتركون الآن: ' + AR(data.count) + (bh ? ' (' + bh + ')' : '') + '. الزر ' + (data.open ? 'ظاهر لكل الطلاب.' : 'مخفي عن الطلاب إلا من أسماؤهم في القائمة.');
+}
+function pushAdminInit() {
+  PN.init = 1; pushInfo();
+  const seg = $('#pn_a'); seg.querySelector('[data-k="pending"]').classList.add('on');
+  seg.onclick = e => { const b = e.target.closest('button'); if (!b) return; PN.a = b.dataset.k; seg.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); $('#pn_uw').hidden = PN.a !== 'user'; };
+  $('#pn_save').onclick = async () => { const { error } = await sb.rpc('muqraa_admin_push_set', { p_secret: ls('tk'), p_open: $('#pn_open').checked, p_users: $('#pn_users').value }); toast(error ? 'تعذّر الحفظ.' : 'تم الحفظ'); if (!error) pushInfo(); };
+  const call = async (mode, all) => { const r = await fetch(SUPABASE_URL + '/functions/v1/muqraa-push', { method: 'POST', headers: { 'content-type': 'application/json', apikey: SUPABASE_ANON_KEY, authorization: 'Bearer ' + SUPABASE_ANON_KEY },
+    body: JSON.stringify({ secret: ls('tk'), mode, audience: PN.a, username: $('#pn_u').value.trim(), title: $('#pn_t').value, message: $('#pn_m').value, confirm_all: !!all }) }); return { r, j: await r.json().catch(() => ({})) }; };
+  const bad = x => x.j.error === 'forbidden' ? 'انتهت صلاحية الدخول، أعد الدخول.' : x.j.error === 'missing_onesignal_key' ? 'مفتاح OneSignal غير مضبوط في Supabase.' : 'تعذّر التنفيذ' + (x.j.error ? ' (' + x.j.error + ')' : '') + '.';
+  const run = async mode => {
+    const st = $('#pn_st'), btns = [$('#pn_prev'), $('#pn_send')];
+    if (PN.a === 'user' && !$('#pn_u').value.trim()) return st.textContent = 'اكتب اسم المستخدم.';
+    if (mode === 'send' && (!$('#pn_t').value.trim() || !$('#pn_m').value.trim())) return st.textContent = 'اكتب العنوان والنص.';
+    btns.forEach(b => b.disabled = true); st.textContent = 'جارٍ التنفيذ…';
+    try {
+      const pv = await call('preview'); if (!pv.r.ok) return st.textContent = bad(pv);
+      if (mode === 'preview') return st.textContent = 'سيصل إلى ' + AR(pv.j.count) + ' مشتركًا.';
+      if (!pv.j.count) return st.textContent = 'لا مشتركين مطابقين الآن.';
+      if (!confirm('سيُرسل الإشعار إلى ' + AR(pv.j.count) + ' مشتركًا. متابعة؟') || (PN.a === 'all' && !confirm('الإرسال لجميع المشتركين. هل أنت متأكد؟'))) return st.textContent = '';
+      const sd = await call('send', PN.a === 'all'), er = sd.j.results && sd.j.results[0] && sd.j.results[0].errors;
+      st.textContent = !sd.r.ok || !sd.j.sent ? bad(sd) : er ? 'قبِل OneSignal الطلب لكن: ' + JSON.stringify(er).slice(0, 140) : 'أُرسل إلى ' + AR(sd.j.sent) + ' مشتركًا.';
+    } catch (e) { st.textContent = 'تعذّر الاتصال.'; } finally { btns.forEach(b => b.disabled = false); }
+  };
+  $('#pn_prev').onclick = () => run('preview'); $('#pn_send').onclick = () => run('send');
+}
+
 /* ---- الحساب: اسم المستخدم والبطاقة ---- */
 const getPf = () => { try { const p = JSON.parse(ls('pf2') || 'null'); return p && p.username && Array.isArray(p.juz) && p.juz.length ? p : null; } catch (e) { return null; } };
 const setPf = p => { const { done_days, today, ...core } = p; ls('pf2', JSON.stringify(core));
@@ -806,9 +903,10 @@ function student() {
   <div class="card"><h2 class="pill">مهام اليوم: <span class="dd">${dateLine(day)}</span></h2>${winNote(day)}<div class="prog"><span></span><span id="pc"></span></div><div class="bar"><i id="pb"></i></div>
   <div class="fgrid">${FIELDS.map(fieldHTML).join('')}</div>
   <button class="btn" id="go">إرسال</button><p class="note" id="st"></p></div>
-  <div id="res"></div><div id="pwa_tip"></div><p class="vision">برنامج نوعي يُعنى برفع مستوى حفظ وإتقان طلاب الحلقات وتخريجهم حفاظًا متقنين.</p>`;
+  <div id="res"></div><div id="pwa_tip"></div><div id="push_box"></div><p class="vision">برنامج نوعي يُعنى برفع مستوى حفظ وإتقان طلاب الحلقات وتخريجهم حفاظًا متقنين.</p>`;
   const upd = () => { const n = filled(vals); $('#pc').textContent = n + ' من ' + FIELDS.length; $('#pb').style.width = (n / FIELDS.length * 100) + '%'; };
   app.querySelectorAll('.logo-h').forEach(secretTap);
+  pushInit();
   const save = () => ls('draft', JSON.stringify({ day, v: vals })), nums = x => LAT(x).match(/\d+/g) || [];
   ['reviewing', 'linking'].forEach(k => { if (vals[k + '_f'] === undefined) { const n = nums(vals[k]); vals[k + '_f'] = n[0] || ''; vals[k + '_t'] = n.length > 1 ? n[n.length - 1] : ''; } });
   ['rep', 'listening'].forEach(k => { vals[k] = String(cnum(vals[k])); });
@@ -829,7 +927,7 @@ function student() {
   if (doneDays().includes(day)) $('#res').innerHTML = weeklyHTML(day);
   reveal();
   $('#pfb').onclick = () => profileForm(true); $('#jrb').onclick = journey; pwaTip();
-  $('#lgo').onclick = () => { if (!confirm('الخروج من هذا الجهاز؟ بياناتك محفوظة باسم المستخدم ويمكنك الدخول به من جديد.')) return; ['pf2', 'srv', 'draft', 'done'].forEach(k => ls(k, '')); student(); };
+  $('#lgo').onclick = () => { if (!confirm('الخروج من هذا الجهاز؟ بياناتك محفوظة باسم المستخدم ويمكنك الدخول به من جديد.')) return; pushLogout(); ['pf2', 'srv', 'draft', 'done'].forEach(k => ls(k, '')); student(); };
   $('#go').onclick = async () => {
     for (const [k, l, ty] of FIELDS) if (ty === 'p') { const a = vals[k + '_f'], z = vals[k + '_t'];
       if (!a && z) return $('#st').textContent = 'اكتب صفحة البداية في ' + l + '.';
@@ -929,6 +1027,15 @@ async function teacher() {
   </section>
   <section class="pane" data-p="set" hidden>
   <div id="pwa_panel"></div>
+  <div class="card push-card" id="pnc" hidden><h2 class="pill">تذكيرات الإشعارات</h2><p class="note" id="pn_i" style="margin-top:0"></p>
+  <label class="pn-sw"><input type="checkbox" id="pn_open"> إظهار زر التذكيرات لكل الطلاب</label>
+  <label for="pn_users">أسماء مستخدمين يظهر لهم الزر للتجربة (تُفصل بفاصلة)</label><input type="text" id="pn_users" autocomplete="off" dir="ltr">
+  <button class="btn sec sm" id="pn_save" type="button" style="margin-top:12px">حفظ</button>
+  <label>المستلمون</label><div class="seg" id="pn_a"><button data-k="pending" type="button">من لم يُتمّ اليوم</button><button data-k="user" type="button">مستخدم محدد</button><button data-k="all" type="button">الجميع</button></div>
+  <div id="pn_uw" hidden><label for="pn_u">اسم المستخدم</label><input type="text" id="pn_u" autocomplete="off" dir="ltr"></div>
+  <label for="pn_t">العنوان</label><input type="text" id="pn_t" maxlength="80" value="تعاهد">
+  <label for="pn_m">النص</label><input type="text" id="pn_m" maxlength="300" value="لم تُتمّ مهام اليوم بعد، بادر قبل ١١ مساءً لتُسجَّل ضمن الموعد.">
+  <div class="row"><button class="btn sec sm" id="pn_prev" type="button">معاينة العدد</button><button class="btn sm" id="pn_send" type="button">إرسال</button></div><p class="note" id="pn_st"></p></div>
   <div class="card" id="tc" hidden><h2 class="pill">رموز المعلمين</h2><p class="note" style="margin-top:0">لكل معلم رمز خاص يفتح له حلقته فقط. «إعادة تعيين» تنشئ رمزًا جديدًا وتوقف القديم.</p>
   ${HQ.map(h => `<div class="trow"><span>${h}</span><button class="btn sec sm" data-h="${h}">إعادة تعيين</button></div>`).join('')}</div>
   <div class="card"><h2 class="pill">الرمز السري</h2><p class="note" style="margin-top:0">غيّر رمزك السري الخاص بحسابك هذا.</p><button class="btn sec sm" id="sec" style="margin-top:12px">تغيير رمزي السري</button></div>
@@ -1007,7 +1114,7 @@ async function load() {
   document.title = 'تعاهد · ' + (isAdmin() ? 'لوحة الإدارة' : S.halaqa);
   if (!S._wl) { S._wl = 1; loadWed(); }
   pwaPanel();
-  $('#tc').hidden = !isAdmin(); $('#sc').hidden = !isAdmin(); $('#trc').hidden = !isAdmin(); if (isAdmin() && !S._sl) { S._sl = 1; loadStu(); loadTrash(); } $('#cy').hidden = !isAdmin(); $('#xcard').hidden = !isAdmin(); $('#rpc').hidden = !isAdmin();
+  $('#tc').hidden = !isAdmin(); $('#pnc').hidden = !isAdmin(); if (isAdmin() && !PN.init) pushAdminInit(); $('#sc').hidden = !isAdmin(); $('#trc').hidden = !isAdmin(); if (isAdmin() && !S._sl) { S._sl = 1; loadStu(); loadTrash(); } $('#cy').hidden = !isAdmin(); $('#xcard').hidden = !isAdmin(); $('#rpc').hidden = !isAdmin();
   if (isAdmin()) { $('#cy_d').value = CYC.start; window.__cyPreview(); }
   document.querySelectorAll('#nav [data-a]').forEach(b => b.hidden = !isAdmin());
   if (!isAdmin() && (S.tab === 'stu' || S.tab === 'exp' || S.tab === 'trs' || S.tab === 'rep')) S.tab = 'home';
