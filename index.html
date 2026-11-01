@@ -301,7 +301,8 @@ details.jr-d dt{color:var(--mu)}details.jr-d dd{margin:0;font-weight:500}
 .pwa-tip{position:relative}
 .pwa-tip p{margin:0}
 .pwa-tip .x{position:absolute;top:10px;inset-inline-end:14px;background:none;border:0;font-size:22px;line-height:1;color:var(--mu);cursor:pointer;font-family:inherit}
-.push-card .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}.push-card .btn.sec{background:transparent;color:var(--g);box-shadow:none;border:1.5px solid var(--g)}.pn-sw{display:flex;align-items:center;gap:8px;margin-top:12px}.pn-sw input{width:auto;margin:0;padding:0;border:0;background:none;box-shadow:none;accent-color:var(--g)}
+.push-card .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}.push-card .btn.sec{background:transparent;color:var(--g);box-shadow:none;border:1.5px solid var(--g)}.pu-pop{padding:0 22px}.pu-pop .stp{text-align:right}.pu-pop .btn{width:100%}.pu-pop .btn.sec{background:transparent;color:var(--g);box-shadow:none;border:1.5px solid var(--g)}.pp-v{margin-top:14px;text-align:right;font-size:15px}.pp-v summary{cursor:pointer;color:var(--g);font-weight:700;padding:6px 0}.pp-v video{width:100%;border-radius:16px;margin-top:8px;background:#000}
+.pn-sw{display:flex;align-items:center;gap:8px;margin-top:12px}.pn-sw input{width:auto;margin:0;padding:0;border:0;background:none;box-shadow:none;accent-color:var(--g)}
 .pwa-tip .stp{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:10px}
 .pwa-tip .stp li{display:flex;align-items:center;gap:10px;font-size:14px;line-height:1.7}
 .pwa-tip .stp b{flex:none;width:24px;height:24px;border-radius:50%;background:var(--g,#1f412f);color:#fff;font-size:13px;display:inline-flex;align-items:center;justify-content:center;font-weight:600}
@@ -747,12 +748,25 @@ function pushRender(on, msg) {
   const a = b.querySelector('#pu_on'); if (a) a.onclick = pushEnable;
   const o = b.querySelector('#pu_off'); if (o) o.onclick = pushDisable;
 }
+function pushPopup() {
+  const pu = pushSupport(); if (pu === 'none' || pu === 'denied' || window.__puDone || document.querySelector('.pu-pop')) return;
+  if (Date.now() - (+ls('push_later') || 0) < 2 * 864e5) return;
+  const body = pu === 'old' ? '<p class="note">إشعارات الموقع تحتاج نظام iOS ١٦٫٤ أو أحدث. حدّث نظام جهازك إن أمكن.</p>'
+    : pu === 'install' ? '<p class="note">على الآيفون تعمل الإشعارات بعد تثبيت تعاهد على الشاشة الرئيسية، ثم افتحه من هناك واضغط «فعّل التذكيرات».</p>' + iosSteps()
+    : '<ol class="stp"><li><b>١</b><span>اضغط «فعّل الآن»</span></li><li><b>٢</b><span>اختر «سماح» عند ظهور طلب الإذن</span></li></ol>';
+  const o = overlay('<div class="pu-pop pwa-tip"><h2 class="serif">فعّل تذكير المهام</h2><p class="note">نذكّرك بمهامك اليومية قبل موعد التسليم، ويصلك التذكير حتى والموقع مغلق.</p>' + body +
+    (pu === 'ok' ? '<button class="btn" id="pp_go" type="button" style="margin-top:14px">فعّل الآن</button>' : '') +
+    '<details class="pp-v"><summary>شاهد الشرح بالفيديو</summary><video controls playsinline preload="none" src="push/howto.mp4"></video></details>' +
+    '<button class="btn sec" id="pp_later" type="button" style="margin-top:12px">' + (pu === 'ok' ? 'لاحقًا' : 'فهمت') + '</button></div>');
+  o.querySelector('#pp_later').onclick = () => { window.__puDone = 1; ls('push_later', String(Date.now())); o.remove(); };
+  const g = o.querySelector('#pp_go'); if (g) g.onclick = () => { window.__puDone = 1; o.remove(); pushEnable(); };
+}
 async function pushInit() {
   const pf = getPf(); if (!pf || !$('#push_box')) return;
   let ok = false; try { const { data } = await sb.rpc('muqraa_push_enabled', { p_username: pf.username }); ok = data === true; } catch (e) {}
   if (!ok || !$('#push_box')) return;
   const mine = ls('push_on') === pf.username && pushSupport() === 'ok' && Notification.permission === 'granted';
-  pushRender(mine);
+  pushRender(mine); if (!mine) setTimeout(pushPopup, 1600);
   if (mine) osGet().then(async OS => { const { data: sid } = await sb.rpc('muqraa_push_register', { p_username: pf.username, p_ua: navigator.userAgent }); if (sid) await OS.login(String(sid)); }).catch(() => {});
 }
 async function pushEnable() {
