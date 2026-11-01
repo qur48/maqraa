@@ -727,7 +727,7 @@ function osGet() {
   osLoad = new Promise((res, rej) => {
     const base = location.pathname.replace(/[^/]*$/, '');
     window.OneSignalDeferred = window.OneSignalDeferred || [];
-    window.OneSignalDeferred.push(async OS => { try { await OS.init({ appId: OS_APP, serviceWorkerPath: base.slice(1) + 'push/OneSignalSDKWorker.js', serviceWorkerParam: { scope: base + 'push/' } }); res(OS); } catch (e) { rej(e); } });
+    window.OneSignalDeferred.push(async OS => { try { await OS.init({ appId: OS_APP, serviceWorkerOverrideForTypical: true, serviceWorkerPath: base.slice(1) + 'push/OneSignalSDKWorker.js', serviceWorkerParam: { scope: base + 'push/' } }); res(OS); } catch (e) { rej(e); } });
     const sc = document.createElement('script'); sc.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js'; sc.defer = true; sc.onerror = () => rej(new Error('load')); document.head.appendChild(sc);
   });
   osLoad.catch(() => { osLoad = null; });
