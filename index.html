@@ -752,7 +752,7 @@ function pwaPanel() {
   const g = box.querySelector('#pwa_go'); if (g) g.onclick = async () => { deferredInstall.prompt(); await deferredInstall.userChoice.catch(() => {}); deferredInstall = null; pwaPanel(); };
 }
 /* تحديث تلقائي: عند عودة الصفحة من الخلفية (أو كل ٥ دقائق وهي ظاهرة) نقارن رقم النسخة بنسخة الخادم ونعيد التحميل مرة إن اختلف ولم يكن الطالب يكتب */
-const BUILD_ID="2026-11-02a";
+const BUILD_ID="2026-11-02b";
 (function () {
   const lbl = document.createElement('div'); lbl.id = 'ver'; lbl.textContent = 'نسخة ' + BUILD_ID; document.body.appendChild(lbl);
   let busy = false;
