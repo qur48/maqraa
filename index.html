@@ -750,7 +750,6 @@ function pushRender(on, msg) {
 }
 function pushPopup() {
   const pu = pushSupport(); if (pu === 'none' || pu === 'denied' || window.__puDone || document.querySelector('.pu-pop')) return;
-  if (Date.now() - (+ls('push_later') || 0) < 2 * 864e5) return;
   const body = pu === 'old' ? '<p class="note">إشعارات الموقع تحتاج نظام iOS ١٦٫٤ أو أحدث. حدّث نظام جهازك إن أمكن.</p>'
     : pu === 'install' ? '<p class="note">على الآيفون تعمل الإشعارات بعد تثبيت تعاهد على الشاشة الرئيسية، ثم افتحه من هناك واضغط «فعّل التذكيرات».</p>' + iosSteps()
     : '<ol class="stp"><li><b>١</b><span>اضغط «فعّل الآن»</span></li><li><b>٢</b><span>اختر «سماح» عند ظهور طلب الإذن</span></li></ol>';
@@ -758,7 +757,7 @@ function pushPopup() {
     (pu === 'ok' ? '<button class="btn" id="pp_go" type="button" style="margin-top:14px">فعّل الآن</button>' : '') +
     '<details class="pp-v"><summary>شاهد الشرح بالفيديو</summary><video controls playsinline preload="none" src="push/howto.mp4"></video></details>' +
     '<button class="btn sec" id="pp_later" type="button" style="margin-top:12px">' + (pu === 'ok' ? 'لاحقًا' : 'فهمت') + '</button></div>');
-  o.querySelector('#pp_later').onclick = () => { window.__puDone = 1; ls('push_later', String(Date.now())); o.remove(); };
+  o.querySelector('#pp_later').onclick = () => { window.__puDone = 1; o.remove(); };
   const g = o.querySelector('#pp_go'); if (g) g.onclick = () => { window.__puDone = 1; o.remove(); pushEnable(); };
 }
 async function pushInit() {
