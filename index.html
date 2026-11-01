@@ -779,7 +779,7 @@ function pushLogout() {
 const PN = { a: 'pending', init: 0 };
 async function pushInfo() {
   const { data, error } = await sb.rpc('muqraa_admin_push_info', { p_secret: ls('tk') }); if (error || !data || !$('#pn_i')) return;
-  $('#pn_open').checked = !!data.open; $('#pn_users').value = data.users || '';
+  $('#pn_open').checked = !!data.open; $('#pn_auto').checked = !!data.auto; $('#pn_users').value = data.users || '';
   const bh = Object.entries(data.by_halaqa || {}).map(([h, c]) => h + ': ' + AR(c)).join(' · ');
   $('#pn_i').textContent = 'المشتركون الآن: ' + AR(data.count) + (bh ? ' (' + bh + ')' : '') + '. الزر ' + (data.open ? 'ظاهر لكل الطلاب.' : 'مخفي عن الطلاب إلا من أسماؤهم في القائمة.');
 }
@@ -787,6 +787,7 @@ function pushAdminInit() {
   PN.init = 1; pushInfo();
   const seg = $('#pn_a'); seg.querySelector('[data-k="pending"]').classList.add('on');
   seg.onclick = e => { const b = e.target.closest('button'); if (!b) return; PN.a = b.dataset.k; seg.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); $('#pn_uw').hidden = PN.a !== 'user'; };
+  $('#pn_auto').onchange = async e => { const on = e.target.checked; const { error } = await sb.rpc('muqraa_admin_push_auto', { p_secret: ls('tk'), p_on: on }); if (error) { e.target.checked = !on; toast('تعذّر الحفظ.'); } else toast(on ? 'فُعّل التذكير التلقائي' : 'أُوقف التذكير التلقائي'); };
   $('#pn_save').onclick = async () => { const { error } = await sb.rpc('muqraa_admin_push_set', { p_secret: ls('tk'), p_open: $('#pn_open').checked, p_users: $('#pn_users').value }); toast(error ? 'تعذّر الحفظ.' : 'تم الحفظ'); if (!error) pushInfo(); };
   const call = async (mode, all) => { const r = await fetch(SUPABASE_URL + '/functions/v1/muqraa-push', { method: 'POST', headers: { 'content-type': 'application/json', apikey: SUPABASE_ANON_KEY, authorization: 'Bearer ' + SUPABASE_ANON_KEY },
     body: JSON.stringify({ secret: ls('tk'), mode, audience: PN.a, username: $('#pn_u').value.trim(), title: $('#pn_t').value, message: $('#pn_m').value, confirm_all: !!all }) }); return { r, j: await r.json().catch(() => ({})) }; };
@@ -1029,11 +1030,12 @@ async function teacher() {
   <div id="pwa_panel"></div>
   <div class="card push-card" id="pnc" hidden><h2 class="pill">تذكيرات الإشعارات</h2><p class="note" id="pn_i" style="margin-top:0"></p>
   <label class="pn-sw"><input type="checkbox" id="pn_open"> إظهار زر التذكيرات لكل الطلاب</label>
+  <label class="pn-sw"><input type="checkbox" id="pn_auto"> تذكير تلقائي لمن لم يُتمّ مهامه: ٧:٣٠ مساءً و١٠:٠٠ مساءً</label>
   <label for="pn_users">أسماء مستخدمين يظهر لهم الزر للتجربة (تُفصل بفاصلة)</label><input type="text" id="pn_users" autocomplete="off" dir="ltr">
   <button class="btn sec sm" id="pn_save" type="button" style="margin-top:12px">حفظ</button>
   <label>المستلمون</label><div class="seg" id="pn_a"><button data-k="pending" type="button">من لم يُتمّ اليوم</button><button data-k="user" type="button">مستخدم محدد</button><button data-k="all" type="button">الجميع</button></div>
   <div id="pn_uw" hidden><label for="pn_u">اسم المستخدم</label><input type="text" id="pn_u" autocomplete="off" dir="ltr"></div>
-  <label for="pn_t">العنوان</label><input type="text" id="pn_t" maxlength="80" value="تعاهد">
+  <label for="pn_t">العنوان</label><input type="text" id="pn_t" maxlength="80" value="تذكير المهام">
   <label for="pn_m">النص</label><input type="text" id="pn_m" maxlength="300" value="لم تُتمّ مهام اليوم بعد، بادر قبل ١١ مساءً لتُسجَّل ضمن الموعد.">
   <div class="row"><button class="btn sec sm" id="pn_prev" type="button">معاينة العدد</button><button class="btn sm" id="pn_send" type="button">إرسال</button></div><p class="note" id="pn_st"></p></div>
   <div class="card" id="tc" hidden><h2 class="pill">رموز المعلمين</h2><p class="note" style="margin-top:0">لكل معلم رمز خاص يفتح له حلقته فقط. «إعادة تعيين» تنشئ رمزًا جديدًا وتوقف القديم.</p>
