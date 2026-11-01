@@ -764,7 +764,7 @@ async function pushEnable() {
     if (error) throw error;
     const OS = await osGet(); await OS.login(String(sid)); await OS.User.PushSubscription.optIn();
     ls('push_on', pf.username); pushRender(true);
-  } catch (e) { pushRender(false, 'تعذّر التفعيل، تأكد من اتصالك وحاول مرة أخرى.'); }
+  } catch (e) { pushRender(false, 'تعذّر التفعيل، تأكد من اتصالك وحاول مرة أخرى. (' + String((e && (e.message || e.name)) || e).slice(0, 140) + ')'); }
 }
 async function pushDisable() {
   const pf = getPf(); ls('push_on', '');
