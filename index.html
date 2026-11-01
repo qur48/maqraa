@@ -310,6 +310,11 @@ details.jr-d dt{color:var(--mu)}details.jr-d dd{margin:0;font-weight:500}
 .sk .skw{flex:1;min-width:0;display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin:0}.sk .skw div{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;height:32px;border-radius:8px;background:#fff;border:1.2px solid var(--bd);font-size:9px;line-height:1;color:var(--mu);position:relative;min-width:0}.sk .skw svg{width:14px;height:14px}.sk .skw .dm{opacity:.55}
 .sk .skw .ok{background:linear-gradient(170deg,#1f412f,#1a5144);border-color:#1f412f;color:var(--cream)}
 .sk .skw .ck{position:absolute;top:-5px;inset-inline-start:-3px;width:11px;height:11px;border-radius:50%;background:var(--gold2);color:var(--g);font-size:7px;font-weight:700;display:grid;place-items:center;line-height:1;font-style:normal}
+.chip.skc{padding:4px 11px;gap:5px;display:inline-flex;align-items:center}.chip.skc svg{width:17px;height:17px;filter:grayscale(1);opacity:.45}.chip.skc b{font-size:14px;font-weight:700}
+.chip.skc.on{border-color:var(--gold2);box-shadow:0 0 0 0 rgba(240,183,59,.55);animation:skg 2.4s ease-in-out infinite}.chip.skc.on svg{filter:none;opacity:1;filter:drop-shadow(0 0 4px rgba(240,183,59,.9))}.chip.skc.on b{color:#f6d37a}
+.chip.skc:not(.on):not(.z){border-color:rgba(214,193,138,.6)}
+@keyframes skg{0%,100%{box-shadow:0 0 0 0 rgba(240,183,59,.0)}50%{box-shadow:0 0 12px 2px rgba(240,183,59,.55)}}
+.skpop{margin-top:18vh;width:100%;max-width:420px;padding:14px}.skpop .sk{box-shadow:none}.skpop .skm{margin:10px 0 0;text-align:center;font-size:14px;color:var(--g2);cursor:pointer}
 .pn-sw{display:flex;align-items:center;gap:8px;margin-top:12px}.pn-sw input{width:auto;margin:0;padding:0;border:0;background:none;box-shadow:none;accent-color:var(--g)}
 .pwa-tip .stp{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:10px}
 .pwa-tip .stp li{display:flex;align-items:center;gap:10px;font-size:14px;line-height:1.7}
@@ -556,7 +561,10 @@ function streakCard() {
   return `<div class="card sk${n ? '' : ' z'}" id="sk"><div class="skf">${FL_ON}</div><div class="skt"><small>سلسلة الإتمام</small><div class="skn"><b>${n ? AR(n) : 0}</b><span class="skb">أفضل <b>${best ? AR(best) : 0}</b></span></div></div>
     <span class="sks">${msg}</span><div class="skw">${days}</div></div>`;
 }
-const skRefresh = () => { const e = $('#sk'); if (e) e.outerHTML = streakCard(); };
+const skChip = () => { const { n, todayDone } = streakInfo(); return `<button class="chip skc${todayDone ? ' on' : n ? '' : ' z'}" id="skb" aria-label="سلسلة الإتمام">${FL_ON}<b>${n ? AR(n) : 0}</b></button>`; };
+const skRefresh = () => { const b = $('#skb'); if (b) b.outerHTML = skChip(); const nb = $('#skb'); if (nb) nb.onclick = skOpen; const e = $('#sk'); if (e) e.outerHTML = streakCard(); };
+function skOpen() { if ($('#skov')) return; const o = document.createElement('div'); o.className = 'ov'; o.id = 'skov'; o.innerHTML = '<div class="card skpop">' + streakCard() + '<p class="skm">' + skMsg() + '</p></div>'; o.onclick = e => { if (e.target === o || e.target.closest('.skm')) o.remove(); }; document.body.appendChild(o); }
+function skMsg() { const { n, todayDone, today } = streakInfo(); return todayDone ? 'محفوظة اليوم ✓' : !isStudy(today) ? 'يوم تعويض، لا يقطعها' : n ? 'أتمّ مهام اليوم لتبقى متقدة' : 'أتمّ مهام اليوم لتشعلها'; }
 function confetti() { for (let i = 0; i < 26; i++) { const e = document.createElement('span'); e.className = 'conf'; e.textContent = ['✦','✧','❖','✦'][i % 4];
   e.style.left = Math.random() * 100 + 'vw'; e.style.animationDelay = Math.random() * .6 + 's'; e.style.color = i % 2 ? '#d6c18a' : '#f5eee6'; document.body.appendChild(e); setTimeout(() => e.remove(), 3200); } }
 
@@ -945,7 +953,7 @@ function student() {
   try { const d = JSON.parse(ls('draft') || '{}'); if (d.day === day) draft = d.v; } catch (e) {}
   if (!draft) { try { const t = JSON.parse(ls('srv') || '{}'); if (t.day === day && t.v) draft = t.v; } catch (e) {} }
   const full = pf.first + ' ' + pf.family, vals = { ...(draft || {}), name: full };
-  app.innerHTML = hero(`${esc(full)} <small class="wd">مقرأة ${esc(pf.muqraa)} · ${esc(pf.halaqa)}</small>`, '<span class="mb"><button class="chip" id="jrb">سيري</button><button class="chip" id="pfb">بطاقتي</button><button class="chip" id="lgo">خروج</button></span>') + streakCard() + '<div class="top">' + clockWidget() + firstBoard() + '</div>' + clockPanel() + hadithBar() + pendNote(pf, day) + `
+  app.innerHTML = hero(`${esc(full)} <small class="wd">مقرأة ${esc(pf.muqraa)} · ${esc(pf.halaqa)}</small>`, '<span class="mb">' + skChip() + '<button class="chip" id="jrb">سيري</button><button class="chip" id="pfb">بطاقتي</button><button class="chip" id="lgo">خروج</button></span>') + '<div class="top">' + clockWidget() + firstBoard() + '</div>' + clockPanel() + hadithBar() + pendNote(pf, day) + `
   <div class="card"><h2 class="pill">مهام اليوم: <span class="dd">${dateLine(day)}</span></h2>${winNote(day)}<div class="prog"><span></span><span id="pc"></span></div><div class="bar"><i id="pb"></i></div>
   <div class="fgrid">${FIELDS.map(fieldHTML).join('')}</div>
   <button class="btn" id="go">إرسال</button><p class="note" id="st"></p></div>
@@ -972,7 +980,7 @@ function student() {
   upd(); clockStart(); fbStart(full); $('#svclk').onclick = () => { const p = $('#svpanel'), o = p.hidden; p.hidden = !o; $('#svclk').setAttribute('aria-expanded', String(o)); };
   if (doneDays().includes(day)) $('#res').innerHTML = weeklyHTML(day);
   reveal();
-  $('#pfb').onclick = () => profileForm(true); $('#jrb').onclick = journey; pwaTip();
+  $('#pfb').onclick = () => profileForm(true); $('#skb').onclick = skOpen; $('#jrb').onclick = journey; pwaTip();
   $('#lgo').onclick = () => { if (!confirm('الخروج من هذا الجهاز؟ بياناتك محفوظة باسم المستخدم ويمكنك الدخول به من جديد.')) return; pushLogout(); ['pf2', 'srv', 'draft', 'done'].forEach(k => ls(k, '')); student(); };
   $('#go').onclick = async () => {
     for (const [k, l, ty] of FIELDS) if (ty === 'p') { const a = vals[k + '_f'], z = vals[k + '_t'];
