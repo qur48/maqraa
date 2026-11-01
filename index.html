@@ -315,6 +315,7 @@ details.jr-d dt{color:var(--mu)}details.jr-d dd{margin:0;font-weight:500}
 .chip.skc:not(.on):not(.z){border-color:rgba(214,193,138,.6)}
 @keyframes skg{0%,100%{box-shadow:0 0 0 0 rgba(240,183,59,.0)}50%{box-shadow:0 0 12px 2px rgba(240,183,59,.55)}}
 .skpop{margin-top:18vh;width:100%;max-width:420px;padding:14px}.skpop .sk{box-shadow:none}.skpop .skm{margin:10px 0 0;text-align:center;font-size:14px;color:var(--g2);cursor:pointer}
+#ver{position:fixed;bottom:3px;inset-inline-start:6px;font-size:9px;color:var(--mu);opacity:.45;pointer-events:none;z-index:5}
 .pn-sw{display:flex;align-items:center;gap:8px;margin-top:12px}.pn-sw input{width:auto;margin:0;padding:0;border:0;background:none;box-shadow:none;accent-color:var(--g)}
 .pwa-tip .stp{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:10px}
 .pwa-tip .stp li{display:flex;align-items:center;gap:10px;font-size:14px;line-height:1.7}
@@ -750,6 +751,28 @@ function pwaPanel() {
     : p('لتفتحه كالتطبيق: من شريط عنوان المتصفح اضغط أيقونة التثبيت، أو من القائمة اختر «تثبيت تعاهد».')) + '</div>';
   const g = box.querySelector('#pwa_go'); if (g) g.onclick = async () => { deferredInstall.prompt(); await deferredInstall.userChoice.catch(() => {}); deferredInstall = null; pwaPanel(); };
 }
+/* تحديث تلقائي: عند عودة الصفحة من الخلفية (أو كل ٥ دقائق وهي ظاهرة) نقارن رقم النسخة بنسخة الخادم ونعيد التحميل مرة إن اختلف ولم يكن الطالب يكتب */
+const BUILD_ID="2026-11-02a";
+(function () {
+  const lbl = document.createElement('div'); lbl.id = 'ver'; lbl.textContent = 'نسخة ' + BUILD_ID; document.body.appendChild(lbl);
+  let busy = false;
+  const typing = () => { const a = document.activeElement; return a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName); };
+  async function chk() {
+    if (busy || document.hidden || location.protocol !== 'https:' || !navigator.onLine) return; busy = true;
+    try {
+      const r = await fetch(location.pathname + '?_v=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
+      const m = (await r.text()).match(new RegExp('BUILD_ID' + '="([^"]+)"')); if (!m || m[1] === BUILD_ID) return;
+      if (typing()) return;
+      let last = 0; try { last = +sessionStorage.getItem('rl_at') || 0; } catch (e) {}
+      if (Date.now() - last < 60000) return;
+      try { sessionStorage.setItem('rl_at', String(Date.now())); } catch (e) {}
+      location.reload();
+    } catch (e) {} finally { busy = false; }
+  }
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) chk(); });
+  window.addEventListener('pageshow', chk); window.addEventListener('focus', chk);
+  setInterval(chk, 300000); setTimeout(chk, 4000);
+})();
 if ('serviceWorker' in navigator && location.protocol === 'https:') window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 
 /* ---- تذكيرات الإشعارات (OneSignal) ---- */
