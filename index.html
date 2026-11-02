@@ -752,13 +752,13 @@ function pwaPanel() {
   const g = box.querySelector('#pwa_go'); if (g) g.onclick = async () => { deferredInstall.prompt(); await deferredInstall.userChoice.catch(() => {}); deferredInstall = null; pwaPanel(); };
 }
 /* تحديث تلقائي: عند عودة الصفحة من الخلفية (أو كل ٥ دقائق وهي ظاهرة) نقارن رقم النسخة بنسخة الخادم ونعيد التحميل مرة إن اختلف ولم يكن الطالب يكتب */
-const BUILD_ID="2026-11-02g";
+const BUILD_ID="2026-11-02h";
 (function () {
   document.body.insertAdjacentHTML('beforeend', '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><radialGradient id="nqy" cx="104" cy="70" r="120" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff7b8"/><stop offset=".45" stop-color="#ffd84a"/><stop offset="1" stop-color="#f2a81d"/></radialGradient><radialGradient id="nqg" cx="104" cy="70" r="120" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#e3e7ea"/><stop offset=".45" stop-color="#c3c9cd"/><stop offset="1" stop-color="#a4acb1"/></radialGradient><linearGradient id="nqm" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8e969c"/><stop offset=".35" stop-color="#dfe4e8"/><stop offset=".7" stop-color="#b3bbc1"/><stop offset="1" stop-color="#7d868d"/></linearGradient><linearGradient id="nqmg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8e969c"/><stop offset=".35" stop-color="#c9ced2"/><stop offset=".7" stop-color="#aab1b6"/><stop offset="1" stop-color="#7d868d"/></linearGradient></defs></svg>');
   let busy = false;
   const typing = () => { const a = document.activeElement; return a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName); };
   async function chk() {
-    if (busy || document.hidden || location.protocol !== 'https:' || !navigator.onLine) return; busy = true;
+    if (busy || window.__busy || document.hidden || location.protocol !== 'https:' || !navigator.onLine) return; busy = true;
     try {
       const r = await fetch(location.pathname + '?_v=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
       const m = (await r.text()).match(new RegExp('BUILD_ID' + '="([^"]+)"')); if (!m || m[1] === BUILD_ID) return;
@@ -830,16 +830,18 @@ async function pushInit() {
   pushRender(mine); if (!mine) setTimeout(pushPopup, 1600);
   if (mine) osGet().then(async OS => { const { data: sid } = await sb.rpc('muqraa_push_register', { p_username: pf.username, p_ua: navigator.userAgent }); if (sid) await OS.login(String(sid)); }).catch(() => {});
 }
+const withT = (p, ms, step) => Promise.race([Promise.resolve(p), new Promise((_, rj) => setTimeout(() => rj(new Error('انتهت المهلة عند: ' + step)), ms))]);
 async function pushEnable() {
-  const pf = getPf(), btn = $('#pu_on'); if (!pf || !btn) return; btn.disabled = true;
+  const pf = getPf(), btn = $('#pu_on'); if (!pf || !btn) return; btn.disabled = true; window.__busy = 1; const st = t => { if (btn.isConnected) btn.textContent = t; };
   const perm = Promise.resolve(Notification.requestPermission()).then(r => r || Notification.permission); /* تُستدعى مباشرةً من الضغطة */
   try {
-    if ((await perm) !== 'granted') return pushRender(false, 'لم يُمنح الإذن، فلن تصلك التذكيرات.');
-    const { data: sid, error } = await sb.rpc('muqraa_push_register', { p_username: pf.username, p_ua: navigator.userAgent });
-    if (error) throw error;
-    const OS = await osGet(); await OS.login(String(sid)); await OS.User.PushSubscription.optIn();
+    st('جارٍ طلب الإذن…'); if ((await perm) !== 'granted') return pushRender(false, 'لم يُمنح الإذن، فلن تصلك التذكيرات.');
+    st('جارٍ تسجيل حسابك…'); const { data: sid, error } = await withT(sb.rpc('muqraa_push_register', { p_username: pf.username, p_ua: navigator.userAgent }), 20000, 'تسجيل الحساب'); if (error) throw error;
+    st('جارٍ تحميل خدمة الإشعارات…'); const OS = await withT(osGet(), 25000, 'تحميل خدمة الإشعارات');
+    st('جارٍ ربط جهازك…'); await withT(OS.login(String(sid)), 20000, 'ربط الجهاز'); await withT(OS.User.PushSubscription.optIn(), 30000, 'الاشتراك في الإشعارات');
     ls('push_on', pf.username); pushRender(true);
-  } catch (e) { pushRender(false, 'تعذّر التفعيل، تأكد من اتصالك وحاول مرة أخرى. (' + String((e && (e.message || e.name)) || e).slice(0, 140) + ')'); }
+  } catch (e) { const m = String((e && (e.message || e.name)) || e).slice(0, 140); pushRender(false, (/انتهت المهلة/.test(m) ? 'استغرق التفعيل أطول من المعتاد، أعد المحاولة. (' : 'تعذّر التفعيل، تأكد من اتصالك وحاول مرة أخرى. (') + m + ')'); }
+  finally { window.__busy = 0; }
 }
 async function pushDisable() {
   const pf = getPf(); ls('push_on', '');
