@@ -304,16 +304,16 @@ details.jr-d dt{color:var(--mu)}details.jr-d dd{margin:0;font-weight:500}
 .push-card .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}.push-card .btn.sec{background:transparent;color:var(--g);box-shadow:none;border:1.5px solid var(--g)}.pu-pop{padding:0 22px}.pu-pop .stp{text-align:right}.pu-pop .btn{width:100%}.pu-pop .btn.sec{background:transparent;color:var(--g);box-shadow:none;border:1.5px solid var(--g)}.pp-v{margin-top:14px;text-align:right;font-size:15px}.pp-v summary{cursor:pointer;color:var(--g);font-weight:700;padding:6px 0}.pp-v video{width:100%;border-radius:16px;margin-top:8px;background:#000}
 .sacts{display:flex;gap:6px;flex:none}.reg{display:flex;align-items:center;gap:12px;background:var(--goldb);border-radius:22px;padding:12px 14px;margin:2px 0 14px}.reg .ri{flex:none;width:44px;height:44px;border-radius:50%;background:var(--g);display:grid;place-items:center}.reg .ri svg{width:22px;height:22px;stroke:var(--gold2);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.reg.cl .ri{background:var(--bad)}.reg .btn{flex:none;white-space:nowrap;padding:0 16px;min-width:0;width:auto}.reg .rt{flex:1;line-height:1.5}.reg .rt b{display:block;font-size:15px}.reg .rt small{display:block;font-size:12.5px;color:var(--mu)}
 .sk{position:relative;display:flex;align-items:center;gap:8px;padding:5px 9px;border-radius:14px;background:linear-gradient(180deg,#fffaf0,var(--card));border:1.5px solid var(--gold2)}
-.sk .skf{flex:none;width:30px;height:30px;display:grid;place-items:center}.sk .skf .nq{width:30px;height:30px}
+.sk .skf{flex:none;width:30px;height:30px;display:grid;place-items:center}.sk .skf .nq{height:20px}
 .sk .skt{flex:none;line-height:1.1}.sk .skt small{display:block;font-size:9.5px;color:var(--mu);font-weight:700;white-space:nowrap}.sk .skn{display:flex;align-items:baseline;gap:5px}.sk .skn b{font-size:18px;line-height:1.1;color:var(--gold);font-weight:700}.sk .skb{font-size:9px;color:var(--mu);white-space:nowrap}.sk .skb b{font-size:10px;color:var(--g2)}
 .sk .sks{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.sk .skw{flex:1;min-width:0;display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin:0}.sk .skw div{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;height:32px;border-radius:8px;background:#fff;border:1.2px solid var(--bd);font-size:9px;line-height:1;color:var(--mu);position:relative;min-width:0}.sk .skw .nq{width:14px;height:14px}
+.sk .skw{flex:1;min-width:0;display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin:0}.sk .skw div{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;height:32px;border-radius:8px;background:#fff;border:1.2px solid var(--bd);font-size:9px;line-height:1;color:var(--mu);position:relative;min-width:0}.sk .skw .nq{height:15px}
 .sk .skw .ok{background:linear-gradient(170deg,#1f412f,#1a5144);border-color:#1f412f;color:var(--cream)}
 .sk .skw .ck{position:absolute;top:-5px;inset-inline-start:-3px;width:11px;height:11px;border-radius:50%;background:var(--gold2);color:var(--g);font-size:7px;font-weight:700;display:grid;place-items:center;line-height:1;font-style:normal}
-.chip.skc{padding:4px 11px;gap:5px;display:inline-flex;align-items:center}.chip.skc .nq{width:17px;height:17px}.chip.skc b{font-size:14px;font-weight:700}
+.chip.skc{padding:4px 11px;gap:5px;display:inline-flex;align-items:center}.chip.skc .nq{height:14px}.chip.skc b{font-size:14px;font-weight:700}
 .chip.skc.on{border-color:var(--gold2);box-shadow:0 0 0 0 rgba(240,183,59,.55);animation:skg 2.4s ease-in-out infinite}.chip.skc.on b{color:#f6d37a}
 .chip.skc:not(.on):not(.z){border-color:rgba(214,193,138,.6)}
-svg.nq{display:inline-block;flex:none;overflow:visible}svg.nq path{fill:#aeb7b2;stroke:#c3cbc6;stroke-width:1;stroke-linejoin:round}svg.nq.on path{fill:#f6c453;stroke:#ffe9a3}svg.nq.on{filter:drop-shadow(0 0 2.5px rgba(240,183,59,.65))}
+svg.nq{display:inline-block;flex:none;overflow:visible;width:auto}svg.nq.on{filter:drop-shadow(0 0 2.5px rgba(240,183,59,.55))}
 @keyframes skg{0%,100%{box-shadow:0 0 0 0 rgba(240,183,59,.0)}50%{box-shadow:0 0 12px 2px rgba(240,183,59,.55)}}
 .skpop{margin-top:18vh;width:100%;max-width:420px;padding:14px}.skpop .sk{box-shadow:none}.skpop .skm{margin:10px 0 0;text-align:center;font-size:14px;color:var(--g2);cursor:pointer}
 .pn-sw{display:flex;align-items:center;gap:8px;margin-top:12px}.pn-sw input{width:auto;margin:0;padding:0;border:0;background:none;box-shadow:none;accent-color:var(--g)}
@@ -550,8 +550,8 @@ function streakInfo() {
   return { n, best: Math.max(best, n), todayDone: s.has(today), today };
 }
 const streak = () => streakInfo().n;
-const FL_ON = '<svg class="nq on" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.8 2 7 13.6h4.4L10 22l7.4-11.6h-4.6z"/></svg>',
-  FL_OFF = '<svg class="nq" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.8 2 7 13.6h4.4L10 22l7.4-11.6h-4.6z"/></svg>';
+const FL_ON = '<svg class="nq on" viewBox="50 18 140 224" aria-hidden="true"><path d="M120 24 C84 24 56 52 56 88 C56 112 68 128 80 142 C86 150 88 156 88 166 H152 C152 156 154 150 160 142 C172 128 184 112 184 88 C184 52 156 24 120 24 Z" fill="url(#nqy)" stroke="#e59a12" stroke-width="3" stroke-opacity=".5"/><path d="M74 82C76 58 92 42 112 38" fill="none" stroke="#fffbe0" stroke-width="9" stroke-linecap="round" opacity=".85"/><path d="M88 166H152V176H88Z" fill="url(#nqm)"/><rect x="86" y="174" width="68" height="16" rx="5" fill="url(#nqm)"/><rect x="88" y="192" width="64" height="16" rx="5" fill="url(#nqm)"/><rect x="92" y="210" width="56" height="12" rx="5" fill="url(#nqm)"/><path d="M100 224H140Q136 236 120 236Q104 236 100 224Z" fill="#454c52"/></svg>',
+  FL_OFF = '<svg class="nq" viewBox="50 18 140 224" aria-hidden="true"><path d="M120 24 C84 24 56 52 56 88 C56 112 68 128 80 142 C86 150 88 156 88 166 H152 C152 156 154 150 160 142 C172 128 184 112 184 88 C184 52 156 24 120 24 Z" fill="url(#nqg)" stroke="#8a9399" stroke-width="3" stroke-opacity=".5"/><path d="M74 82C76 58 92 42 112 38" fill="none" stroke="#fffbe0" stroke-width="9" stroke-linecap="round" opacity=".85"/><path d="M88 166H152V176H88Z" fill="url(#nqmg)"/><rect x="86" y="174" width="68" height="16" rx="5" fill="url(#nqmg)"/><rect x="88" y="192" width="64" height="16" rx="5" fill="url(#nqmg)"/><rect x="92" y="210" width="56" height="12" rx="5" fill="url(#nqmg)"/><path d="M100 224H140Q136 236 120 236Q104 236 100 224Z" fill="#454c52"/></svg>';
 const DN = ['أحد', 'إثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت'];
 const DL = ['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س'];
 function streakCard() {
@@ -752,8 +752,9 @@ function pwaPanel() {
   const g = box.querySelector('#pwa_go'); if (g) g.onclick = async () => { deferredInstall.prompt(); await deferredInstall.userChoice.catch(() => {}); deferredInstall = null; pwaPanel(); };
 }
 /* تحديث تلقائي: عند عودة الصفحة من الخلفية (أو كل ٥ دقائق وهي ظاهرة) نقارن رقم النسخة بنسخة الخادم ونعيد التحميل مرة إن اختلف ولم يكن الطالب يكتب */
-const BUILD_ID="2026-11-02f";
+const BUILD_ID="2026-11-02g";
 (function () {
+  document.body.insertAdjacentHTML('beforeend', '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><radialGradient id="nqy" cx="104" cy="70" r="120" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff7b8"/><stop offset=".45" stop-color="#ffd84a"/><stop offset="1" stop-color="#f2a81d"/></radialGradient><radialGradient id="nqg" cx="104" cy="70" r="120" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#e3e7ea"/><stop offset=".45" stop-color="#c3c9cd"/><stop offset="1" stop-color="#a4acb1"/></radialGradient><linearGradient id="nqm" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8e969c"/><stop offset=".35" stop-color="#dfe4e8"/><stop offset=".7" stop-color="#b3bbc1"/><stop offset="1" stop-color="#7d868d"/></linearGradient><linearGradient id="nqmg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8e969c"/><stop offset=".35" stop-color="#c9ced2"/><stop offset=".7" stop-color="#aab1b6"/><stop offset="1" stop-color="#7d868d"/></linearGradient></defs></svg>');
   let busy = false;
   const typing = () => { const a = document.activeElement; return a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName); };
   async function chk() {
