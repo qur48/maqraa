@@ -752,7 +752,7 @@ function pwaPanel() {
   const g = box.querySelector('#pwa_go'); if (g) g.onclick = async () => { deferredInstall.prompt(); await deferredInstall.userChoice.catch(() => {}); deferredInstall = null; pwaPanel(); };
 }
 /* تحديث تلقائي: عند عودة الصفحة من الخلفية (أو كل ٥ دقائق وهي ظاهرة) نقارن رقم النسخة بنسخة الخادم ونعيد التحميل مرة إن اختلف ولم يكن الطالب يكتب */
-const BUILD_ID="2026-11-02l";
+const BUILD_ID="2026-11-02m";
 (function () {
   document.body.insertAdjacentHTML('beforeend', '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><radialGradient id="nqy" cx="104" cy="70" r="120" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff7b8"/><stop offset=".45" stop-color="#ffd84a"/><stop offset="1" stop-color="#f2a81d"/></radialGradient><radialGradient id="nqg" cx="104" cy="70" r="120" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#e3e7ea"/><stop offset=".45" stop-color="#c3c9cd"/><stop offset="1" stop-color="#a4acb1"/></radialGradient><linearGradient id="nqm" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8e969c"/><stop offset=".35" stop-color="#dfe4e8"/><stop offset=".7" stop-color="#b3bbc1"/><stop offset="1" stop-color="#7d868d"/></linearGradient><linearGradient id="nqmg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8e969c"/><stop offset=".35" stop-color="#c9ced2"/><stop offset=".7" stop-color="#aab1b6"/><stop offset="1" stop-color="#7d868d"/></linearGradient></defs></svg>');
   let busy = false;
@@ -790,7 +790,7 @@ function osGet() {
   osLoad = new Promise((res, rej) => {
     const base = location.pathname.replace(/[^/]*$/, ''); window.__osStep = 'تحميل ملف الخدمة من الشبكة';
     window.OneSignalDeferred = window.OneSignalDeferred || [];
-    if (!window.__osLog) { window.__osLog = []; ['log', 'info', 'warn', 'error', 'debug'].forEach(k => { const o = console[k]; console[k] = function () { try { const t = [].slice.call(arguments).map(x => typeof x === 'string' ? x : (x && x.message) || '').join(' '); if (/onesignal/i.test(t)) { window.__osLog.push(t.replace(/\s+/g, ' ').slice(0, 70)); if (window.__osLog.length > 40) window.__osLog.shift(); } } catch (e) {} return o.apply(console, arguments); }; }); }
+    if (!window.__osLog) { window.__osLog = []; ['log', 'info', 'warn', 'error', 'debug'].forEach(k => { const o = console[k]; console[k] = function () { try { const t = [].slice.call(arguments).map(x => typeof x === 'string' ? x : (x && x.message) || '').join(' '); if (/onesignal/i.test(t)) { window.__osLog.push(t.replace(/\s+/g, ' ').slice(0, 110)); if (window.__osLog.length > 40) window.__osLog.shift(); } } catch (e) {} return o.apply(console, arguments); }; }); }
     window.OneSignalDeferred.push(async OS => { window.__osStep = 'تهيئة الخدمة على الجهاز'; try { OS.Debug.setLogLevel('trace'); } catch (e) {} try { await OS.init({ appId: OS_APP, serviceWorkerOverrideForTypical: true, serviceWorkerPath: base.slice(1) + 'push/OneSignalSDKWorker.js', serviceWorkerParam: { scope: base + 'push/' } }); window.__osStep = 'جاهزة'; res(OS); } catch (e) { rej(e); } });
     const sc = document.createElement('script'); sc.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js'; sc.defer = true; sc.onerror = () => rej(new Error('تعذّر تحميل ملف الخدمة')); document.head.appendChild(sc);
   });
@@ -828,17 +828,19 @@ async function pushInit() {
   let ok = false; try { const { data } = await sb.rpc('muqraa_push_enabled', { p_username: pf.username }); ok = data === true; } catch (e) {}
   if (!ok || !$('#push_box')) return;
   const mine = ls('push_on') === pf.username && pushSupport() === 'ok' && Notification.permission === 'granted';
-  pushRender(mine); if (!mine) setTimeout(pushPopup, 1600);
+  let hm = window.__healMsg || ''; try { if (!hm) { hm = sessionStorage.getItem('os_heal') || ''; if (hm) { sessionStorage.removeItem('os_heal'); window.__healMsg = hm; } } } catch (e) {}
+  pushRender(mine, hm ? 'أُعيد ضبط خدمة الإشعارات على جهازك. اضغط «تفعيل» مرة أخرى. (' + hm.slice(0, 700) + ')' : undefined); if (!mine && !hm) setTimeout(pushPopup, 1600);
   if (mine) osGet().then(async OS => { const { data: sid } = await sb.rpc('muqraa_push_register', { p_username: pf.username, p_ua: navigator.userAgent }); if (sid) await OS.login(String(sid)); }).catch(() => {});
 }
 const withT = (p, ms, step) => Promise.race([Promise.resolve(p), new Promise((_, rj) => setTimeout(() => rj(new Error('انتهت المهلة عند: ' + (typeof step === 'function' ? step() : step))), ms))]);
+async function osHeal() { try { const rs = await navigator.serviceWorker.getRegistrations(), base = location.pathname.replace(/[^/]*$/, ''); await Promise.all(rs.filter(r => r.scope.endsWith(base + 'push/')).map(r => r.unregister())); } catch (e) {} }
 async function osDiag() {
   const o = [], base = location.pathname.replace(/[^/]*$/, '');
   try { const rs = await navigator.serviceWorker.getRegistrations(), r = rs.find(x => x.scope.endsWith(base + 'push/')); o.push('العامل: ' + (r ? (r.active ? 'نشط' : r.waiting ? 'منتظر' : r.installing ? 'يُثبَّت' : 'غير معروف') : 'غير مسجّل') + ' (' + rs.length + ')'); } catch (e) { o.push('العامل: خطأ'); }
   const t = async (n, u, m) => { const c = new AbortController(), id = setTimeout(() => c.abort(), 5000); try { const r = await fetch(u, { mode: m || 'cors', cache: 'no-store', signal: c.signal }); o.push(n + ': ' + (r.type === 'opaque' ? 'يصل' : r.status)); } catch (e) { o.push(n + ': ' + (e.name === 'AbortError' ? 'لا يستجيب' : 'محجوب')); } finally { clearTimeout(id); } };
   await Promise.all([t('ملف العامل', base + 'push/OneSignalSDKWorker.js'), t('عامل السحابة', 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js', 'no-cors'), t('الخادم', 'https://api.onesignal.com/', 'no-cors')]);
   await new Promise(r => { let d = 0; const f = v => { if (!d) { d = 1; o.push('التخزين: ' + v); r(); } }; try { const q = indexedDB.open('tahaod_probe'); q.onsuccess = () => { try { q.result.close(); indexedDB.deleteDatabase('tahaod_probe'); } catch (e) {} f('يعمل'); }; q.onerror = () => f('خطأ'); q.onblocked = () => f('محجوب'); setTimeout(() => f('لا يستجيب'), 4000); } catch (e) { f('غير متاح'); } });
-  const lg = (window.__osLog || []).slice(-4); if (lg.length) o.push('السجل: ' + lg.join(' ¦ '));
+  const lg = (window.__osLog || []).slice(-9); if (lg.length) o.push('السجل: ' + lg.join(' ¦ '));
   return o.join(' · ');
 }
 async function pushEnable() {
@@ -847,10 +849,10 @@ async function pushEnable() {
   try {
     st('جارٍ طلب الإذن…'); if ((await perm) !== 'granted') return pushRender(false, 'لم يُمنح الإذن، فلن تصلك التذكيرات.');
     st('جارٍ تسجيل حسابك…'); const { data: sid, error } = await withT(sb.rpc('muqraa_push_register', { p_username: pf.username, p_ua: navigator.userAgent }), 20000, 'تسجيل الحساب'); if (error) throw error;
-    st('جارٍ تحميل خدمة الإشعارات…'); const OS = await withT(osGet(), 25000, () => 'تحميل خدمة الإشعارات — ' + (window.__osStep || 'لم تبدأ'));
+    await osHeal(); st('جارٍ تحميل خدمة الإشعارات…'); const OS = await withT(osGet(), 25000, () => 'تحميل خدمة الإشعارات — ' + (window.__osStep || 'لم تبدأ'));
     st('جارٍ ربط جهازك…'); await withT(OS.login(String(sid)), 20000, 'ربط الجهاز'); await withT(OS.User.PushSubscription.optIn(), 30000, 'الاشتراك في الإشعارات');
     ls('push_on', pf.username); pushRender(true);
-  } catch (e) { osLoad = null; let m = String((e && (e.message || e.name)) || e).slice(0, 160); if (/انتهت المهلة/.test(m)) { st('جارٍ فحص السبب…'); try { m += ' | ' + await osDiag(); } catch (x) {} } pushRender(false, (/انتهت المهلة/.test(m) ? 'استغرق التفعيل أطول من المعتاد، أعد المحاولة. (' : 'تعذّر التفعيل، تأكد من اتصالك وحاول مرة أخرى. (') + m + ')'); }
+  } catch (e) { osLoad = null; let m = String((e && (e.message || e.name)) || e).slice(0, 160); if (/انتهت المهلة/.test(m)) { st('جارٍ فحص السبب…'); try { m += ' | ' + await osDiag(); } catch (x) {} try { if (!sessionStorage.getItem('os_heal')) { sessionStorage.setItem('os_heal', m); await osHeal(); location.reload(); return; } } catch (x) {} } pushRender(false, (/انتهت المهلة/.test(m) ? 'استغرق التفعيل أطول من المعتاد، أعد المحاولة. (' : 'تعذّر التفعيل، تأكد من اتصالك وحاول مرة أخرى. (') + m + ')'); }
   finally { window.__busy = 0; }
 }
 async function pushDisable() {
