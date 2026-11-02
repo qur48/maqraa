@@ -301,7 +301,7 @@ details.jr-d dt{color:var(--mu)}details.jr-d dd{margin:0;font-weight:500}
 .pwa-tip{position:relative}
 .pwa-tip p{margin:0}
 .pwa-tip .x{position:absolute;top:10px;inset-inline-end:14px;background:none;border:0;font-size:22px;line-height:1;color:var(--mu);cursor:pointer;font-family:inherit}
-.push-card .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}.push-card .btn.sec{background:transparent;color:var(--g);box-shadow:none;border:1.5px solid var(--g)}.pu-pop{padding:0 22px}.pu-pop .stp{text-align:right}.pu-pop .btn{width:100%}.pu-pop .btn.sec{background:transparent;color:var(--g);box-shadow:none;border:1.5px solid var(--g)}.pp-v{margin-top:14px;text-align:right;font-size:15px}.pp-v summary{cursor:pointer;color:var(--g);font-weight:700;padding:6px 0}.pp-v video{width:100%;border-radius:16px;margin-top:8px;background:#000}
+.push-card .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}.push-card .btn.sec{background:transparent;color:var(--g);box-shadow:none;border:1.5px solid var(--g)}.pu-pop{padding:0 22px}.pu-pop .stp{text-align:right}.pu-pop .btn{width:100%}.pu-pop .btn.sec{background:transparent;color:var(--g);box-shadow:none;border:1.5px solid var(--g)}.ip-pop .ipw{background:#f5eee6;border-radius:12px;padding:8px 12px;font-size:13px;line-height:1.7;margin-top:10px;text-align:right}.ip-pop .ipn{margin-top:12px;font-size:13px;color:var(--mu)}.pp-v{margin-top:14px;text-align:right;font-size:15px}.pp-v summary{cursor:pointer;color:var(--g);font-weight:700;padding:6px 0}.pp-v video{width:100%;border-radius:16px;margin-top:8px;background:#000}
 .sacts{display:flex;gap:6px;flex:none}.reg{display:flex;align-items:center;gap:12px;background:var(--goldb);border-radius:22px;padding:12px 14px;margin:2px 0 14px}.reg .ri{flex:none;width:44px;height:44px;border-radius:50%;background:var(--g);display:grid;place-items:center}.reg .ri svg{width:22px;height:22px;stroke:var(--gold2);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.reg.cl .ri{background:var(--bad)}.reg .btn{flex:none;white-space:nowrap;padding:0 16px;min-width:0;width:auto}.reg .rt{flex:1;line-height:1.5}.reg .rt b{display:block;font-size:15px}.reg .rt small{display:block;font-size:12.5px;color:var(--mu)}
 .sk{position:relative;display:flex;align-items:center;gap:8px;padding:5px 9px;border-radius:14px;background:linear-gradient(180deg,#fffaf0,var(--card));border:1.5px solid var(--gold2)}
 .sk .skf{flex:none;width:30px;height:30px;display:grid;place-items:center}.sk .skf .nq{height:20px}
@@ -723,7 +723,7 @@ async function journey() {
 
 /* ---- إضافة التطبيق للشاشة الرئيسية ---- */
 let deferredInstall = null;
-window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; const t = $('#pwa_tip'); if (t) pwaTip(); if ($('#pwa_panel')) pwaPanel(); });
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; const t = $('#pwa_tip'); if (t) pwaTip(); if ($('#pwa_panel')) pwaPanel(); if (document.querySelector('.ip-pop')) ipFill(); });
 window.addEventListener('appinstalled', () => { deferredInstall = null; if ($('#pwa_panel')) pwaPanel(); });
 const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (/macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
 const SHARE_ICO = '<span class="shr" aria-label="زر المشاركة"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M8 7l4-4 4 4M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/></svg></span>';
@@ -753,8 +753,41 @@ function pwaPanel() {
     : p('لتفتحه كالتطبيق: من شريط عنوان المتصفح اضغط أيقونة التثبيت، أو من القائمة اختر «تثبيت تعاهد».')) + '</div>';
   const g = box.querySelector('#pwa_go'); if (g) g.onclick = async () => { deferredInstall.prompt(); await deferredInstall.userChoice.catch(() => {}); deferredInstall = null; pwaPanel(); };
 }
+/* نافذة دعوة التثبيت: تظهر لمن يفتح الصفحة من المتصفح (لا من الشاشة الرئيسية) على آيفون أو أندرويد، أو حيث يتوفر زر التثبيت. تظهر في كل دخول وتُغلق للجلسة بـ«لاحقًا»؛ IP_GAP_H = عدد الساعات التي تُخفى فيها بعد الإغلاق (٠ = كل دخول). */
+const IP_GAP_H = 0;
+const ipWebview = () => /; wv\)|FBAN|FBAV|Instagram|Snapchat|Line\/|Twitter|MicroMessenger|Telegram|WhatsApp/i.test(navigator.userAgent) || (isIOS() && !/Safari\//.test(navigator.userAgent));
+function ipEligible() {
+  if (window.__ipDone || isStandalone() || !getPf()) return false;
+  if (!(isIOS() || /android/i.test(navigator.userAgent) || deferredInstall)) return false;
+  if (IP_GAP_H > 0) { const t = +ls('ip_at') || 0; if (Date.now() - t < IP_GAP_H * 3600000) return false; }
+  return true;
+}
+function ipFill() {
+  const o = document.querySelector('.ip-pop'); if (!o) return;
+  const ios = isIOS(), android = /android/i.test(navigator.userAgent), wv = ipWebview();
+  const lead = 'يفتح بلمسة واحدة كالتطبيق من شاشة جوالك، فلا تبحث عن الرابط كل مرة.' + (ios ? (pushSupport() === 'old' ? ' ملاحظة: تذكيرات المهام تحتاج نظام iOS ١٦٫٤ أو أحدث، فحدّث نظام جهازك إن أمكن.' : ' وهو شرط لتصلك تذكيرات المهام على الآيفون.') : '');
+  const steps = deferredInstall ? '' : ios ? iosSteps()
+    : android ? '<ol class="stp"><li><b>١</b><span>اضغط قائمة المتصفح <b style="display:inline;width:auto;height:auto;background:none;color:inherit;font-size:18px">⋮</b> أعلى الشاشة</span></li><li><b>٢</b><span>اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية»</span></li><li><b>٣</b><span>اضغط «تثبيت» أو «إضافة»</span></li></ol>'
+    : '<p class="note">من شريط عنوان المتصفح اضغط أيقونة التثبيت، أو من القائمة اختر «تثبيت تعاهد».</p>';
+  o.querySelector('.ip-b').innerHTML = `<p class="note">${lead}</p>` + (wv ? '<p class="ipw">تفتح الصفحة الآن من داخل تطبيق آخر. افتح الرابط في المتصفح نفسه (Safari أو Chrome) ثم ثبّته من هناك.</p>' : '') + steps +
+    (deferredInstall ? '<button class="btn" id="ip_go" type="button" style="margin-top:14px">تثبيت الآن</button>' : '') +
+    `<button class="btn sec" id="ip_later" type="button" style="margin-top:12px">${deferredInstall ? 'لاحقًا' : 'فهمت'}</button>`;
+  o.querySelector('#ip_later').onclick = ipClose;
+  const g = o.querySelector('#ip_go'); if (g) g.onclick = async () => { const d = deferredInstall; deferredInstall = null; try { d.prompt(); await d.userChoice; } catch (e) {} ipClose(); };
+}
+function ipClose() {
+  const o = document.querySelector('.ip-pop'), ov = o && o.closest('.ov'); if (ov) ov.remove();
+  if (IP_GAP_H > 0) ls('ip_at', String(Date.now()));
+  if (window.__puWant && pushSupport() === 'ok') setTimeout(pushPopup, 400);
+}
+function ipShow() {
+  if (!ipEligible() || window.__busy || document.querySelector('.pu-pop')) return;
+  window.__ipDone = 1;
+  overlay('<div class="pu-pop pwa-tip ip-pop"><h2 class="serif">ثبّت تعاهد على شاشتك</h2><div class="ip-b"></div></div>');
+  ipFill();
+}
 /* تحديث تلقائي: عند عودة الصفحة من الخلفية (أو كل ٥ دقائق وهي ظاهرة) نقارن رقم النسخة بنسخة الخادم ونعيد التحميل مرة إن اختلف ولم يكن الطالب يكتب */
-const BUILD_ID="2026-11-02o";
+const BUILD_ID="2026-11-02p";
 (function () {
   document.body.insertAdjacentHTML('beforeend', '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><radialGradient id="nqy" cx="104" cy="70" r="120" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff7b8"/><stop offset=".45" stop-color="#ffd84a"/><stop offset="1" stop-color="#f2a81d"/></radialGradient><radialGradient id="nqg" cx="104" cy="70" r="120" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#e3e7ea"/><stop offset=".45" stop-color="#c3c9cd"/><stop offset="1" stop-color="#a4acb1"/></radialGradient><linearGradient id="nqm" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8e969c"/><stop offset=".35" stop-color="#dfe4e8"/><stop offset=".7" stop-color="#b3bbc1"/><stop offset="1" stop-color="#7d868d"/></linearGradient><linearGradient id="nqmg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8e969c"/><stop offset=".35" stop-color="#c9ced2"/><stop offset=".7" stop-color="#aab1b6"/><stop offset="1" stop-color="#7d868d"/></linearGradient></defs></svg>');
   let busy = false;
@@ -814,7 +847,7 @@ function pushRender(on, msg) {
   const o = b.querySelector('#pu_off'); if (o) o.onclick = pushDisable;
 }
 function pushPopup() {
-  const pu = pushSupport(); if (pu === 'none' || pu === 'denied' || window.__puDone || document.querySelector('.pu-pop')) return;
+  const pu = pushSupport(); if (pu === 'none' || pu === 'denied' || window.__puDone || document.querySelector('.pu-pop') || ipEligible()) return;
   const body = pu === 'old' ? '<p class="note">إشعارات الموقع تحتاج نظام iOS ١٦٫٤ أو أحدث. حدّث نظام جهازك إن أمكن.</p>'
     : pu === 'install' ? '<p class="note">على الآيفون تعمل الإشعارات بعد تثبيت تعاهد على الشاشة الرئيسية، ثم افتحه من هناك واضغط «فعّل التذكيرات».</p>' + iosSteps()
     : '<ol class="stp"><li><b>١</b><span>اضغط «فعّل الآن»</span></li><li><b>٢</b><span>اختر «سماح» عند ظهور طلب الإذن</span></li></ol>';
@@ -831,7 +864,7 @@ async function pushInit() {
   if (!ok || !$('#push_box')) return;
   const mine = ls('push_on') === pf.username && pushSupport() === 'ok' && Notification.permission === 'granted';
   let hm = window.__healMsg || ''; try { if (!hm) { hm = sessionStorage.getItem('os_heal') || ''; if (hm) { sessionStorage.removeItem('os_heal'); window.__healMsg = hm; } } } catch (e) {}
-  pushRender(mine, hm ? 'أُعيد ضبط خدمة الإشعارات على جهازك. اضغط «تفعيل» مرة أخرى. (' + hm.slice(0, 700) + ')' : undefined); if (!mine && !hm) setTimeout(pushPopup, 1600);
+  pushRender(mine, hm ? 'أُعيد ضبط خدمة الإشعارات على جهازك. اضغط «تفعيل» مرة أخرى. (' + hm.slice(0, 700) + ')' : undefined); if (!mine && !hm) { window.__puWant = 1; setTimeout(pushPopup, 1600); }
   if (mine) osGet().then(async OS => { const { data: sid } = await sb.rpc('muqraa_push_register', { p_username: pf.username, p_ua: navigator.userAgent }); if (sid) await OS.login(String(sid)); }).catch(() => {});
 }
 const withT = (p, ms, step) => Promise.race([Promise.resolve(p), new Promise((_, rj) => setTimeout(() => rj(new Error('انتهت المهلة عند: ' + (typeof step === 'function' ? step() : step))), ms))]);
@@ -1007,7 +1040,7 @@ function student() {
   <div id="res"></div><div id="pwa_tip"></div><div id="push_box"></div><p class="vision">برنامج نوعي يُعنى برفع مستوى حفظ وإتقان طلاب الحلقات وتخريجهم حفاظًا متقنين.</p>`;
   const upd = () => { const n = filled(vals); $('#pc').textContent = n + ' من ' + FIELDS.length; $('#pb').style.width = (n / FIELDS.length * 100) + '%'; };
   app.querySelectorAll('.logo-h').forEach(secretTap);
-  pushInit();
+  pushInit(); setTimeout(ipShow, 1200);
   const save = () => ls('draft', JSON.stringify({ day, v: vals })), nums = x => LAT(x).match(/\d+/g) || [];
   ['reviewing', 'linking'].forEach(k => { if (vals[k + '_f'] === undefined) { const n = nums(vals[k]); vals[k + '_f'] = n[0] || ''; vals[k + '_t'] = n.length > 1 ? n[n.length - 1] : ''; } });
   ['rep', 'listening'].forEach(k => { vals[k] = String(cnum(vals[k])); });
