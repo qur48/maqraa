@@ -316,6 +316,8 @@ details.jr-d dt{color:var(--mu)}details.jr-d dd{margin:0;font-weight:500}
 svg.nq{display:inline-block;flex:none;overflow:visible;width:auto}svg.nq.on{filter:drop-shadow(0 0 2.5px rgba(240,183,59,.55))}
 @keyframes skg{0%,100%{box-shadow:0 0 0 0 rgba(240,183,59,.0)}50%{box-shadow:0 0 12px 2px rgba(240,183,59,.55)}}
 .skpop{margin-top:18vh;width:100%;max-width:420px;padding:14px}.skpop .sk{box-shadow:none}.skpop .skm{margin:10px 0 0;text-align:center;font-size:14px;color:var(--g2);cursor:pointer}
+.pn-l{margin:8px 0 2px;border:1px solid var(--bd);border-radius:14px;background:var(--card2);padding:0 12px}.pn-l summary{cursor:pointer;padding:9px 0;font-size:14px;font-weight:700;color:var(--g2);list-style:none;display:flex;justify-content:space-between;align-items:center}.pn-l summary::-webkit-details-marker{display:none}.pn-l summary::after{content:"";width:8px;height:8px;border:solid var(--mu);border-width:0 2px 2px 0;transform:rotate(45deg);transition:transform .2s;margin-inline-start:8px}.pn-l[open]>summary::after{transform:rotate(-135deg)}
+.pn-l .hg{margin:8px 0 2px;font-size:12.5px;color:var(--mu);font-weight:700}.pn-l ul{list-style:none;margin:0 0 6px;padding:0}.pn-l li{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px dashed var(--bd);font-size:13.5px}.pn-l li small{color:var(--mu);font-size:11.5px;white-space:nowrap}.pn-l details.nn{margin:6px 0 10px}.pn-l details.nn summary{font-weight:400;color:var(--mu);font-size:13px}
 .pn-sw{display:flex;align-items:center;gap:8px;margin-top:12px}.pn-sw input{width:auto;margin:0;padding:0;border:0;background:none;box-shadow:none;accent-color:var(--g)}
 .pwa-tip .stp{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:10px}
 .pwa-tip .stp li{display:flex;align-items:center;gap:10px;font-size:14px;line-height:1.7}
@@ -752,7 +754,7 @@ function pwaPanel() {
   const g = box.querySelector('#pwa_go'); if (g) g.onclick = async () => { deferredInstall.prompt(); await deferredInstall.userChoice.catch(() => {}); deferredInstall = null; pwaPanel(); };
 }
 /* تحديث تلقائي: عند عودة الصفحة من الخلفية (أو كل ٥ دقائق وهي ظاهرة) نقارن رقم النسخة بنسخة الخادم ونعيد التحميل مرة إن اختلف ولم يكن الطالب يكتب */
-const BUILD_ID="2026-11-02m";
+const BUILD_ID="2026-11-02n";
 (function () {
   document.body.insertAdjacentHTML('beforeend', '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><radialGradient id="nqy" cx="104" cy="70" r="120" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff7b8"/><stop offset=".45" stop-color="#ffd84a"/><stop offset="1" stop-color="#f2a81d"/></radialGradient><radialGradient id="nqg" cx="104" cy="70" r="120" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#e3e7ea"/><stop offset=".45" stop-color="#c3c9cd"/><stop offset="1" stop-color="#a4acb1"/></radialGradient><linearGradient id="nqm" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8e969c"/><stop offset=".35" stop-color="#dfe4e8"/><stop offset=".7" stop-color="#b3bbc1"/><stop offset="1" stop-color="#7d868d"/></linearGradient><linearGradient id="nqmg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8e969c"/><stop offset=".35" stop-color="#c9ced2"/><stop offset=".7" stop-color="#aab1b6"/><stop offset="1" stop-color="#7d868d"/></linearGradient></defs></svg>');
   let busy = false;
@@ -872,8 +874,17 @@ async function pushInfo() {
   const bh = Object.entries(data.by_halaqa || {}).map(([h, c]) => h + ': ' + AR(c)).join(' · ');
   $('#pn_i').textContent = 'المشتركون الآن: ' + AR(data.count) + (bh ? ' (' + bh + ')' : '') + '. الزر ' + (data.open ? 'ظاهر لكل الطلاب.' : 'مخفي عن الطلاب' + (PN.users ? ' عدا حسابات التجربة.' : '.'));
 }
+async function pushList() {
+  const box = $('#pn_lb'); if (!box) return; box.textContent = 'جارٍ التحميل…';
+  const { data, error } = await sb.rpc('muqraa_admin_push_list', { p_secret: ls('tk') }); if (error || !data) { box.textContent = 'تعذّر تحميل القائمة.'; return; }
+  const grp = (arr, f) => { const g = {}; arr.forEach(x => (g[x.h] = g[x.h] || []).push(x)); return Object.entries(g).map(([h, xs]) => `<div class="hg">${esc(h)} · ${AR(xs.length)}</div><ul>${xs.map(f).join('')}</ul>`).join(''); };
+  const dt = t => { try { return new Intl.DateTimeFormat('ar-SA-u-ca-gregory-nu-arab', { timeZone: 'Asia/Riyadh', day: 'numeric', month: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(t)); } catch (e) { return ''; } };
+  const subs = data.subs || [], none = data.none || [];
+  box.innerHTML = `<div class="hg" style="color:var(--g2)">فعّلوا التذكيرات: ${AR(subs.length)}</div>` + (subs.length ? grp(subs, x => `<li><span>${esc(x.n)}</span><small>${esc(dt(x.t))}</small></li>`) : '<p class="note" style="margin:4px 0">لم يفعّل أحد بعد.</p>')
+    + `<details class="nn"><summary>لم يفعّلوا بعد: ${AR(none.length)}</summary>${grp(none, x => `<li><span>${esc(x.n)}</span></li>`)}</details>`;
+}
 function pushAdminInit() {
-  PN.init = 1; pushInfo();
+  PN.init = 1; pushInfo(); $('#pn_l').ontoggle = e => { if (e.target.open) pushList(); };
   const seg = $('#pn_a'); seg.querySelector('[data-k="pending"]').classList.add('on');
   seg.onclick = e => { const b = e.target.closest('button'); if (!b) return; PN.a = b.dataset.k; seg.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); $('#pn_uw').hidden = PN.a !== 'user'; };
   $('#pn_auto').onchange = async e => { const on = e.target.checked; const { error } = await sb.rpc('muqraa_admin_push_auto', { p_secret: ls('tk'), p_on: on }); if (error) { e.target.checked = !on; toast('تعذّر الحفظ.'); } else toast(on ? 'فُعّل التذكير التلقائي' : 'أُوقف التذكير التلقائي'); };
@@ -1120,6 +1131,7 @@ async function teacher() {
   <section class="pane" data-p="set" hidden>
   <div id="pwa_panel"></div>
   <div class="card push-card" id="pnc" hidden><h2 class="pill">تذكيرات الإشعارات</h2><p class="note" id="pn_i" style="margin-top:0"></p>
+  <details class="pn-l" id="pn_l"><summary>أسماء المشتركين</summary><div id="pn_lb" class="note">جارٍ التحميل…</div></details>
   <label class="pn-sw"><input type="checkbox" id="pn_open"> إظهار زر التذكيرات لكل الطلاب</label>
   <label class="pn-sw"><input type="checkbox" id="pn_auto"> تذكير تلقائي لمن لم يُتمّ مهامه: ٧:٣٠ مساءً و١٠:٠٠ مساءً</label>
   <label>المستلمون</label><div class="seg" id="pn_a"><button data-k="pending" type="button">من لم يُتمّ اليوم</button><button data-k="user" type="button">مستخدم محدد</button><button data-k="all" type="button">الجميع</button></div>
