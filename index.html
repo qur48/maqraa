@@ -752,7 +752,7 @@ function pwaPanel() {
   const g = box.querySelector('#pwa_go'); if (g) g.onclick = async () => { deferredInstall.prompt(); await deferredInstall.userChoice.catch(() => {}); deferredInstall = null; pwaPanel(); };
 }
 /* تحديث تلقائي: عند عودة الصفحة من الخلفية (أو كل ٥ دقائق وهي ظاهرة) نقارن رقم النسخة بنسخة الخادم ونعيد التحميل مرة إن اختلف ولم يكن الطالب يكتب */
-const BUILD_ID="2026-11-02k";
+const BUILD_ID="2026-11-02l";
 (function () {
   document.body.insertAdjacentHTML('beforeend', '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><radialGradient id="nqy" cx="104" cy="70" r="120" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff7b8"/><stop offset=".45" stop-color="#ffd84a"/><stop offset="1" stop-color="#f2a81d"/></radialGradient><radialGradient id="nqg" cx="104" cy="70" r="120" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#e3e7ea"/><stop offset=".45" stop-color="#c3c9cd"/><stop offset="1" stop-color="#a4acb1"/></radialGradient><linearGradient id="nqm" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8e969c"/><stop offset=".35" stop-color="#dfe4e8"/><stop offset=".7" stop-color="#b3bbc1"/><stop offset="1" stop-color="#7d868d"/></linearGradient><linearGradient id="nqmg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8e969c"/><stop offset=".35" stop-color="#c9ced2"/><stop offset=".7" stop-color="#aab1b6"/><stop offset="1" stop-color="#7d868d"/></linearGradient></defs></svg>');
   let busy = false;
@@ -790,7 +790,8 @@ function osGet() {
   osLoad = new Promise((res, rej) => {
     const base = location.pathname.replace(/[^/]*$/, ''); window.__osStep = 'تحميل ملف الخدمة من الشبكة';
     window.OneSignalDeferred = window.OneSignalDeferred || [];
-    window.OneSignalDeferred.push(async OS => { window.__osStep = 'تهيئة الخدمة على الجهاز'; try { await OS.init({ appId: OS_APP, serviceWorkerOverrideForTypical: true, serviceWorkerPath: base.slice(1) + 'push/OneSignalSDKWorker.js', serviceWorkerParam: { scope: base + 'push/' } }); window.__osStep = 'جاهزة'; res(OS); } catch (e) { rej(e); } });
+    if (!window.__osLog) { window.__osLog = []; ['log', 'info', 'warn', 'error', 'debug'].forEach(k => { const o = console[k]; console[k] = function () { try { const t = [].slice.call(arguments).map(x => typeof x === 'string' ? x : (x && x.message) || '').join(' '); if (/onesignal/i.test(t)) { window.__osLog.push(t.replace(/\s+/g, ' ').slice(0, 70)); if (window.__osLog.length > 40) window.__osLog.shift(); } } catch (e) {} return o.apply(console, arguments); }; }); }
+    window.OneSignalDeferred.push(async OS => { window.__osStep = 'تهيئة الخدمة على الجهاز'; try { OS.Debug.setLogLevel('trace'); } catch (e) {} try { await OS.init({ appId: OS_APP, serviceWorkerOverrideForTypical: true, serviceWorkerPath: base.slice(1) + 'push/OneSignalSDKWorker.js', serviceWorkerParam: { scope: base + 'push/' } }); window.__osStep = 'جاهزة'; res(OS); } catch (e) { rej(e); } });
     const sc = document.createElement('script'); sc.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js'; sc.defer = true; sc.onerror = () => rej(new Error('تعذّر تحميل ملف الخدمة')); document.head.appendChild(sc);
   });
   osLoad.catch(() => { osLoad = null; });
@@ -836,6 +837,8 @@ async function osDiag() {
   try { const rs = await navigator.serviceWorker.getRegistrations(), r = rs.find(x => x.scope.endsWith(base + 'push/')); o.push('العامل: ' + (r ? (r.active ? 'نشط' : r.waiting ? 'منتظر' : r.installing ? 'يُثبَّت' : 'غير معروف') : 'غير مسجّل') + ' (' + rs.length + ')'); } catch (e) { o.push('العامل: خطأ'); }
   const t = async (n, u, m) => { const c = new AbortController(), id = setTimeout(() => c.abort(), 5000); try { const r = await fetch(u, { mode: m || 'cors', cache: 'no-store', signal: c.signal }); o.push(n + ': ' + (r.type === 'opaque' ? 'يصل' : r.status)); } catch (e) { o.push(n + ': ' + (e.name === 'AbortError' ? 'لا يستجيب' : 'محجوب')); } finally { clearTimeout(id); } };
   await Promise.all([t('ملف العامل', base + 'push/OneSignalSDKWorker.js'), t('عامل السحابة', 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js', 'no-cors'), t('الخادم', 'https://api.onesignal.com/', 'no-cors')]);
+  await new Promise(r => { let d = 0; const f = v => { if (!d) { d = 1; o.push('التخزين: ' + v); r(); } }; try { const q = indexedDB.open('tahaod_probe'); q.onsuccess = () => { try { q.result.close(); indexedDB.deleteDatabase('tahaod_probe'); } catch (e) {} f('يعمل'); }; q.onerror = () => f('خطأ'); q.onblocked = () => f('محجوب'); setTimeout(() => f('لا يستجيب'), 4000); } catch (e) { f('غير متاح'); } });
+  const lg = (window.__osLog || []).slice(-4); if (lg.length) o.push('السجل: ' + lg.join(' ¦ '));
   return o.join(' · ');
 }
 async function pushEnable() {
