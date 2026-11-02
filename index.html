@@ -788,10 +788,10 @@ let osLoad = null;
 function osGet() {
   if (osLoad) return osLoad;
   osLoad = new Promise((res, rej) => {
-    const base = location.pathname.replace(/[^/]*$/, '');
+    const base = location.pathname.replace(/[^/]*$/, ''); window.__osStep = 'تحميل ملف الخدمة من الشبكة';
     window.OneSignalDeferred = window.OneSignalDeferred || [];
-    window.OneSignalDeferred.push(async OS => { try { await OS.init({ appId: OS_APP, serviceWorkerOverrideForTypical: true, serviceWorkerPath: base.slice(1) + 'push/OneSignalSDKWorker.js', serviceWorkerParam: { scope: base + 'push/' } }); res(OS); } catch (e) { rej(e); } });
-    const sc = document.createElement('script'); sc.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js'; sc.defer = true; sc.onerror = () => rej(new Error('load')); document.head.appendChild(sc);
+    window.OneSignalDeferred.push(async OS => { window.__osStep = 'تهيئة الخدمة على الجهاز'; try { await OS.init({ appId: OS_APP, serviceWorkerOverrideForTypical: true, serviceWorkerPath: base.slice(1) + 'push/OneSignalSDKWorker.js', serviceWorkerParam: { scope: base + 'push/' } }); window.__osStep = 'جاهزة'; res(OS); } catch (e) { rej(e); } });
+    const sc = document.createElement('script'); sc.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js'; sc.defer = true; sc.onerror = () => rej(new Error('تعذّر تحميل ملف الخدمة')); document.head.appendChild(sc);
   });
   osLoad.catch(() => { osLoad = null; });
   return osLoad;
@@ -830,17 +830,17 @@ async function pushInit() {
   pushRender(mine); if (!mine) setTimeout(pushPopup, 1600);
   if (mine) osGet().then(async OS => { const { data: sid } = await sb.rpc('muqraa_push_register', { p_username: pf.username, p_ua: navigator.userAgent }); if (sid) await OS.login(String(sid)); }).catch(() => {});
 }
-const withT = (p, ms, step) => Promise.race([Promise.resolve(p), new Promise((_, rj) => setTimeout(() => rj(new Error('انتهت المهلة عند: ' + step)), ms))]);
+const withT = (p, ms, step) => Promise.race([Promise.resolve(p), new Promise((_, rj) => setTimeout(() => rj(new Error('انتهت المهلة عند: ' + (typeof step === 'function' ? step() : step))), ms))]);
 async function pushEnable() {
   const pf = getPf(), btn = $('#pu_on'); if (!pf || !btn) return; btn.disabled = true; window.__busy = 1; const st = t => { if (btn.isConnected) btn.textContent = t; };
   const perm = Promise.resolve(Notification.requestPermission()).then(r => r || Notification.permission); /* تُستدعى مباشرةً من الضغطة */
   try {
     st('جارٍ طلب الإذن…'); if ((await perm) !== 'granted') return pushRender(false, 'لم يُمنح الإذن، فلن تصلك التذكيرات.');
     st('جارٍ تسجيل حسابك…'); const { data: sid, error } = await withT(sb.rpc('muqraa_push_register', { p_username: pf.username, p_ua: navigator.userAgent }), 20000, 'تسجيل الحساب'); if (error) throw error;
-    st('جارٍ تحميل خدمة الإشعارات…'); const OS = await withT(osGet(), 25000, 'تحميل خدمة الإشعارات');
+    st('جارٍ تحميل خدمة الإشعارات…'); const OS = await withT(osGet(), 25000, () => 'تحميل خدمة الإشعارات — ' + (window.__osStep || 'لم تبدأ'));
     st('جارٍ ربط جهازك…'); await withT(OS.login(String(sid)), 20000, 'ربط الجهاز'); await withT(OS.User.PushSubscription.optIn(), 30000, 'الاشتراك في الإشعارات');
     ls('push_on', pf.username); pushRender(true);
-  } catch (e) { const m = String((e && (e.message || e.name)) || e).slice(0, 140); pushRender(false, (/انتهت المهلة/.test(m) ? 'استغرق التفعيل أطول من المعتاد، أعد المحاولة. (' : 'تعذّر التفعيل، تأكد من اتصالك وحاول مرة أخرى. (') + m + ')'); }
+  } catch (e) { osLoad = null; const m = String((e && (e.message || e.name)) || e).slice(0, 160); pushRender(false, (/انتهت المهلة/.test(m) ? 'استغرق التفعيل أطول من المعتاد، أعد المحاولة. (' : 'تعذّر التفعيل، تأكد من اتصالك وحاول مرة أخرى. (') + m + ')'); }
   finally { window.__busy = 0; }
 }
 async function pushDisable() {
